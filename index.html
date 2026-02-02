@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2024년 3월 고1 모의고사 단어 시험</title>
+<style>
+body{
+  margin:0;
+  background:#0b1220;
+  color:#fff;
+  font-family:system-ui, -apple-system, sans-serif;
+}
+#wrap{
+  max-width:480px;
+  margin:0 auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+header{
+  padding:14px;
+  background:#111a2b;
+}
+#english{
+  font-size:22px;
+  font-weight:800;
+}
+#progress{
+  font-size:13px;
+  opacity:.8;
+}
+#game{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+  background:#0f172a;
+}
+.floor{
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:60px;
+  background:rgba(255,80,80,.25);
+  text-align:center;
+  line-height:60px;
+  font-size:13px;
+}
+.choice{
+  position:absolute;
+  left:10px; right:10px;
+  height:56px;
+  background:#1e293b;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
+}
+.choice.good{background:#065f46;}
+.choice.bad{background:#7f1d1d;}
+#overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.card{
+  background:#111a2b;
+  padding:20px;
+  border-radius:18px;
+  width:90%;
+  text-align:center;
+}
+button{
+  width:100%;
+  margin-top:12px;
+  padding:12px;
+  font-size:15px;
+  font-weight:800;
+  border-radius:12px;
+  border:none;
+  background:#38bdf8;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div id="wrap">
+<header>
+  <div id="english">단어 시험</div>
+  <div id="progress"></div>
+</header>
+
+<div id="game">
+  <div class="floor">바닥 도달 = 즉시 불합격</div>
+</div>
+</div>
+
+<div id="overlay">
+  <div class="card">
+    <h2>단어 시험 시작</h2>
+    <p>모든 단어를 반드시 통과해야 합격입니다.</p>
+    <button onclick="start()">시험 시작</button>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+["psychologist","심리학자"],["study","연구하다, 연구"],["individual","개인"],
+["severe","심각한"],["mental illness","정신 질환"],["experience","경험하다, 경험"],
+["weekly","매주"],["group","그룹, 집단"],["therapy","치료"],
+["sing","노래하다"],["compose","작곡하다"],["original","독창적인"],
+["result","결과"],["improve","향상시키다"],["quality","질"],
+["participate","참여하다"],["session","회기, 기간"],["benefit","이익, 혜택"],
+["focus","집중하다"],["review","검토하다"],["efficacy","효능, 효과"],
+["treatment","치료"],["finding","발견, 연구 결과"],["choir","합창단"],
+["wellbeing","행복, 건강"],["provide","제공하다"],["enjoyment","즐거움"],
+["develop","발전시키다"],["belonging","소속감"],["enhance","향상시키다"],
+["confidence","자신감"],
+
+["sport","스포츠"],["realize","깨닫다"],["difficulty","어려움"],
+["impossibility","불가능"],["participate","참여하다"],["environment","환경"],
+["success","성공"],["play","놀다, 경기하다"],["field","운동장, 경기장"],
+["court","코트"],["arena","경기장"],["equipment","장비"],
+["handle","다루다"],["compete","경쟁하다"],["adaptation","조정, 적응"],
+["example","예시"],["baseball","야구"],["football","풋볼"],
+["soccer","축구"],["ball","공"],["junior","유소년, 어린이"],
+["team","팀"],["structure","구조"],["shorter","더 짧은"],
+["progressive","점진적인"],["relate","관련되다"],
+
+["horse","말"],["available","이용 가능한"],["empire","제국"],
+["excel","뛰어나다"],["deliver","전달하다"],["message","메시지"],
+["messenger","전령"],["station","배치하다"],["order","명령"],
+["report","보고"],["land","땅, 영토"],["chasquis","차스키"],
+["live","살다"],["hut","오두막"],["place","배치하다"],
+["mile","마일"],["young","젊은"],["runner","달리는 사람"],
+["watch","지켜보다"],["direction","방향"],["catch sight","발견하다"],
+["hurry","서두르다"],["meet","만나다"],["build","짓다"],
+["high ground","높은 지대"],["call out","외치다"],
+["repeat","반복하다"],["relay","전달하다"],["condition","조건, 상태"],
+
+["tongue","혀"],["map","지도"],["separate","분리하다"],
+["area","영역"],["register","등록하다"],["sweetness","단맛"],
+["sourness","신맛"],["bitterness","쓴맛"],["research","연구"],
+["demonstrate","증명하다"],["explanation","설명"],
+["taste","맛, 맛보다"],["wrong","틀린"],["misinterpret","오해하다"],
+["mistranslate","오역하다"],["conduct","수행하다"],
+["century","세기"],["leading","선도적인"],["believe","믿다"],
+["taste bud","미뢰"],["group","그룹"],["perceive","인식하다"],
+["intensity","강도"],["mechanism","기제"],["register","인식하다"],
+
+["animal","동물"],["alike","비슷한"],["display","보여주다"],
+["feature","특징"],["exactly","정확히"],["respond","반응하다"],
+["healing","치유"],["session","세션"],["environmental","환경적인"],
+["factor","요인"],["determine","결정하다"],["treatment","치료"],
+["rescue","구조하다"],["domestic","가정의"],["illness","질병"],
+["react","반응하다"],["emotional","감정적인"],["confusion","혼란"],
+["explore","탐구하다"],["adjust","조정하다"],["suit","맞추다"],
+["specific","특정한"],["learning","학습"],["process","과정"]
+];
+
+let idx=0, speed=120, timer, choices=[];
+const game=document.getElementById("game");
+
+function start(){
+  document.getElementById("overlay").style.display="none";
+  next();
+}
+
+function next(){
+  if(idx>=WORDS.length){
+    alert("🎉 모든 단어 통과! 합격입니다.");
+    location.reload();
+    return;
+  }
+  document.getElementById("english").textContent=WORDS[idx][0];
+  document.getElementById("progress").textContent=(idx+1)+" / "+WORDS.length;
+  spawn();
+}
+
+function spawn(){
+  game.querySelectorAll(".choice").forEach(e=>e.remove());
+  choices=[];
+  const correct=WORDS[idx][1];
+  const pool=WORDS.map(w=>w[1]).filter(v=>v!==correct);
+  pool.sort(()=>Math.random()-.5);
+  const options=[correct,...pool.slice(0,3)].sort(()=>Math.random()-.5);
+
+  options.forEach((txt,i)=>{
+    const d=document.createElement("div");
+    d.className="choice";
+    d.textContent=txt;
+    d.y=-100-(i*80);
+    d.onclick=()=>{
+      if(txt===correct){
+        idx++; speed+=3;
+        next();
+      }else fail();
+    };
+    game.appendChild(d);
+    choices.push(d);
+  });
+  move();
+}
+
+function move(){
+  clearInterval(timer);
+  timer=setInterval(()=>{
+    choices.forEach(d=>{
+      d.y+=2;
+      d.style.top=d.y+"px";
+      if(d.y>game.clientHeight-120) fail();
+    });
+  },16);
+}
+
+function fail(){
+  clearInterval(timer);
+  alert("❌ 불합격 (바닥 도달 또는 오답)");
+  location.reload();
+}
+</script>
+</body>
+</html>
