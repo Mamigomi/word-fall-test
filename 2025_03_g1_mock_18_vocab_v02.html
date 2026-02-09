@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>2025년 3월 고1 모의고사 23~30번 어휘 단어 시험</title>
+<title>2025년 3월 고1 모의고사 18번 어휘 단어 시험</title>
 <style>
   body{
     margin:0;
@@ -157,160 +157,37 @@
    ✅ 단어 목록(내용만 바꾸면 됨)
    ========================= */
 const words = [
-  { en: "wealth", ko: "풍부함" },
-  { en: "evidence", ko: "증거" },
-  { en: "parents", ko: "부모들" },
-  { en: "teachers", ko: "교사들" },
-  { en: "supervisors", ko: "감독들" },
-  { en: "coaches", ko: "코치들" },
-  { en: "perceived", ko: "인식된" },
-  { en: "involved", ko: "참여하는" },
-  { en: "caring", ko: "배려하는" },
-  { en: "happier", ko: "더 행복한" },
-  { en: "motivated", ko: "동기 부여된" },
-  { en: "power", ko: "권력" },
-  { en: "valued", ko: "가치 있는" },
-  { en: "respected", ko: "존경받는" },
-  { en: "peers", ko: "또래" },
-  { en: "coworkers", ko: "동료들" },
-  { en: "relatedness", ko: "관계성" },
-  { en: "internalization", ko: "내면화" },
-  { en: "fueled", ko: "촉진된" },
-  { en: "support", ko: "지원" },
-  { en: "autonomy", ko: "자율성" },
-  { en: "competence", ko: "유능함" },
-  { en: "motivate", ko: "동기를 부여하다" },
-  { en: "relationship", ko: "관계" },
-  { en: "crucial", ko: "중요한" },
-  { en: "basis", ko: "기초" },
-  { en: "connectedness", ko: "연결감" },
-  { en: "longterm", ko: "장기적인" },
-  { en: "persistence", ko: "지속" },
-  { en: "exercise", ko: "운동" },
-  { en: "friend", ko: "친구" },
-  { en: "difficult", ko: "어려운" },
-  { en: "decision", ko: "결정" },
-  { en: "support for others", ko: "다른 사람에 대한 지원" },
-  { en: "challenge", ko: "도전" },
-
-  { en: "brainscanning", ko: "뇌 스캔" },
-  { en: "techniques", ko: "기법" },
-  { en: "fMRI", ko: "fMRI (기능적 자기공명영상)" },
-  { en: "revealed", ko: "밝혀진" },
-  { en: "reading aloud", ko: "소리 내어 읽기" },
-  { en: "lights up", ko: "밝히다" },
-  { en: "areas", ko: "영역" },
-  { en: "associated", ko: "관련된" },
-  { en: "pronunciation", ko: "발음" },
-  { en: "hearing", ko: "듣기" },
-  { en: "sound", ko: "소리" },
-  { en: "spoken response", ko: "말로 된 반응" },
-  { en: "strengthens", ko: "강화하다" },
-  { en: "connective structures", ko: "연결 구조" },
-  { en: "brain cells", ko: "뇌 세포" },
-  { en: "brainpower", ko: "두뇌력" },
-  { en: "improvement", ko: "향상" },
-  { en: "concentration", ko: "집중" },
-  { en: "public speaking", ko: "대중 연설" },
-  { en: "forces", ko: "강요하다" },
-  { en: "each and every", ko: "모든" },
-  { en: "reading quickly", ko: "빠르게 읽기" },
-  { en: "reading in silence", ko: "조용히 읽기" },
-  { en: "children", ko: "어린이들" },
-  { en: "encouraged", ko: "격려된" },
-  { en: "wired for learning", ko: "학습을 위한 연결됨" },
-  { en: "connections", ko: "연결" },
-  { en: "positive stimulation", ko: "긍정적 자극" },
-  { en: "singing", ko: "노래" },
-  { en: "touching", ko: "만지기" },
-  { en: "stimulation", ko: "자극" },
-
-  { en: "routine", ko: "루틴, 일상 절차" },
-  { en: "enable", ko: "가능하게 하다" },
-  { en: "athlete", ko: "선수" },
-  { en: "evaluate", ko: "평가하다" },
-  { en: "competition", ko: "경쟁" },
-  { en: "condition", ko: "조건" },
-  { en: "example", ko: "예" },
-  { en: "bounce", ko: "튕기다" },
-  { en: "volleyball", ko: "배구" },
-  { en: "service", ko: "서브, 서비스" },
-  { en: "supply", ko: "제공하다" },
-  { en: "server", ko: "서브하는 사람" },
-  { en: "information", ko: "정보" },
-  { en: "ball", ko: "공" },
-  { en: "floor", ko: "바닥" },
-  { en: "state", ko: "상태" },
-  { en: "muscle", ko: "근육" },
-  { en: "use", ko: "사용하다" },
-  { en: "prepare", ko: "준비하다" },
-  { en: "properly", ko: "적절하게" },
-  { en: "adjust", ko: "조정하다" },
-  { en: "fine-tune", ko: "미세 조정하다" },
-  { en: "preparation", ko: "준비 과정" },
-  { en: "evaluation", ko: "평가" },
-  { en: "pursuit", ko: "추구" },
-  { en: "particular", ko: "특정한" },
-  { en: "competitive", ko: "경쟁의" },
-  { en: "goal", ko: "목표" },
-  { en: "adaptation", ko: "적응" },
-  { en: "involve", ko: "포함하다" },
-  { en: "adjustment", ko: "조정" },
-  { en: "rival", ko: "경쟁자" },
-  { en: "situation", ko: "상황" },
-  { en: "internal", ko: "내부의" },
-  { en: "influence", ko: "영향" },
-  { en: "affect", ko: "영향을 미치다" },
-  { en: "performance", ko: "성과, 수행" },
-  { en: "race-car engine", ko: "경주용 자동차 엔진" },
-  { en: "track", ko: "트랙, 경기장" },
-  { en: "air temperature", ko: "기온" },
-  { en: "weather", ko: "날씨" },
-  { en: "component", ko: "구성 요소" },
-  { en: "achieve", ko: "이루다" },
-  { en: "proper", ko: "적절한" },
-
-  { en: "promotion", ko: "프로모션, 홍보" },
-  { en: "deal with", ko: "다루다" },
-  { en: "consumer", ko: "소비자" },
-  { en: "psychology", ko: "심리" },
-  { en: "force", ko: "강요하다" },
-  { en: "person", ko: "사람" },
-  { en: "think", ko: "생각하다" },
-  { en: "way", ko: "방식" },
-  { en: "clever", ko: "영리한" },
-  { en: "marketer", ko: "마케터" },
-  { en: "provide", ko: "제공하다" },
-  { en: "information", ko: "정보" },
-  { en: "clear", ko: "명확한" },
-  { en: "honest", ko: "정직한" },
-  { en: "simple", ko: "단순한" },
-  { en: "fashion", ko: "방식" },
-  { en: "possibility", ko: "가능성" },
-  { en: "increase", ko: "증가하다" },
-  { en: "sale", ko: "판매" },
-  { en: "fool", ko: "속이다" },
-  { en: "purchase", ko: "구매하다" },
-  { en: "effect", ko: "효과, 영향" },
-  { en: "want", ko: "원하다" },
-  { en: "need", ko: "필요로 하다" },
-  { en: "damage", ko: "피해" },
-  { en: "relate", ko: "이야기하다, 전달하다" },
-  { en: "experience", ko: "경험" },
-  { en: "identify", ko: "식별하다" },
-  { en: "appreciate", ko: "감사하다" },
-  { en: "good", ko: "상품" },
-  { en: "service", ko: "서비스" },
-  { en: "value", ko: "가치" },
-  { en: "consumer", ko: "소비자" },
-  { en: "uninterested", ko: "관심 없는" },
-  { en: "reach", ko: "도달하다" }
+  { en: "participating", ko: "참여하는" },
+  { en: "chosen", ko: "선택된" },
+  { en: "looking forward", ko: "기대하다" },
+  { en: "introducing", ko: "소개하는" },
+  { en: "unique", ko: "독특한" },
+  { en: "handmade", ko: "수제의" },
+  { en: "baskets", ko: "바구니" },
+  { en: "organizing", ko: "조직하는" },
+  { en: "exhibition plan", ko: "전시 계획" },
+  { en: "happy", ko: "기쁜" },
+  { en: "inform", ko: "알리다" },
+  { en: "assigned", ko: "배정된" },
+  { en: "table", ko: "테이블" },
+  { en: "visitors", ko: "방문객들" },
+  { en: "easily", ko: "쉽게" },
+  { en: "located", ko: "위치한" },
+  { en: "entrance", ko: "입구" },
+  { en: "special", ko: "특별한" },
+  { en: "requirements", ko: "요구 사항" },
+  { en: "further", ko: "추가적인" },
+  { en: "assistance", ko: "도움" },
+  { en: "feel free", ko: "자유롭게 하다" },
+  { en: "contact", ko: "연락하다" },
+  { en: "in advance", ko: "미리" },
+  { en: "Sincerely", ko: "진심으로" }
 ];
 
 /* =========================
    게임 설정
    ========================= */
-const PASS_MESSAGE = "2025년 3월 고1 모의고사 23~30번 어휘 단어테스트 통과!";
+const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 18번 어휘 정복!!";
 const baseSpeed = 100;          // ✅ 전체 문항 동일 + 조금 더 느리게
 const speedIncreasePer5 = 0;    // ✅ 속도 증가 제거(사용 안 함)
 const floorHeight = 60;
@@ -389,7 +266,6 @@ function startGame(){
 
 function nextWord(){
   if(idx >= deck.length){
-    // ✅ 모두 통과 시 문구 출력
     stopLoop();
     clearChoices();
     showOverlay(
@@ -401,7 +277,6 @@ function nextWord(){
     return;
   }
 
-  // ✅ 속도 고정 (모든 단어 동일)
   speed = baseSpeed;
 
   const w = deck[idx];
@@ -442,9 +317,7 @@ function pick(el){
    선택지 생성/이동
    ========================= */
 function clearChoices(){
-  for(const el of choices){
-    el.remove();
-  }
+  for(const el of choices) el.remove();
   choices = [];
 }
 
@@ -452,8 +325,6 @@ function spawnChoices(word){
   clearChoices();
 
   const correct = word.ko;
-
-  // ✅ 오답풀: "중복 뜻"이 있을 수 있어 Set으로 유니크 처리
   const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
 
   const wrongs = shuffle(pool).slice(0, 3);
@@ -469,7 +340,6 @@ function spawnChoices(word){
     el.dataset.correct = (txt === correct) ? "1" : "0";
     el._y = startYs[i];
 
-    // 클릭/터치
     el.addEventListener("click", () => pick(el));
     el.addEventListener("touchstart", (e) => {
       e.preventDefault();
@@ -532,7 +402,6 @@ restartBtn.addEventListener("click", () => {
   );
 });
 
-/* 초기 화면 */
 showOverlay(
   "단어 시험 시작",
   `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
