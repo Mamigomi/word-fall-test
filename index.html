@@ -318,11 +318,11 @@ const words = [
 /* =========================
    게임 설정
    ========================= */
-const PASS_MESSAGE = "18~22번 단어테스트 통과!"; // ✅ 요청하신 합격 문구
-const baseSpeed = 120;          // px/s
-const speedIncreasePer5 = 18;   // 5문항마다 빨라짐
-const floorHeight = 60;         // CSS .floor 높이
-const choiceHeight = 56;        // CSS .choice 높이
+const PASS_MESSAGE = "18~22번 단어테스트 통과!";
+const baseSpeed = 100;          // ✅ 전체 문항 동일 + 조금 더 느리게
+const speedIncreasePer5 = 0;    // ✅ 속도 증가 제거(사용 안 함)
+const floorHeight = 60;
+const choiceHeight = 56;
 
 /* =========================
    유틸
@@ -409,9 +409,8 @@ function nextWord(){
     return;
   }
 
-  // 난이도(속도): 5문항마다 상승
-  const level = 1 + Math.floor(idx / 5);
-  speed = baseSpeed + (level - 1) * speedIncreasePer5;
+// ✅ 속도 고정 (모든 단어 동일)
+  speed = baseSpeed;
 
   const w = deck[idx];
   englishEl.textContent = w.en;
@@ -549,4 +548,5 @@ showOverlay(
 
 </body>
 </html>
+
 
