@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Day 11 The Media Vocab - Spelling Game</title>
+<style>
+  :root{
+    --bg:#0b1220;
+    --panel:#111a2b;
+    --panel2:#0f172a;
+    --card:#0f1a30;
+    --line:rgba(255,255,255,.10);
+    --muted:rgba(255,255,255,.78);
+    --good:#065f46;
+    --bad:#7f1d1d;
+    --accent:#38bdf8;
+    --warn:#fb7185;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action: manipulation;
+  }
+  #wrap{
+    max-width:520px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px 14px 12px;
+    background:var(--panel);
+    border-bottom:1px solid var(--line);
+  }
+  #koMeaning{
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:.2px;
+    line-height:1.2;
+  }
+  #subRow{
+    margin-top:8px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+  }
+  #progress{
+    font-size:13px;
+    opacity:.9;
+  }
+  #timer{
+    font-size:13px;
+    font-weight:900;
+    padding:6px 10px;
+    border-radius:999px;
+    background:rgba(56,189,248,.16);
+    border:1px solid rgba(56,189,248,.35);
+  }
+  #timer.danger{
+    background:rgba(251,113,133,.16);
+    border-color:rgba(251,113,133,.45);
+  }
+
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:var(--panel2);
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .card{
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:14px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.25);
+  }
+
+  /* 입력 영역 */
+  #answerBox{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  #answerInput{
+    width:100%;
+    font-size:20px; /* iOS 자동확대 방지(16px 이상) */
+    padding:14px 14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.14);
+    background:#0b152b;
+    color:#fff;
+    outline:none;
+    user-select:text;
+  }
+  #answerInput::placeholder{ color:rgba(255,255,255,.45); }
+
+  #btnRow{
+    display:flex;
+    gap:10px;
+  }
+  button{
+    border:none;
+    border-radius:14px;
+    padding:13px 12px;
+    font-size:15px;
+    font-weight:900;
+    cursor:pointer;
+  }
+  #submitBtn{
+    flex:1;
+    background:var(--accent);
+    color:#06121d;
+  }
+  #skipBtn{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid var(--line);
+  }
+
+  /* 피드백 */
+  #feedback{
+    font-size:14px;
+    line-height:1.35;
+    color:var(--muted);
+    min-height:20px;
+  }
+  #feedback.good{ color:#5eead4; font-weight:900; }
+  #feedback.bad{ color:#fb7185; font-weight:900; }
+
+  /* 터치 키패드 */
+  #keypad{
+    margin-top:auto;
+  }
+  #keys{
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap:8px;
+  }
+  .key{
+    background:#16233d;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;
+    padding:12px 0;
+    text-align:center;
+    font-weight:900;
+    font-size:15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,.18);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .key:active{ transform: scale(.98); }
+  .key.wide{
+    grid-column: span 2;
+  }
+  .key.util{
+    background:#1f2a44;
+  }
+
+  /* 오버레이 */
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.74);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:10;
+  }
+  #overlay .panel{
+    width:100%;
+    max-width:440px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:18px;
+    text-align:center;
+    box-shadow: 0 22px 60px rgba(0,0,0,.35);
+  }
+  #ovTitle{
+    margin:0 0 10px;
+    font-size:20px;
+    font-weight:1000;
+  }
+  #ovText{
+    margin:0;
+    font-size:13px;
+    opacity:.92;
+    line-height:1.55;
+  }
+  #ovBtns{
+    margin-top:14px;
+    display:flex;
+    gap:10px;
+  }
+  #startBtn{
+    flex:1;
+    background:var(--accent);
+    color:#06121d;
+  }
+  #restartBtn{
+    flex:1;
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid var(--line);
+    display:none;
+  }
+
+  /* 결과 리스트 */
+  #resultList{
+    text-align:left;
+    margin-top:10px;
+    padding:10px 12px;
+    border-radius:14px;
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--line);
+    max-height:220px;
+    overflow:auto;
+    font-size:13px;
+    line-height:1.5;
+    display:none;
+  }
+  .rowWrong{ color:#fb7185; font-weight:900; }
+  .rowRight{ color:#5eead4; font-weight:900; }
+</style>
+</head>
+
+<body>
+<div id="wrap">
+  <header>
+    <div id="koMeaning">단어 시험</div>
+    <div id="subRow">
+      <div id="progress"></div>
+      <div id="timer">⏱ 30s</div>
+    </div>
+  </header>
+
+  <div id="game">
+    <div class="card" id="answerBox">
+      <input
+        id="answerInput"
+        type="text"
+        inputmode="latin"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        placeholder="영어 철자를 입력하세요 (예: report)"
+      />
+      <div id="btnRow">
+        <button id="submitBtn">정답 제출</button>
+        <button id="skipBtn" title="시간 끝난 것처럼 다음 문제로">PASS</button>
+      </div>
+      <div id="feedback"></div>
+    </div>
+
+    <div class="card" id="keypad">
+      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px;">
+        <div style="font-weight:900;">터치로 철자 조립</div>
+        <div style="font-size:12px; opacity:.85;">키보드가 불편하면 버튼만 눌러도 됩니다</div>
+      </div>
+      <div id="keys"></div>
+    </div>
+
+    <div id="overlay">
+      <div class="panel">
+        <h2 id="ovTitle">Day 11 The Media</h2>
+        <p id="ovText">
+          화면 상단의 <b>한국어 뜻</b>을 보고<br>
+          아래에 <b>영어 철자</b>를 입력(또는 버튼으로 조립)하세요.<br><br>
+          ⏱ 문항당 <b>30초</b> 제한입니다.<br>
+          ✅ <b>커트라인 0개</b>: 틀려도 불합격 없이 끝까지 진행합니다.
+        </p>
+        <div id="resultList"></div>
+        <div id="ovBtns">
+          <button id="startBtn">시작</button>
+          <button id="restartBtn">다시 시작</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   ✅ Day 11 The Media (301~330)
+   한국어 뜻 -> 영어 철자 맞추기
+   ========================= */
+const words = [
+  { en: "report",      ko: "보도하다, 전하다 / 보도, 보고" },
+  { en: "press",       ko: "신문, 잡지, 언론 / 언론인, 기자" },
+  { en: "article",     ko: "기사, 논설 / (문법) 관사" },
+  { en: "journal",     ko: "잡지, 정기 간행물 / 일기, 일지" },
+  { en: "broadcast",   ko: "방송하다, 방영하다 / 방송" },
+  { en: "post",        ko: "게시공고하다 / 게시글, 포스트" },
+  { en: "pose",        ko: "자세를 취하다 / 자세, 포즈" },
+  { en: "scene",       ko: "(연극·영화) 장면, 무대 / 현장" },
+  { en: "survey",      ko: "조사, 검사, 측량 / 조사하다, 살펴보다" },
+  { en: "mass",        ko: "대중, 집단 / 다수 대중의" },
+  { en: "factual",     ko: "사실의, 사실에 입각한" },
+  { en: "fame",        ko: "명성, 평판" },
+  { en: "poll",        ko: "투표, 여론 조사 / 투표하다, 여론 조사를 하다" },
+  { en: "channel",     ko: "채널 / 수로, 해협" },
+  { en: "criticize",   ko: "비판하다, 혹평하다" },
+  { en: "compliment",  ko: "칭찬, 칭찬의 말 / 칭찬하다" },
+  { en: "series",      ko: "연속물, 시리즈 / (TV프로그램) 연속 프로그램" },
+  { en: "feature",     ko: "연재 기사, 특집 기사 / 특징 / (특색으로) 삼다" },
+  { en: "script",      ko: "(방송) 대본, 각본 / 필기 문자" },
+  { en: "bulletin",    ko: "보고, 게시 / 뉴스 속보" },
+  { en: "preview",     ko: "(영화) 시사회, 미리보기, 예고편 / 예습하다" },
+  { en: "column",      ko: "신문의 칸, 칼럼 / 특정 기고란" },
+  { en: "release",     ko: "(레코드) 발매하다, (영화) 개봉하다 / (뉴스) 발표·공개하다" },
+  { en: "announce",    ko: "알리다, 공표하다, 공고하다" },
+  { en: "reveal",      ko: "드러내다, 폭로하다" },
+  { en: "audience",    ko: "청중, 관중, 관객" },
+  { en: "panel",       ko: "패널, (토론회의) 토론자단, 심사위원단" },
+  { en: "focus",       ko: "초점을 맞추다, 관심을 집중하다(on) / 초점, 집중점" },
+  { en: "argue over",  ko: "~을 두고 논쟁하다, 왁가왁부하다" },
+  { en: "come up with",ko: "~을 생각해 내다, 창안하다" }
+];
+
+/* =========================
+   설정
+   ========================= */
+const FILE_TITLE = "영어단어게임 - 2025 Day 11 The Media 어휘(철자)";
+const PASS_MESSAGE = "축하합니다. Day 11 The Media 어휘 게임을 끝까지 완료했습니다!";
+const LIMIT_SEC = 30;          // 문항당 타이머
+const DECOY_EXTRA = 5;         // 글자 키패드에 섞을 덫 글자 수
+const AUTO_ADVANCE_MS = 750;   // 정답/시간끝 후 다음 문제로 넘어가는 텀
+
+/* =========================
+   유틸
+   ========================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function norm(s){
+  // 대소문자 무시 + 양쪽 공백 제거 + 중복 공백 1개로
+  return (s ?? "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ");
+}
+function pickRandomLetters(n){
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  const out = [];
+  for(let i=0;i<n;i++){
+    out.push(letters[Math.floor(Math.random()*letters.length)]);
+  }
+  return out;
+}
+
+/* =========================
+   DOM
+   ========================= */
+const koMeaningEl = document.getElementById("koMeaning");
+const progressEl  = document.getElementById("progress");
+const timerEl     = document.getElementById("timer");
+
+const inputEl     = document.getElementById("answerInput");
+const submitBtn   = document.getElementById("submitBtn");
+const skipBtn     = document.getElementById("skipBtn");
+const feedbackEl  = document.getElementById("feedback");
+
+const keysEl      = document.getElementById("keys");
+
+const overlayEl   = document.getElementById("overlay");
+const ovTitleEl   = document.getElementById("ovTitle");
+const ovTextEl    = document.getElementById("ovText");
+const startBtn    = document.getElementById("startBtn");
+const restartBtn  = document.getElementById("restartBtn");
+const resultListEl= document.getElementById("resultList");
+
+/* =========================
+   상태
+   ========================= */
+let deck = [];
+let idx = 0;
+let running = false;
+
+let tLeft = LIMIT_SEC;
+let tId = null;
+
+let results = []; // {en, ko, ok, user}
+
+/* =========================
+   화면 제어
+   ========================= */
+function showOverlay(title, htmlText, showStart, showRestart, showResult=false){
+  ovTitleEl.textContent = title;
+  ovTextEl.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+  resultListEl.style.display = showResult ? "" : "none";
+}
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+function setFeedback(type, html){
+  feedbackEl.className = "";
+  if(type) feedbackEl.classList.add(type);
+  feedbackEl.innerHTML = html || "";
+}
+
+/* =========================
+   타이머
+   ========================= */
+function updateTimerUI(){
+  timerEl.textContent = `⏱ ${tLeft}s`;
+  if(tLeft <= 7) timerEl.classList.add("danger");
+  else timerEl.classList.remove("danger");
+}
+function stopTimer(){
+  if(tId) clearInterval(tId);
+  tId = null;
+}
+function startTimer(){
+  stopTimer();
+  tLeft = LIMIT_SEC;
+  updateTimerUI();
+  tId = setInterval(() => {
+    if(!running) return;
+    tLeft -= 1;
+    updateTimerUI();
+    if(tLeft <= 0){
+      timeUp();
+    }
+  }, 1000);
+}
+
+/* =========================
+   키패드 생성 (정답 철자 기반 + 덫 글자)
+   ========================= */
+function buildKeypadFor(answer){
+  keysEl.innerHTML = "";
+
+  // 답안에 필요한 글자들(공백 제외)
+  const baseLetters = answer.replace(/\s/g,"").toLowerCase().split("");
+
+  // 덫 글자 섞기
+  const decoys = pickRandomLetters(DECOY_EXTRA);
+  let pool = shuffle([...baseLetters, ...decoys]);
+
+  // 공백이 필요한 구문이면 SPACE 키 추가
+  const needSpace = /\s/.test(answer);
+
+  // 버튼 렌더링
+  for(const ch of pool){
+    const b = document.createElement("div");
+    b.className = "key";
+    b.textContent = ch.toUpperCase();
+    b.addEventListener("click", () => appendChar(ch));
+    b.addEventListener("touchstart", (e) => { e.preventDefault(); appendChar(ch); }, {passive:false});
+    keysEl.appendChild(b);
+  }
+
+  // 유틸 키들
+  const spaceBtn = document.createElement("div");
+  spaceBtn.className = "key util wide";
+  spaceBtn.textContent = "SPACE";
+  spaceBtn.style.display = needSpace ? "" : "none";
+  spaceBtn.addEventListener("click", () => appendChar(" "));
+  spaceBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); appendChar(" "); }, {passive:false});
+  keysEl.appendChild(spaceBtn);
+
+  const backBtn = document.createElement("div");
+  backBtn.className = "key util wide";
+  backBtn.textContent = "⌫";
+  backBtn.addEventListener("click", backspace);
+  backBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); backspace(); }, {passive:false});
+  keysEl.appendChild(backBtn);
+
+  const clearBtn = document.createElement("div");
+  clearBtn.className = "key util wide";
+  clearBtn.textContent = "CLEAR";
+  clearBtn.addEventListener("click", () => { inputEl.value=""; inputEl.focus(); });
+  clearBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); inputEl.value=""; inputEl.focus(); }, {passive:false});
+  keysEl.appendChild(clearBtn);
+}
+
+function appendChar(ch){
+  if(!running) return;
+  inputEl.value += ch;
+  inputEl.focus();
+}
+function backspace(){
+  if(!running) return;
+  inputEl.value = inputEl.value.slice(0, -1);
+  inputEl.focus();
+}
+
+/* =========================
+   게임 흐름
+   ========================= */
+function resetGame(){
+  deck = shuffle(words);
+  idx = 0;
+  results = [];
+  running = false;
+  stopTimer();
+
+  koMeaningEl.textContent = FILE_TITLE;
+  progressEl.textContent = `0 / ${deck.length}`;
+  inputEl.value = "";
+  setFeedback("", "");
+  updateTimerUI();
+  buildKeypadFor("report"); // 초기 예시
+}
+
+function startGame(){
+  resetGame();
+  running = true;
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    endGame();
+    return;
+  }
+  const w = deck[idx];
+
+  koMeaningEl.textContent = w.ko;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  inputEl.value = "";
+  inputEl.placeholder = "영어 철자를 입력하세요";
+  setFeedback("", "");
+
+  buildKeypadFor(w.en);
+
+  // 모바일에서 바로 타이핑 가능하게
+  setTimeout(() => inputEl.focus(), 50);
+
+  startTimer();
+}
+
+function gradeCurrent(userAnswer){
+  const w = deck[idx];
+  const ok = norm(userAnswer) === norm(w.en);
+
+  results.push({ en:w.en, ko:w.ko, ok, user:userAnswer });
+
+  if(ok){
+    setFeedback("good", `✅ 정답! <b>${w.en}</b>`);
+  }else{
+    setFeedback("bad", `❌ 오답<br>정답: <b>${w.en}</b>`);
+  }
+
+  stopTimer();
+  // 다음으로
+  setTimeout(() => {
+    idx += 1;
+    nextWord();
+  }, AUTO_ADVANCE_MS);
+}
+
+function submit(){
+  if(!running) return;
+  // 너무 빨리 연타 방지: 타이머가 돌고 있을 때만 채점
+  gradeCurrent(inputEl.value);
+}
+
+function timeUp(){
+  if(!running) return;
+  // 시간 종료도 오답 처리(커트라인 0이므로 계속 진행)
+  setFeedback("bad", `⏰ 시간 종료<br>정답: <b>${deck[idx].en}</b>`);
+  results.push({ en:deck[idx].en, ko:deck[idx].ko, ok:false, user:"(TIME UP)" });
+
+  stopTimer();
+  setTimeout(() => {
+    idx += 1;
+    nextWord();
+  }, AUTO_ADVANCE_MS);
+}
+
+function endGame(){
+  running = false;
+  stopTimer();
+
+  const total = results.length;
+  const correct = results.filter(r => r.ok).length;
+  const wrong = total - correct;
+
+  // 결과 리스트 구성
+  resultListEl.innerHTML = results.map((r, i) => {
+    const cls = r.ok ? "rowRight" : "rowWrong";
+    const user = (r.user ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    return `
+      <div class="${cls}">
+        ${i+1}. [${r.ko}] → <b>${r.en}</b>
+        <div style="font-weight:600; opacity:.9; margin-top:2px;">
+          입력: ${user || "(blank)"}
+        </div>
+      </div>
+      <div style="height:10px;"></div>
+    `;
+  }).join("");
+
+  showOverlay(
+    "통과",
+    `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>
+     총 <b>${total}</b>문항 완료<br>
+     정답 <b>${correct}</b>개 / 오답 <b>${wrong}</b>개<br><br>
+     (커트라인 0개: 점수와 무관하게 완료 시 통과 처리)`,
+    false,
+    true,
+    true
+  );
+}
+
+/* =========================
+   이벤트
+   ========================= */
+submitBtn.addEventListener("click", submit);
+submitBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); submit(); }, {passive:false});
+
+skipBtn.addEventListener("click", timeUp);
+skipBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); timeUp(); }, {passive:false});
+
+// 엔터로 제출 (모바일/PC)
+inputEl.addEventListener("keydown", (e) => {
+  if(e.key === "Enter"){
+    e.preventDefault();
+    submit();
+  }
+});
+
+/* =========================
+   오버레이 버튼
+   ========================= */
+startBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "Day 11 The Media",
+    `화면 상단의 <b>한국어 뜻</b>을 보고<br>
+     아래에 <b>영어 철자</b>를 입력(또는 버튼으로 조립)하세요.<br><br>
+     ⏱ 문항당 <b>30초</b> 제한입니다.<br>
+     ✅ <b>커트라인 0개</b>: 틀려도 불합격 없이 끝까지 진행합니다.`,
+    true,
+    false,
+    false
+  );
+});
+
+/* =========================
+   초기
+   ========================= */
+resetGame();
+showOverlay(
+  "Day 11 The Media",
+  `화면 상단의 <b>한국어 뜻</b>을 보고<br>
+   아래에 <b>영어 철자</b>를 입력(또는 버튼으로 조립)하세요.<br><br>
+   ⏱ 문항당 <b>30초</b> 제한입니다.<br>
+   ✅ <b>커트라인 0개</b>: 틀려도 불합격 없이 끝까지 진행합니다.`,
+  true,
+  false,
+  false
+);
+</script>
+</body>
+</html>
