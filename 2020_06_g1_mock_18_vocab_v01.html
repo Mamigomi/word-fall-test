@@ -37,6 +37,7 @@
     margin-top:6px;
     font-size:13px;
     opacity:.85;
+    line-height:1.35;
   }
   #game{
     flex:1;
@@ -107,7 +108,7 @@
     margin:0 0 12px;
     font-size:13px;
     opacity:.9;
-    line-height:1.5;
+    line-height:1.55;
   }
   button{
     width:100%;
@@ -136,16 +137,18 @@
   </header>
 
   <div id="game">
-    <div class="floor">바닥 도달 = 즉시 불합격</div>
+    <div class="floor">바닥 도달 = 오답 처리 후 다음 문제로 진행</div>
 
     <div id="overlay">
       <div class="card">
         <h2 id="ovTitle">단어 시험 시작</h2>
         <p id="ovText">
           화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
-          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+          <b>오답 또는 바닥 도달은 “오답 처리”</b>되고 다음 문제로 넘어갑니다.<br>
+          1차 시험이 끝나면 <b>틀린 단어만 모아 재시험(각 3회, 랜덤/연속금지)</b>이 진행됩니다.
         </p>
-        <button id="startBtn">시험 시작</button>
+        <button id="startBtn">1차 시험 시작</button>
+        <button id="retestBtn" style="display:none;">재시험 시작</button>
         <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
       </div>
     </div>
@@ -188,10 +191,12 @@ const words = [
    게임 설정
    ========================= */
 const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 18번 어휘 정복!!";
-const baseSpeed = 100;          // ✅ 전체 문항 동일 + 조금 더 느리게
-const speedIncreasePer5 = 0;    // ✅ 속도 증가 제거(사용 안 함)
+const baseSpeed = 100;
 const floorHeight = 60;
 const choiceHeight = 56;
+
+const RETEST_REPEAT = 3;            // ✅ 틀린 단어는 재시험에서 3회 등장
+const RETEST_NO_ADJACENT = true;    // ✅ 같은 단어 연속 등장 금지
 
 /* =========================
    유틸
@@ -205,6 +210,56 @@ function shuffle(arr){
   return a;
 }
 
+function formatTime(ms){
+  const totalSec = Math.floor(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}분 ${String(s).padStart(2,"0")}초`;
+}
+
+// key(여기선 en) 기준으로 "연속 중복"을 피하려고 시도
+function shuffleNoAdjacent(items, keyFn, maxTries=300){
+  if(items.length <= 2) return shuffle(items);
+
+  for(let t=0; t<maxTries; t++){
+    const cand = shuffle(items);
+    let ok = true;
+    for(let i=1; i<cand.length; i++){
+      if(keyFn(cand[i]) === keyFn(cand[i-1])) { ok = false; break; }
+    }
+    if(ok) return cand;
+  }
+
+  // 그래도 안 되면: 간단한 그리디 재배치(최악 방지)
+  const groups = new Map();
+  for(const it of items){
+    const k = keyFn(it);
+    if(!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(it);
+  }
+  const keys = Array.from(groups.keys()).sort((a,b)=>groups.get(b).length - groups.get(a).length);
+
+  const res = [];
+  let lastKey = null;
+
+  while(res.length < items.length){
+    // lastKey가 아닌 것 중 남아있는 키를 찾기
+    let chosenKey = null;
+    for(const k of keys){
+      if(k !== lastKey && groups.get(k).length > 0){ chosenKey = k; break; }
+    }
+    // 없으면 어쩔 수 없이 lastKey 허용
+    if(!chosenKey){
+      for(const k of keys){
+        if(groups.get(k).length > 0){ chosenKey = k; break; }
+      }
+    }
+    res.push(groups.get(chosenKey).pop());
+    lastKey = chosenKey;
+  }
+  return res;
+}
+
 /* =========================
    DOM
    ========================= */
@@ -216,12 +271,16 @@ const overlayEl = document.getElementById("overlay");
 const ovTitle = document.getElementById("ovTitle");
 const ovText = document.getElementById("ovText");
 const startBtn = document.getElementById("startBtn");
+const retestBtn = document.getElementById("retestBtn");
 const restartBtn = document.getElementById("restartBtn");
 
 /* =========================
    상태
    ========================= */
-let deck = [];
+let phase = "idle"; // idle | main | retest | done
+let mainDeck = [];
+let retestDeck = [];
+
 let idx = 0;
 let speed = baseSpeed;
 
@@ -230,14 +289,23 @@ let raf = null;
 let running = false;
 let lastTs = 0;
 
+let wrongMap = new Map(); // en -> word
+let retestHadAnyWrong = false;
+
+// 시간 측정
+let t0 = 0;
+let tMainEnd = 0;
+let tEnd = 0;
+
 /* =========================
    오버레이
    ========================= */
-function showOverlay(title, htmlText, showStart, showRestart){
+function showOverlay(title, htmlText, showStart, showRetest, showRestart){
   ovTitle.textContent = title;
   ovText.innerHTML = htmlText;
   overlayEl.style.display = "flex";
   startBtn.style.display = showStart ? "" : "none";
+  retestBtn.style.display = showRetest ? "" : "none";
   restartBtn.style.display = showRestart ? "" : "none";
 }
 
@@ -248,69 +316,171 @@ function hideOverlay(){
 /* =========================
    게임 흐름
    ========================= */
-function resetGame(){
-  deck = shuffle(words);
+function resetAll(){
+  phase = "idle";
+  mainDeck = shuffle(words);
+  retestDeck = [];
   idx = 0;
   speed = baseSpeed;
-  progressEl.textContent = `0 / ${deck.length}`;
+
+  wrongMap = new Map();
+  retestHadAnyWrong = false;
+
+  t0 = 0; tMainEnd = 0; tEnd = 0;
+
+  progressEl.textContent = "";
   englishEl.textContent = "단어 시험";
   clearChoices();
   stopLoop();
 }
 
-function startGame(){
-  resetGame();
+function startMain(){
+  resetAll();
+  phase = "main";
+  t0 = performance.now();
+  hideOverlay();
+  idx = 0;
+  nextWord();
+}
+
+function buildRetestDeck(){
+  const wrongWords = Array.from(wrongMap.values());
+  const expanded = [];
+  for(const w of wrongWords){
+    for(let i=0; i<RETEST_REPEAT; i++) expanded.push(w);
+  }
+  if(RETEST_NO_ADJACENT){
+    return shuffleNoAdjacent(expanded, (x)=>x.en);
+  }
+  return shuffle(expanded);
+}
+
+function startRetest(){
+  phase = "retest";
+  retestHadAnyWrong = false;
+  retestDeck = buildRetestDeck();
+  idx = 0;
   hideOverlay();
   nextWord();
 }
 
 function nextWord(){
+  const deck = (phase === "main") ? mainDeck : retestDeck;
+
   if(idx >= deck.length){
     stopLoop();
     clearChoices();
-    showOverlay(
-      "합격",
-      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
-      false,
-      true
-    );
-    return;
+
+    if(phase === "main"){
+      tMainEnd = performance.now();
+      const wrongCount = wrongMap.size;
+
+      if(wrongCount === 0){
+        // 1차에서 전부 맞으면 재시험 없이 즉시 합격 + 시간 표시
+        tEnd = performance.now();
+        const total = formatTime(tEnd - t0);
+        const mainTime = formatTime(tMainEnd - t0);
+
+        showOverlay(
+          "합격",
+          `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>
+           ✅ 1차 시험에서 오답이 없습니다.<br><br>
+           ⏱ 총 소요시간: <b>${total}</b><br>
+           ⏱ 1차 소요시간: <b>${mainTime}</b>`,
+          false, false, true
+        );
+        phase = "done";
+        return;
+      }
+
+      // 오답이 있으면 재시험 안내
+      const mainTime = formatTime(tMainEnd - t0);
+      showOverlay(
+        "1차 시험 완료",
+        `1차 시험을 끝까지 완료했습니다.<br>
+         오답 단어: <b>${wrongCount}개</b><br>
+         재시험에서 오답 단어는 <b>각 ${RETEST_REPEAT}회</b> 랜덤으로 등장합니다 (연속 등장 금지).<br><br>
+         ⏱ 1차 소요시간: <b>${mainTime}</b>`,
+        false, true, true
+      );
+      return;
+    }
+
+    if(phase === "retest"){
+      tEnd = performance.now();
+      const total = formatTime(tEnd - t0);
+      const mainTime = formatTime(tMainEnd - t0);
+      const retestTime = formatTime(tEnd - tMainEnd);
+
+      if(retestHadAnyWrong){
+        showOverlay(
+          "재시험 불합격",
+          `재시험 중 오답이 있었습니다.<br>
+           다시 시작해 주세요.<br><br>
+           ⏱ 총 소요시간: <b>${total}</b><br>
+           ⏱ 1차: <b>${mainTime}</b><br>
+           ⏱ 재시험: <b>${retestTime}</b>`,
+          false, false, true
+        );
+      }else{
+        showOverlay(
+          "최종 합격",
+          `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>
+           ✅ 1차 + 재시험 모두 통과했습니다.<br><br>
+           ⏱ 총 소요시간: <b>${total}</b><br>
+           ⏱ 1차: <b>${mainTime}</b><br>
+           ⏱ 재시험: <b>${retestTime}</b>`,
+          false, false, true
+        );
+      }
+      phase = "done";
+      return;
+    }
   }
 
   speed = baseSpeed;
 
   const w = deck[idx];
   englishEl.textContent = w.en;
-  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  if(phase === "main"){
+    progressEl.textContent =
+      `1차 진행: ${idx + 1} / ${deck.length}  |  오답: ${wrongMap.size}개`;
+  }else{
+    progressEl.textContent =
+      `재시험: ${idx + 1} / ${deck.length}  |  (각 단어 ${RETEST_REPEAT}회)`;
+  }
 
   spawnChoices(w);
   startLoop();
 }
 
-function fail(reason){
-  stopLoop();
-  clearChoices();
-  showOverlay(
-    "불합격",
-    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
-    false,
-    true
-  );
+// 오답 처리: 표시 후 다음 문제로 진행(리셋 없음)
+function registerWrong(word, why){
+  if(phase === "main"){
+    wrongMap.set(word.en, word);
+  }else if(phase === "retest"){
+    retestHadAnyWrong = true;
+  }
+  // why는 메시지 용도로 필요하면 확장 가능
 }
 
-function pick(el){
+function pick(el, currentWord){
   if(!running) return;
-  if(el.dataset.correct !== "1"){
+
+  const isCorrect = (el.dataset.correct === "1");
+  if(!isCorrect){
     el.classList.add("bad");
-    fail("오답을 선택했습니다.");
-    return;
+    registerWrong(currentWord, "오답 선택");
+  }else{
+    el.classList.add("good");
   }
-  el.classList.add("good");
+
   stopLoop();
   setTimeout(() => {
     idx += 1;
     nextWord();
-  }, 200);
+  }, 220);
 }
 
 /* =========================
@@ -340,10 +510,10 @@ function spawnChoices(word){
     el.dataset.correct = (txt === correct) ? "1" : "0";
     el._y = startYs[i];
 
-    el.addEventListener("click", () => pick(el));
+    el.addEventListener("click", () => pick(el, word));
     el.addEventListener("touchstart", (e) => {
       e.preventDefault();
-      pick(el);
+      pick(el, word);
     }, { passive:false });
 
     el.style.top = "0px";
@@ -378,11 +548,25 @@ function tick(ts){
   const rect = gameEl.getBoundingClientRect();
   const bottomLimit = rect.height - floorHeight - choiceHeight;
 
+  const deck = (phase === "main") ? mainDeck : retestDeck;
+  const currentWord = deck[idx];
+
   for(const el of choices){
     el._y += speed * dt;
     el.style.transform = `translateY(${el._y}px)`;
+
     if(el._y >= bottomLimit){
-      fail("선택지가 바닥에 닿았습니다.");
+      // 바닥 도달 = 오답 처리 후 다음 문제
+      stopLoop();
+      // 시각적으로 '바닥 도달'을 보여주기 위해 하나만 빨갛게 표시
+      el.classList.add("bad");
+      registerWrong(currentWord, "바닥 도달");
+
+      setTimeout(() => {
+        idx += 1;
+        nextWord();
+      }, 220);
+
       return;
     }
   }
@@ -392,21 +576,34 @@ function tick(ts){
 /* =========================
    버튼
    ========================= */
-startBtn.addEventListener("click", startGame);
+startBtn.addEventListener("click", startMain);
+
+retestBtn.addEventListener("click", () => {
+  // 재시험 시작 전에 덱 생성
+  startRetest();
+});
+
 restartBtn.addEventListener("click", () => {
+  resetAll();
   showOverlay(
     "단어 시험 시작",
-    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
-    true,
-    false
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+     <b>오답 또는 바닥 도달은 “오답 처리”</b>되고 다음 문제로 넘어갑니다.<br>
+     1차 시험이 끝나면 <b>틀린 단어만 모아 재시험(각 3회, 랜덤/연속금지)</b>이 진행됩니다.`,
+    true, false, false
   );
 });
 
+/* =========================
+   첫 화면
+   ========================= */
+resetAll();
 showOverlay(
   "단어 시험 시작",
-  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
-  true,
-  false
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+   <b>오답 또는 바닥 도달은 “오답 처리”</b>되고 다음 문제로 넘어갑니다.<br>
+   1차 시험이 끝나면 <b>틀린 단어만 모아 재시험(각 3회, 랜덤/연속금지)</b>이 진행됩니다.`,
+  true, false, false
 );
 </script>
 
