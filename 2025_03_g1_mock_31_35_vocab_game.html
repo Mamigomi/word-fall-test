@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>2025년 3월 고1 모의고사 31~35번 어휘 테스트</title>
+<title>2025년 3월 고1 모의고사 31~35번 어휘 단어 시험</title>
 <style>
   body{
     margin:0;
@@ -154,11 +154,9 @@
 
 <script>
 /* =========================
-   ✅ 2025년 3월 고1 모의고사 31~35번 어휘
-   (전하님 제공 목록 반영)
+   ✅ 단어 목록(2025년 3월 고1 모의고사 31~35번)
    ========================= */
 const words = [
-  // 31번(미학/예술)
   { en:"argue", ko:"주장하다" },
   { en:"see", ko:"보다" },
   { en:"strike", ko:"(마음에) 와닿다" },
@@ -191,7 +189,6 @@ const words = [
   { en:"lie in", ko:"~속에 존재하다" },
   { en:"beautiful thing", ko:"아름다운 것" },
 
-  // 32번(대화/감정)
   { en:"listen", ko:"듣다" },
   { en:"child", ko:"아이" },
   { en:"emotional moment", ko:"감정적인 순간" },
@@ -224,7 +221,6 @@ const words = [
   { en:"seem", ko:"~처럼 보이다" },
   { en:"frown", ko:"얼굴을 찌푸리다" },
 
-  // 33번(피부/땀/전기)
   { en:"skin", ko:"피부" },
   { en:"conduct", ko:"전달하다, 전도하다" },
   { en:"electricity", ko:"전기" },
@@ -258,7 +254,6 @@ const words = [
   { en:"figure out", ko:"알아내다" },
   { en:"transfer", ko:"전달하다" },
 
-  // 34번(식물/소리/스트레스)
   { en:"plant", ko:"식물" },
   { en:"communicate", ko:"의사소통하다" },
   { en:"express", ko:"표현하다" },
@@ -302,7 +297,6 @@ const words = [
   { en:"defend", ko:"방어하다" },
   { en:"harm", ko:"해를 끼치다" },
 
-  // 35번(서사/인물)
   { en:"mean", ko:"의미하다" },
   { en:"character", ko:"등장인물" },
   { en:"hero", ko:"영웅" },
@@ -336,8 +330,6 @@ const words = [
   { en:"portrayal", ko:"묘사" },
   { en:"fictional", ko:"허구의" },
   { en:"documentary", ko:"다큐멘터리의" },
-  { en:"feel", ko:"느끼다" },
-  { en:"action", ko:"행동" },
   { en:"benefit", ko:"이익이 되다" },
   { en:"worthy", ko:"가치 있는" },
   { en:"companion", ko:"동반자" },
@@ -349,14 +341,14 @@ const words = [
   { en:"fill", ko:"채우다" },
   { en:"little", ko:"거의 없는" },
   { en:"invest", ko:"감정이입하다, 투입하다" },
-  { en:"strong", ko:"강한" },
+  { en:"strong", ko:"강한" }
 ];
 
 /* =========================
    게임 설정
    ========================= */
 const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 31~35번 어휘 통과!";
-const baseSpeed = 100;           // 기본 낙하 속도
+const baseSpeed = 110;
 const floorHeight = 60;
 const choiceHeight = 56;
 
@@ -407,7 +399,9 @@ function showOverlay(title, htmlText, showStart, showRestart){
   startBtn.style.display = showStart ? "" : "none";
   restartBtn.style.display = showRestart ? "" : "none";
 }
-function hideOverlay(){ overlayEl.style.display = "none"; }
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
 
 /* =========================
    게임 흐름
@@ -426,6 +420,7 @@ function startGame(){
   hideOverlay();
   nextWord();
 }
+
 function nextWord(){
   if(idx >= deck.length){
     stopLoop();
@@ -439,7 +434,7 @@ function nextWord(){
     return;
   }
 
-  speed = baseSpeed; // 필요시 점점 빨라지게도 가능
+  speed = baseSpeed;
 
   const w = deck[idx];
   englishEl.textContent = w.en;
@@ -448,6 +443,7 @@ function nextWord(){
   spawnChoices(w);
   startLoop();
 }
+
 function fail(reason){
   stopLoop();
   clearChoices();
@@ -458,6 +454,7 @@ function fail(reason){
     true
   );
 }
+
 function pick(el){
   if(!running) return;
   if(el.dataset.correct !== "1"){
@@ -470,7 +467,7 @@ function pick(el){
   setTimeout(() => {
     idx += 1;
     nextWord();
-  }, 180);
+  }, 200);
 }
 
 /* =========================
@@ -485,17 +482,9 @@ function spawnChoices(word){
   clearChoices();
 
   const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
 
-  // 오답 풀: 한국어 뜻 기준으로 유니크하게
-  const uniqueKo = Array.from(new Set(words.map(x => x.ko)));
-  const pool = uniqueKo.filter(ko => ko !== correct);
-
-  // 혹시 유니크 뜻이 3개 미만이면(극단적 케이스) 대비
   const wrongs = shuffle(pool).slice(0, 3);
-  while(wrongs.length < 3){
-    wrongs.push("—"); // 안전 패딩(거의 발생 안 함)
-  }
-
   const options = shuffle([correct, ...wrongs]);
 
   const startYs = [-220, -320, -420, -520];
@@ -523,7 +512,7 @@ function spawnChoices(word){
 }
 
 /* =========================
-   루프(낙하 애니메이션)
+   루프
    ========================= */
 function startLoop(){
   running = true;
