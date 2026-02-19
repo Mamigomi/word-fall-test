@@ -176,7 +176,7 @@
     <h2 id="ovTitle">독해 빈칸 추론 시작</h2>
     <p id="ovText">
       빈칸(______)에 들어갈 가장 적절한 단어를 고르세요.<br>
-      <b>오답 선택</b> 또는 <b>1분 타임아웃</b> 시 불합격입니다.
+      <b>오답 선택</b> 또는 <b>각 문제 1분 타임아웃</b> 시 불합격입니다.
     </p>
     <button id="startBtn">시험 시작</button>
     <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
@@ -221,7 +221,7 @@ const questions = [
 ];
 
 const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 31번 독해 빈칸 추론 통과!";
-const TOTAL_TIME_SEC = 60;
+const PER_QUESTION_TIME_SEC = 60; // ✅ 각 문제마다 1분
 
 /* =========================
    유틸
@@ -262,7 +262,8 @@ let deck = [];
 let idx = 0;
 let running = false;
 
-let remaining = TOTAL_TIME_SEC;
+// ✅ 문제별 타이머
+let remaining = PER_QUESTION_TIME_SEC;
 let timerInterval = null;
 
 /* =========================
@@ -278,7 +279,7 @@ function showOverlay(title, htmlText, showStart, showRestart){
 function hideOverlay(){ overlayEl.style.display = "none"; }
 
 /* =========================
-   타이머
+   타이머(문제마다 리셋)
    ========================= */
 function stopTimer(){
   if(timerInterval) clearInterval(timerInterval);
@@ -286,7 +287,7 @@ function stopTimer(){
 }
 function resetTimer(){
   stopTimer();
-  remaining = TOTAL_TIME_SEC;
+  remaining = PER_QUESTION_TIME_SEC;
   timerEl.textContent = fmtTime(remaining);
   timerEl.classList.remove("danger");
 }
@@ -319,7 +320,6 @@ function startGame(){
   resetGame();
   running = true;
   hideOverlay();
-  startTimer();
   nextQ();
 }
 
@@ -336,6 +336,10 @@ function nextQ(){
     );
     return;
   }
+
+  // ✅ 다음 문제 시작 시 타이머를 1분으로 초기화하고 시작
+  resetTimer();
+  startTimer();
 
   const q = deck[idx];
   sentenceEl.textContent = q.sentence;
@@ -370,15 +374,25 @@ function renderChoices(q){
 
 function pick(el){
   if(!running) return;
+
+  // ✅ 중복 클릭 방지(정답 눌렀는데 타이머가 1초 더 흘러서 오작동 방지)
+  running = false;
+
   const correct = (el.dataset.correct === "1");
   if(!correct){
     el.classList.add("bad");
     fail("오답을 선택했습니다.");
     return;
   }
+
   el.classList.add("good");
+
+  // ✅ 정답이면 현재 문제 타이머 멈추고 다음으로
+  stopTimer();
+
   setTimeout(() => {
     idx += 1;
+    running = true;
     nextQ();
   }, 180);
 }
@@ -388,7 +402,7 @@ function fail(reason){
   running = false;
   showOverlay(
     "불합격",
-    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 1분 타임아웃 시 즉시 종료됩니다.`,
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 각 문제 1분 타임아웃 시 즉시 종료됩니다.`,
     false,
     true
   );
@@ -416,7 +430,7 @@ restartBtn.addEventListener("click", () => {
   showOverlay(
     "독해 빈칸 추론 시작",
     `빈칸(______)에 들어갈 가장 적절한 단어를 고르세요.<br>
-     <b>오답 선택</b> 또는 <b>1분 타임아웃</b> 시 불합격입니다.`,
+     <b>오답 선택</b> 또는 <b>각 문제 1분 타임아웃</b> 시 불합격입니다.`,
     true,
     false
   );
@@ -426,7 +440,7 @@ restartBtn.addEventListener("click", () => {
 showOverlay(
   "독해 빈칸 추론 시작",
   `빈칸(______)에 들어갈 가장 적절한 단어를 고르세요.<br>
-   <b>오답 선택</b> 또는 <b>1분 타임아웃</b> 시 불합격입니다.`,
+   <b>오답 선택</b> 또는 <b>각 문제 1분 타임아웃</b> 시 불합격입니다.`,
   true,
   false
 );
