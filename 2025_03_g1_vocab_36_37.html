@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2025년 3월 고1 모의고사 36~37번 어휘 단어 시험</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action: manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px; right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    transition: transform .08s ease, background .12s ease;
+  }
+  .choice:active{ transform: scale(.98); }
+  .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
+  .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <div id="english">단어 시험</div>
+    <div id="progress"></div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">단어 시험 시작</h2>
+        <p id="ovText">
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   ✅ 단어 목록(2025년 3월 고1 모의고사 36~37번)
+   ========================= */
+const words = [
+  // 36번
+  { en:"assume", ko:"가정하다" },
+  { en:"animal", ko:"동물" },
+  { en:"be capable of", ko:"~할 수 있다" },
+  { en:"think", ko:"생각하다" },
+  { en:"lack", ko:"부족하다" },
+  { en:"language", ko:"언어" },
+  { en:"imply", ko:"의미하다" },
+  { en:"concept", ko:"개념" },
+  { en:"need", ko:"필요로 하다" },
+  { en:"concrete", ko:"구체적인" },
+  { en:"form", ko:"형태" },
+  { en:"thought", ko:"생각" },
+  { en:"be able to", ko:"~할 수 있다" },
+  { en:"show", ko:"보여주다" },
+  { en:"ability", ko:"능력" },
+  { en:"imagine", ko:"상상하다" },
+  { en:"squirrel", ko:"다람쥐" },
+  { en:"plan", ko:"계획하다" },
+  { en:"get from A to B", ko:"A에서 B로 가다" },
+  { en:"branch", ko:"가지" },
+  { en:"tree", ko:"나무" },
+  { en:"in front", ko:"앞에" },
+  { en:"mental", ko:"정신의" },
+  { en:"map", ko:"지도" },
+  { en:"try out", ko:"시도해보다" },
+  { en:"route", ko:"경로" },
+
+  // 37번
+  { en:"cartilage", ko:"연골" },
+  { en:"important", ko:"중요한" },
+  { en:"healthy", ko:"건강한" },
+  { en:"functioning", ko:"기능" },
+  { en:"joint", ko:"관절" },
+  { en:"bear", ko:"견디다, 버티다" },
+  { en:"weight", ko:"무게" },
+  { en:"knee", ko:"무릎" },
+  { en:"imagine", ko:"상상하다" },
+  { en:"inner", ko:"내부의" },
+  { en:"working", ko:"작동" },
+  { en:"shift", ko:"이동하다" },
+  { en:"weight", ko:"무게" },
+  { en:"release", ko:"풀리다" },
+  { en:"drink in", ko:"흡수하다" },
+  { en:"synovial fluid", ko:"윤활액" },
+  { en:"sponge", ko:"스펀지" },
+  { en:"soak up", ko:"흡수하다" },
+  { en:"liquid", ko:"액체" },
+  { en:"step", ko:"발걸음" },
+  { en:"transfer", ko:"옮기다" },
+  { en:"squeeze", ko:"짜내다" },
+  { en:"respond", ko:"반응하다" },
+  { en:"pressure", ko:"압력" },
+  { en:"break", ko:"부서지다" }
+];
+
+/* =========================
+   게임 설정
+   ========================= */
+const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 36~37번 어휘 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
+
+/* =========================
+   유틸
+   ========================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* =========================
+   DOM
+   ========================= */
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+/* =========================
+   상태
+   ========================= */
+let deck = [];
+let idx = 0;
+let speed = baseSpeed;
+
+let choices = [];
+let raf = null;
+let running = false;
+let lastTs = 0;
+
+/* =========================
+   오버레이
+   ========================= */
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+/* =========================
+   게임 흐름
+   ========================= */
+function resetGame(){
+  deck = shuffle(words);
+  idx = 0;
+  speed = baseSpeed;
+  progressEl.textContent = `0 / ${deck.length}`;
+  englishEl.textContent = "단어 시험";
+  clearChoices();
+  stopLoop();
+}
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  speed = baseSpeed;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running) return;
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    fail("오답을 선택했습니다.");
+    return;
+  }
+  el.classList.add("good");
+  stopLoop();
+  setTimeout(() => {
+    idx += 1;
+    nextWord();
+  }, 200);
+}
+
+/* =========================
+   선택지 생성/이동
+   ========================= */
+function clearChoices(){
+  for(const el of choices) el.remove();
+  choices = [];
+}
+
+function spawnChoices(word){
+  clearChoices();
+
+  const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
+
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
+
+  const startYs = [-220, -320, -420, -520];
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+
+    el.dataset.correct = (txt === correct) ? "1" : "0";
+    el._y = startYs[i];
+
+    el.addEventListener("click", () => pick(el));
+    el.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      pick(el);
+    }, { passive:false });
+
+    el.style.top = "0px";
+    el.style.transform = `translateY(${el._y}px)`;
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+/* =========================
+   루프
+   ========================= */
+function startLoop(){
+  running = true;
+  lastTs = performance.now();
+  if(raf) cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(tick);
+}
+function stopLoop(){
+  running = false;
+  if(raf) cancelAnimationFrame(raf);
+  raf = null;
+}
+function tick(ts){
+  if(!running) return;
+  const dt = (ts - lastTs) / 1000;
+  lastTs = ts;
+
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    el._y += speed * dt;
+    el.style.transform = `translateY(${el._y}px)`;
+    if(el._y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+/* =========================
+   버튼
+   ========================= */
+startBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "단어 시험 시작",
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
+});
+
+showOverlay(
+  "단어 시험 시작",
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
+</script>
+
+</body>
+</html>
