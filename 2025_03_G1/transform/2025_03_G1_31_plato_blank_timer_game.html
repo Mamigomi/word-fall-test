@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>2025년 3월 고1 모의고사 31번 독해 빈칸 추론</title>
 <style>
   body{
@@ -73,7 +73,6 @@
     padding:16px;
     background:#0f172a;
   }
-
   .choices{
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -94,11 +93,12 @@
     cursor:pointer;
     border:1px solid rgba(255,255,255,.10);
     box-shadow: 0 10px 25px rgba(0,0,0,.25);
-    transition: transform .08s ease, background .12s ease, border-color .12s ease;
+    transition: transform .08s ease, background .12s ease, border-color .12s ease, opacity .12s ease;
   }
   .choice:active{ transform: scale(.98); }
   .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
   .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
+  .choice.disabled{ opacity:.55; pointer-events:none; }
 
   #overlay{
     position:fixed;
@@ -120,21 +120,9 @@
     border:1px solid rgba(255,255,255,.10);
     box-shadow: 0 18px 50px rgba(0,0,0,.35);
   }
-  .card h2{
-    margin:0 0 10px;
-    font-size:20px;
-  }
-  .card p{
-    margin:0 0 12px;
-    font-size:13px;
-    opacity:.9;
-    line-height:1.55;
-  }
-  .skull{
-    font-size:46px;
-    line-height:1;
-    margin:10px 0 4px;
-  }
+  .card h2{ margin:0 0 10px; font-size:20px; }
+  .card p{ margin:0 0 12px; font-size:13px; opacity:.9; line-height:1.55; }
+  .skull{ font-size:46px; line-height:1; margin:10px 0 4px; }
   button{
     width:100%;
     margin-top:12px;
@@ -176,7 +164,7 @@
     <h2 id="ovTitle">독해 빈칸 추론 시작</h2>
     <p id="ovText">
       빈칸(______)에 들어갈 가장 적절한 단어를 고르세요.<br>
-      <b>오답 선택</b> 또는 <b>각 문제 1분 타임아웃</b> 시 불합격입니다.
+      <b>오답 선택</b> 또는 <b>각 문제 60초 초과</b> 시 불합격입니다.
     </p>
     <button id="startBtn">시험 시작</button>
     <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
@@ -185,7 +173,7 @@
 
 <script>
 /* =========================
-   ✅ 2025년 3월 고1 모의고사 31번 (Plato) 빈칸 추론 문제 세트
+   문제 세트 (총 6문제)
    ========================= */
 const questions = [
   {
@@ -221,7 +209,7 @@ const questions = [
 ];
 
 const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 31번 독해 빈칸 추론 통과!";
-const PER_QUESTION_TIME_SEC = 60; // ✅ 각 문제마다 1분
+const PER_QUESTION_TIME_SEC = 60;
 
 /* =========================
    유틸
@@ -261,8 +249,8 @@ const restartBtn = document.getElementById("restartBtn");
 let deck = [];
 let idx = 0;
 let running = false;
+let locked = false; // ✅ 정답 클릭 후 다음 문제 넘어갈 때까지 클릭 잠금
 
-// ✅ 문제별 타이머
 let remaining = PER_QUESTION_TIME_SEC;
 let timerInterval = null;
 
@@ -279,26 +267,27 @@ function showOverlay(title, htmlText, showStart, showRestart){
 function hideOverlay(){ overlayEl.style.display = "none"; }
 
 /* =========================
-   타이머(문제마다 리셋)
+   타이머 (핵심: 문제마다 완전 재시작)
    ========================= */
 function stopTimer(){
   if(timerInterval) clearInterval(timerInterval);
   timerInterval = null;
 }
-function resetTimer(){
+function startTimerFresh(){
+  // ✅ 매 문제 시작마다 "완전 초기화 + 즉시 표시 + 새 interval"로 강제
   stopTimer();
   remaining = PER_QUESTION_TIME_SEC;
   timerEl.textContent = fmtTime(remaining);
   timerEl.classList.remove("danger");
-}
-function startTimer(){
-  stopTimer();
+
   timerInterval = setInterval(() => {
     if(!running) return;
     remaining -= 1;
     if(remaining < 0) remaining = 0;
+
     timerEl.textContent = fmtTime(remaining);
     if(remaining <= 10) timerEl.classList.add("danger");
+
     if(remaining <= 0) failTimeout();
   }, 1000);
 }
@@ -310,10 +299,16 @@ function resetGame(){
   deck = shuffle(questions);
   idx = 0;
   running = false;
+  locked = false;
+
   sentenceEl.textContent = "독해 빈칸 추론";
   progressEl.textContent = `0 / ${deck.length}`;
   clearChoices();
-  resetTimer();
+
+  stopTimer();
+  remaining = PER_QUESTION_TIME_SEC;
+  timerEl.textContent = fmtTime(remaining);
+  timerEl.classList.remove("danger");
 }
 
 function startGame(){
@@ -327,6 +322,7 @@ function nextQ(){
   if(idx >= deck.length){
     stopTimer();
     running = false;
+    locked = false;
     clearChoices();
     showOverlay(
       "합격",
@@ -337,14 +333,12 @@ function nextQ(){
     return;
   }
 
-  // ✅ 다음 문제 시작 시 타이머를 1분으로 초기화하고 시작
-  resetTimer();
-  startTimer();
+  // ✅ 여기서 매 문제마다 타이머를 “무조건” 60초로 리셋/재시작
+  startTimerFresh();
 
   const q = deck[idx];
   sentenceEl.textContent = q.sentence;
   progressEl.textContent = `${idx + 1} / ${deck.length}`;
-
   renderChoices(q);
 }
 
@@ -354,8 +348,9 @@ function clearChoices(){
 
 function renderChoices(q){
   clearChoices();
-  const opts = shuffle(q.options);
+  locked = false;
 
+  const opts = shuffle(q.options);
   for(const txt of opts){
     const btn = document.createElement("div");
     btn.className = "choice";
@@ -372,11 +367,17 @@ function renderChoices(q){
   }
 }
 
+function disableAllChoices(){
+  const nodes = choicesWrap.querySelectorAll(".choice");
+  nodes.forEach(n => n.classList.add("disabled"));
+}
+
 function pick(el){
   if(!running) return;
+  if(locked) return;
 
-  // ✅ 중복 클릭 방지(정답 눌렀는데 타이머가 1초 더 흘러서 오작동 방지)
-  running = false;
+  locked = true;
+  disableAllChoices();
 
   const correct = (el.dataset.correct === "1");
   if(!correct){
@@ -386,23 +387,21 @@ function pick(el){
   }
 
   el.classList.add("good");
-
-  // ✅ 정답이면 현재 문제 타이머 멈추고 다음으로
-  stopTimer();
+  stopTimer(); // ✅ 정답 즉시 타이머 정지
 
   setTimeout(() => {
     idx += 1;
-    running = true;
-    nextQ();
+    nextQ(); // ✅ 다음 문제 들어갈 때 startTimerFresh()가 60초로 다시 세팅
   }, 180);
 }
 
 function fail(reason){
   stopTimer();
   running = false;
+  locked = false;
   showOverlay(
     "불합격",
-    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 각 문제 1분 타임아웃 시 즉시 종료됩니다.`,
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 각 문제 60초 초과 시 즉시 종료됩니다.`,
     false,
     true
   );
@@ -412,10 +411,11 @@ function failTimeout(){
   if(!running) return;
   stopTimer();
   running = false;
+  locked = false;
   showOverlay(
     "불합격",
     `<div class="skull">💀</div>
-     <b style="font-size:16px;">시간 초과(1분)로 불합격</b><br><br>
+     <b style="font-size:16px;">시간 초과(60초)로 불합격</b><br><br>
      다음에는 더 빠르게!`,
     false,
     true
@@ -430,7 +430,7 @@ restartBtn.addEventListener("click", () => {
   showOverlay(
     "독해 빈칸 추론 시작",
     `빈칸(______)에 들어갈 가장 적절한 단어를 고르세요.<br>
-     <b>오답 선택</b> 또는 <b>각 문제 1분 타임아웃</b> 시 불합격입니다.`,
+     <b>오답 선택</b> 또는 <b>각 문제 60초 초과</b> 시 불합격입니다.`,
     true,
     false
   );
@@ -440,7 +440,7 @@ restartBtn.addEventListener("click", () => {
 showOverlay(
   "독해 빈칸 추론 시작",
   `빈칸(______)에 들어갈 가장 적절한 단어를 고르세요.<br>
-   <b>오답 선택</b> 또는 <b>각 문제 1분 타임아웃</b> 시 불합격입니다.`,
+   <b>오답 선택</b> 또는 <b>각 문제 60초 초과</b> 시 불합격입니다.`,
   true,
   false
 );
