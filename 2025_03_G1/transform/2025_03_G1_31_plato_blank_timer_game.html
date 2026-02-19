@@ -192,9 +192,6 @@
 <script>
 /* =========================
    ✅ 2025년 3월 고1 모의고사 31번 (Plato) 빈칸 추론 문제 세트
-   - sentence: 표시할 문장(빈칸 포함)
-   - answer: 정답
-   - options: 보기 4개
    ========================= */
 const questions = [
   {
@@ -230,14 +227,14 @@ const questions = [
 ];
 
 /* =========================
-   게임 설정
+   설정
    ========================= */
 const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 31번 독해 빈칸 추론 통과!";
-const baseSpeed = 110;
 const floorHeight = 60;
 const choiceHeight = 56;
 
 const TOTAL_TIME_SEC = 60; // ✅ 1분 타이머
+const START_YS = [-220, -320, -420, -520]; // 선택지 시작 위치
 
 /* =========================
    유틸
@@ -276,12 +273,14 @@ const restartBtn = document.getElementById("restartBtn");
    ========================= */
 let deck = [];
 let idx = 0;
-let speed = baseSpeed;
 
 let choices = [];
 let raf = null;
 let running = false;
 let lastTs = 0;
+
+// ✅ 속도: "가장 첫(가장 아래에서 시작하는) 선택지"가 바닥에 닿기까지 정확히 60초
+let speedPxPerSec = 14; // 초기값(실제 시작 시 화면 높이 기준으로 자동 재계산)
 
 // ✅ 타이머
 let remaining = TOTAL_TIME_SEC;
@@ -324,10 +323,26 @@ function startTimer(){
     if(remaining <= 10) timerEl.classList.add("danger");
 
     if(remaining <= 0){
-      // ✅ 타임아웃 불합격 (해골 표시)
       failTimeout();
     }
   }, 1000);
+}
+
+/* =========================
+   ✅ 속도 계산 (핵심 수정)
+   - START_YS 중 "가장 바닥에 가까운 시작값"(-220)이
+     bottomLimit(바닥 위 한계)까지 이동하는 데 60초 걸리도록 speed 설정
+   ========================= */
+function computeSpeed(){
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  const closestStartY = Math.max(...START_YS); // -220
+  const distance = bottomLimit - closestStartY;
+
+  // 안전장치: 화면이 너무 작거나 계산이 이상하면 최소 속도 유지
+  const raw = distance / TOTAL_TIME_SEC;
+  speedPxPerSec = Math.max(6, raw); // 너무 느려서 답답해지는 것 방지(최소 6px/s)
 }
 
 /* =========================
@@ -336,7 +351,6 @@ function startTimer(){
 function resetGame(){
   deck = shuffle(questions);
   idx = 0;
-  speed = baseSpeed;
   progressEl.textContent = `0 / ${deck.length}`;
   sentenceEl.textContent = "독해 빈칸 추론";
   clearChoices();
@@ -347,6 +361,11 @@ function resetGame(){
 function startGame(){
   resetGame();
   hideOverlay();
+
+  // ✅ 시작 직후 화면 높이 기준으로 속도 계산
+  computeSpeed();
+  window.addEventListener("resize", computeSpeed);
+
   running = true;
   startTimer();
   nextQ();
@@ -366,8 +385,6 @@ function nextQ(){
     );
     return;
   }
-
-  speed = baseSpeed;
 
   const q = deck[idx];
   sentenceEl.textContent = q.sentence;
@@ -391,7 +408,6 @@ function fail(reason){
 }
 
 function failTimeout(){
-  // 이미 종료된 상태면 중복 실행 방지
   if(!running) return;
   stopLoop();
   stopTimer();
@@ -436,15 +452,13 @@ function spawnChoices(q){
   const correct = q.answer;
   const options = shuffle(q.options);
 
-  const startYs = [-220, -320, -420, -520];
-
   options.forEach((txt, i) => {
     const el = document.createElement("div");
     el.className = "choice";
     el.textContent = txt;
 
     el.dataset.correct = (txt === correct) ? "1" : "0";
-    el._y = startYs[i];
+    el._y = START_YS[i];
 
     el.addEventListener("click", () => pick(el));
     el.addEventListener("touchstart", (e) => {
@@ -481,7 +495,7 @@ function tick(ts){
   const bottomLimit = rect.height - floorHeight - choiceHeight;
 
   for(const el of choices){
-    el._y += speed * dt;
+    el._y += speedPxPerSec * dt;
     el.style.transform = `translateY(${el._y}px)`;
     if(el._y >= bottomLimit){
       fail("선택지가 바닥에 닿았습니다.");
@@ -496,6 +510,7 @@ function tick(ts){
    ========================= */
 startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", () => {
+  window.removeEventListener("resize", computeSpeed);
   showOverlay(
     "독해 빈칸 추론 시작",
     `빈칸(______)에 들어갈 가장 적절한 단어를 터치하세요.<br>
