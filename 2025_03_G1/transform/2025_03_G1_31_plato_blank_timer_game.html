@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2025년 3월 고1 모의고사 31번 독해 빈칸 추론</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action: manipulation;
+  }
+  #wrap{
+    max-width:520px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #topbar{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+  #sentence{
+    font-size:17px;
+    font-weight:800;
+    line-height:1.45;
+    letter-spacing:.1px;
+    flex:1;
+  }
+  #hud{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+    min-width:120px;
+  }
+  #timer{
+    font-size:18px;
+    font-weight:900;
+    padding:6px 10px;
+    border-radius:12px;
+    background:#0f172a;
+    border:1px solid rgba(255,255,255,.10);
+  }
+  #timer.danger{
+    background:rgba(255,80,80,.18);
+    border-color: rgba(255,80,80,.45);
+  }
+  #progress{
+    font-size:13px;
+    opacity:.85;
+  }
+
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px; right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:900;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    transition: transform .08s ease, background .12s ease;
+  }
+  .choice:active{ transform: scale(.98); }
+  .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
+  .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:460px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.55;
+  }
+  .skull{
+    font-size:46px;
+    line-height:1;
+    margin:10px 0 4px;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <div id="topbar">
+      <div id="sentence">독해 빈칸 추론</div>
+      <div id="hud">
+        <div id="timer">01:00</div>
+        <div id="progress"></div>
+      </div>
+    </div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">독해 빈칸 추론 시작</h2>
+        <p id="ovText">
+          빈칸(______)에 들어갈 가장 적절한 단어를 터치하세요.<br>
+          <b>오답 선택 / 선택지 바닥 도달 / 1분 타임아웃</b> 시 즉시 불합격입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   ✅ 2025년 3월 고1 모의고사 31번 (Plato) 빈칸 추론 문제 세트
+   - sentence: 표시할 문장(빈칸 포함)
+   - answer: 정답
+   - options: 보기 4개
+   ========================= */
+const questions = [
+  {
+    sentence: "Plato argued that when you see something that strikes you as beautiful, you are really just seeing a partial ______ of true beauty.",
+    answer: "reflection",
+    options: ["reflection","triangle","scent","route"]
+  },
+  {
+    sentence: "True beauty, or what Plato calls the Form of Beauty, has no particular color, shape, or ______.",
+    answer: "size",
+    options: ["size","branch","pressure","liquid"]
+  },
+  {
+    sentence: "Rather, it is an abstract idea, like the number ______.",
+    answer: "five",
+    options: ["five","tree","knee","map"]
+  },
+  {
+    sentence: "You can make drawings of the number five in blue or red ink, big or small, but the number five itself has no physical ______.",
+    answer: "form",
+    options: ["form","joint","animal","weight"]
+  },
+  {
+    sentence: "Although the idea of a triangle has no particular color or size, it somehow lies ______ each and every triangle you see.",
+    answer: "within",
+    options: ["within","in front","from A to B","off-and-on"]
+  },
+  {
+    sentence: "Plato thought the same was true of beauty: the Form of Beauty somehow lies within each and every ______ thing you see.",
+    answer: "beautiful",
+    options: ["beautiful","capable","healthy","working"]
+  }
+];
+
+/* =========================
+   게임 설정
+   ========================= */
+const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 31번 독해 빈칸 추론 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
+
+const TOTAL_TIME_SEC = 60; // ✅ 1분 타이머
+
+/* =========================
+   유틸
+   ========================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function pad2(n){ return String(n).padStart(2,"0"); }
+function fmtTime(sec){
+  const m = Math.floor(sec/60);
+  const s = sec%60;
+  return `${pad2(m)}:${pad2(s)}`;
+}
+
+/* =========================
+   DOM
+   ========================= */
+const gameEl = document.getElementById("game");
+const sentenceEl = document.getElementById("sentence");
+const progressEl = document.getElementById("progress");
+const timerEl = document.getElementById("timer");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+/* =========================
+   상태
+   ========================= */
+let deck = [];
+let idx = 0;
+let speed = baseSpeed;
+
+let choices = [];
+let raf = null;
+let running = false;
+let lastTs = 0;
+
+// ✅ 타이머
+let remaining = TOTAL_TIME_SEC;
+let timerInterval = null;
+
+/* =========================
+   오버레이
+   ========================= */
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+/* =========================
+   타이머
+   ========================= */
+function stopTimer(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+}
+function resetTimer(){
+  stopTimer();
+  remaining = TOTAL_TIME_SEC;
+  timerEl.textContent = fmtTime(remaining);
+  timerEl.classList.remove("danger");
+}
+function startTimer(){
+  stopTimer();
+  timerInterval = setInterval(() => {
+    if(!running) return;
+    remaining -= 1;
+    if(remaining < 0) remaining = 0;
+    timerEl.textContent = fmtTime(remaining);
+    if(remaining <= 10) timerEl.classList.add("danger");
+
+    if(remaining <= 0){
+      // ✅ 타임아웃 불합격 (해골 표시)
+      failTimeout();
+    }
+  }, 1000);
+}
+
+/* =========================
+   게임 흐름
+   ========================= */
+function resetGame(){
+  deck = shuffle(questions);
+  idx = 0;
+  speed = baseSpeed;
+  progressEl.textContent = `0 / ${deck.length}`;
+  sentenceEl.textContent = "독해 빈칸 추론";
+  clearChoices();
+  stopLoop();
+  resetTimer();
+}
+
+function startGame(){
+  resetGame();
+  hideOverlay();
+  running = true;
+  startTimer();
+  nextQ();
+}
+
+function nextQ(){
+  if(idx >= deck.length){
+    stopLoop();
+    stopTimer();
+    clearChoices();
+    running = false;
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>문제를 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  speed = baseSpeed;
+
+  const q = deck[idx];
+  sentenceEl.textContent = q.sentence;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(q);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  stopTimer();
+  clearChoices();
+  running = false;
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 / 선택지 바닥 도달 / 1분 타임아웃 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function failTimeout(){
+  // 이미 종료된 상태면 중복 실행 방지
+  if(!running) return;
+  stopLoop();
+  stopTimer();
+  clearChoices();
+  running = false;
+  showOverlay(
+    "불합격",
+    `<div class="skull">💀</div>
+     <b style="font-size:16px;">시간 초과(1분)로 불합격</b><br><br>
+     다음에는 더 빠르게!`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running) return;
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    fail("오답을 선택했습니다.");
+    return;
+  }
+  el.classList.add("good");
+  stopLoop();
+  setTimeout(() => {
+    idx += 1;
+    nextQ();
+  }, 200);
+}
+
+/* =========================
+   선택지 생성/이동
+   ========================= */
+function clearChoices(){
+  for(const el of choices) el.remove();
+  choices = [];
+}
+
+function spawnChoices(q){
+  clearChoices();
+
+  const correct = q.answer;
+  const options = shuffle(q.options);
+
+  const startYs = [-220, -320, -420, -520];
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+
+    el.dataset.correct = (txt === correct) ? "1" : "0";
+    el._y = startYs[i];
+
+    el.addEventListener("click", () => pick(el));
+    el.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      pick(el);
+    }, { passive:false });
+
+    el.style.top = "0px";
+    el.style.transform = `translateY(${el._y}px)`;
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+/* =========================
+   루프
+   ========================= */
+function startLoop(){
+  lastTs = performance.now();
+  if(raf) cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(tick);
+}
+function stopLoop(){
+  if(raf) cancelAnimationFrame(raf);
+  raf = null;
+}
+function tick(ts){
+  if(!running) return;
+  const dt = (ts - lastTs) / 1000;
+  lastTs = ts;
+
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    el._y += speed * dt;
+    el.style.transform = `translateY(${el._y}px)`;
+    if(el._y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+/* =========================
+   버튼
+   ========================= */
+startBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "독해 빈칸 추론 시작",
+    `빈칸(______)에 들어갈 가장 적절한 단어를 터치하세요.<br>
+     <b>오답 선택 / 선택지 바닥 도달 / 1분 타임아웃</b> 시 즉시 불합격입니다.`,
+    true,
+    false
+  );
+  resetGame();
+});
+
+showOverlay(
+  "독해 빈칸 추론 시작",
+  `빈칸(______)에 들어갈 가장 적절한 단어를 터치하세요.<br>
+   <b>오답 선택 / 선택지 바닥 도달 / 1분 타임아웃</b> 시 즉시 불합격입니다.`,
+  true,
+  false
+);
+</script>
+
+</body>
+</html>
