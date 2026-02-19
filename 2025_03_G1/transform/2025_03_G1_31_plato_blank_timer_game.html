@@ -46,7 +46,7 @@
     flex-direction:column;
     align-items:flex-end;
     gap:6px;
-    min-width:120px;
+    min-width:140px;
   }
   #timer{
     font-size:18px;
@@ -100,9 +100,8 @@
     border:1px solid rgba(255,255,255,.10);
     box-shadow: 0 10px 25px rgba(0,0,0,.25);
     z-index:1;
-    transition: transform .08s ease, background .12s ease;
+    transition: background .12s ease;
   }
-  .choice:active{ transform: scale(.98); }
   .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
   .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
 
@@ -233,8 +232,13 @@ const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 31번 독�
 const floorHeight = 60;
 const choiceHeight = 56;
 
-const TOTAL_TIME_SEC = 60; // ✅ 1분 타이머
-const START_YS = [-220, -320, -420, -520]; // 선택지 시작 위치
+const TOTAL_TIME_SEC = 60;            // ✅ 타임아웃 1분
+const TIME_TO_FLOOR_SEC = 60;         // ✅ '가장 첫 선택지'가 바닥에 닿기까지 정확히 60초
+
+// ✅ 시작 y(픽셀): 가장 아래에서 시작하는 것(closest)이 FIRST_TO_FLOOR가 됨
+//    (너무 빨라 보이면 '숫자를 더 작게(더 위에서 시작)' 해도 됩니다.)
+//    하지만 속도는 아래 computeSpeed가 60초에 맞춰 자동 계산됩니다.
+const START_YS = [-220, -320, -420, -520];
 
 /* =========================
    유틸
@@ -279,8 +283,8 @@ let raf = null;
 let running = false;
 let lastTs = 0;
 
-// ✅ 속도: "가장 첫(가장 아래에서 시작하는) 선택지"가 바닥에 닿기까지 정확히 60초
-let speedPxPerSec = 14; // 초기값(실제 시작 시 화면 높이 기준으로 자동 재계산)
+// ✅ 핵심: 픽셀/초 속도 (startGame 때 화면높이 기반으로 정확히 산출)
+let speedPxPerSec = 1;
 
 // ✅ 타이머
 let remaining = TOTAL_TIME_SEC;
@@ -296,9 +300,7 @@ function showOverlay(title, htmlText, showStart, showRestart){
   startBtn.style.display = showStart ? "" : "none";
   restartBtn.style.display = showRestart ? "" : "none";
 }
-function hideOverlay(){
-  overlayEl.style.display = "none";
-}
+function hideOverlay(){ overlayEl.style.display = "none"; }
 
 /* =========================
    타이머
@@ -321,28 +323,24 @@ function startTimer(){
     if(remaining < 0) remaining = 0;
     timerEl.textContent = fmtTime(remaining);
     if(remaining <= 10) timerEl.classList.add("danger");
-
-    if(remaining <= 0){
-      failTimeout();
-    }
+    if(remaining <= 0) failTimeout();
   }, 1000);
 }
 
 /* =========================
-   ✅ 속도 계산 (핵심 수정)
-   - START_YS 중 "가장 바닥에 가까운 시작값"(-220)이
-     bottomLimit(바닥 위 한계)까지 이동하는 데 60초 걸리도록 speed 설정
+   ✅ 속도 계산(핵심 수정)
+   - "가장 먼저 바닥에 닿는 선택지"가 60초 걸리도록 speed를 정확히 계산
+   - transform 대신 top(px)로 직접 이동시켜 체감/오차/브라우저 차이 최소화
    ========================= */
 function computeSpeed(){
   const rect = gameEl.getBoundingClientRect();
   const bottomLimit = rect.height - floorHeight - choiceHeight;
 
-  const closestStartY = Math.max(...START_YS); // -220
-  const distance = bottomLimit - closestStartY;
+  // 가장 먼저 닿는 시작 y = START_YS 중 가장 큰 값(덜 음수, 가장 아래쪽 시작)
+  const firstStartY = Math.max(...START_YS); // -220
 
-  // 안전장치: 화면이 너무 작거나 계산이 이상하면 최소 속도 유지
-  const raw = distance / TOTAL_TIME_SEC;
-  speedPxPerSec = Math.max(6, raw); // 너무 느려서 답답해지는 것 방지(최소 6px/s)
+  const distancePx = bottomLimit - firstStartY;
+  speedPxPerSec = distancePx / TIME_TO_FLOOR_SEC; // ✅ 60초 정확히 맞춤
 }
 
 /* =========================
@@ -362,7 +360,6 @@ function startGame(){
   resetGame();
   hideOverlay();
 
-  // ✅ 시작 직후 화면 높이 기준으로 속도 계산
   computeSpeed();
   window.addEventListener("resize", computeSpeed);
 
@@ -458,16 +455,16 @@ function spawnChoices(q){
     el.textContent = txt;
 
     el.dataset.correct = (txt === correct) ? "1" : "0";
+
+    // ✅ top(px)로 직접 이동 (transform 사용 X)
     el._y = START_YS[i];
+    el.style.top = `${el._y}px`;
 
     el.addEventListener("click", () => pick(el));
     el.addEventListener("touchstart", (e) => {
       e.preventDefault();
       pick(el);
     }, { passive:false });
-
-    el.style.top = "0px";
-    el.style.transform = `translateY(${el._y}px)`;
 
     gameEl.appendChild(el);
     choices.push(el);
@@ -496,7 +493,8 @@ function tick(ts){
 
   for(const el of choices){
     el._y += speedPxPerSec * dt;
-    el.style.transform = `translateY(${el._y}px)`;
+    el.style.top = `${el._y}px`;
+
     if(el._y >= bottomLimit){
       fail("선택지가 바닥에 닿았습니다.");
       return;
