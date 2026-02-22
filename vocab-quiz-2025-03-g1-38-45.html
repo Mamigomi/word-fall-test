@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2025년 3월 고1 모의고사 38~45번 어휘 단어 시험</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action: manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px; right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    transition: transform .08s ease, background .12s ease;
+  }
+  .choice:active{ transform: scale(.98); }
+  .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
+  .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <div id="english">단어 시험</div>
+    <div id="progress"></div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">단어 시험 시작</h2>
+        <p id="ovText">
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   ✅ 단어 목록(2025년 3월 고1 모의고사 38~45번)
+   ========================= */
+const words = [
+  // 38번
+  { en:"argue", ko:"주장하다" },
+  { en:"understanding", ko:"이해" },
+  { en:"morality", ko:"도덕성" },
+  { en:"innate", ko:"타고난" },
+  { en:"learn", ko:"배우다" },
+  { en:"directly", ko:"직접" },
+  { en:"adult", ko:"성인" },
+  { en:"put", ko:"넣다" },
+  { en:"amount", ko:"양" },
+  { en:"water", ko:"물" },
+  { en:"glass", ko:"유리잔" },
+  { en:"tall", ko:"키가 큰" },
+  { en:"narrow", ko:"좁은" },
+  { en:"wide", ko:"넓은" },
+  { en:"compare", ko:"비교하다" },
+  { en:"younger", ko:"더 어린" },
+  { en:"level", ko:"수위" },
+  { en:"hold", ko:"담다" },
+  { en:"ready", ko:"준비된" },
+  { en:"figure out", ko:"알아내다" },
+  { en:"conservation", ko:"보존" },
+  { en:"volume", ko:"부피" },
+  { en:"play", ko:"놀다" },
+  { en:"rather", ko:"오히려" },
+  { en:"self-constructed", ko:"스스로 구성된" },
+  { en:"turn", ko:"차례" },
+  { en:"pour", ko:"붓다" },
+  { en:"work out", ko:"해결하다" },
+  { en:"fairness", ko:"공정함" },
+  { en:"effectively", ko:"효과적으로" },
+  { en:"teaching", ko:"가르침" },
+
+  // 39번
+  { en:"wisdom", ko:"지혜" },
+  { en:"deal with", ko:"다루다" },
+  { en:"heat", ko:"열" },
+  { en:"accumulate", ko:"축적하다" },
+  { en:"century", ko:"세기" },
+  { en:"practical", ko:"실용적인" },
+  { en:"experience", ko:"경험" },
+  { en:"ignore", ko:"무시하다" },
+  { en:"rise", ko:"증가, 상승" },
+  { en:"air-conditioning", ko:"냉방, 에어컨" },
+  { en:"accelerate", ko:"가속시키다" },
+  { en:"construction", ko:"건설" },
+  { en:"sealed", ko:"밀폐된" },
+  { en:"box", ko:"상자, 구조물" },
+  { en:"building", ko:"건물" },
+  { en:"airflow", ko:"공기 흐름" },
+  { en:"filtered", ko:"여과된" },
+  { en:"duct", ko:"관, 덕트" },
+  { en:"unit", ko:"장치" },
+  { en:"have to", ko:"~해야 한다" },
+  { en:"look at", ko:"보다" },
+  { en:"old", ko:"오래된" },
+  { en:"climate", ko:"기후" },
+  { en:"Sicily", ko:"시칠리아" },
+  { en:"Marrakesh", ko:"마라케시" },
+  { en:"Tehran", ko:"테헤란" },
+  { en:"architect", ko:"건축가" },
+  { en:"understand", ko:"이해하다" },
+  { en:"importance", ko:"중요성" },
+  { en:"shade", ko:"그늘" },
+  { en:"light color", ko:"밝은 색" },
+  { en:"orient", ko:"방향을 잡다" },
+  { en:"capture", ko:"잡다, 포착하다" },
+  { en:"breeze", ko:"산들바람" },
+  { en:"block", ko:"막다" },
+  { en:"worst", ko:"최악의" },
+  { en:"afternoon", ko:"오후" },
+  { en:"build", ko:"짓다" },
+  { en:"thick", ko:"두꺼운" },
+  { en:"wall", ko:"벽" },
+  { en:"white", ko:"흰색의" },
+  { en:"roof", ko:"지붕" },
+  { en:"transom", ko:"채광창" },
+  { en:"door", ko:"문" },
+  { en:"encourage", ko:"장려하다, 촉진하다" },
+  { en:"minute", ko:"분" },
+  { en:"mudbrick", ko:"흙벽돌" },
+  { en:"house", ko:"집" },
+  { en:"street", ko:"거리" },
+  { en:"construction method", ko:"건축 방식" },
+  { en:"work", ko:"작동하다, 효과 있다" },
+  { en:"sense", ko:"의미" },
+  { en:"technology", ko:"기술" },
+  { en:"comfort", ko:"편안함" },
+  { en:"forget", ko:"잊다" },
+
+  // 40번
+  { en:"in the course of", ko:"~하는 과정에서" },
+  { en:"try", ko:"시도하다" },
+  { en:"solve", ko:"해결하다" },
+  { en:"problem", ko:"문제" },
+  { en:"invention", ko:"발명" },
+  { en:"encounter", ko:"마주치다" },
+  { en:"brick wall", ko:"장벽" },
+  { en:"resistance", ko:"저항" },
+  { en:"think", ko:"생각하다" },
+  { en:"logically", ko:"논리적으로" },
+  { en:"logical", ko:"논리적인" },
+  { en:"type", ko:"유형" },
+  { en:"process", ko:"과정" },
+  { en:"reasoning", ko:"추론" },
+  { en:"operate", ko:"작동하다" },
+  { en:"area", ko:"영역" },
+  { en:"know", ko:"알다" },
+  { en:"experience", ko:"경험하다" },
+  { en:"deal with", ko:"다루다" },
+  { en:"new", ko:"새로운" },
+  { en:"information", ko:"정보" },
+  { en:"idea", ko:"아이디어" },
+  { en:"viewpoint", ko:"관점" },
+  { en:"come up short", ko:"부족하다" },
+  { en:"creativity", ko:"창의성" },
+  { en:"involve", ko:"포함하다" },
+  { en:"application", ko:"적용" },
+  { en:"conception", ko:"개념화" },
+  { en:"effective", ko:"효과적인" },
+  { en:"learn", ko:"배우다" },
+  { en:"nonlinear", ko:"비선형의" },
+  { en:"manner", ko:"방식" },
+  { en:"creative", ko:"창의적인" },
+  { en:"brain", ko:"뇌" },
+  { en:"stated differently", ko:"달리 말하면" },
+  { en:"conservative", ko:"보수적인" },
+  { en:"keep ~ing", ko:"계속 ~하다" },
+  { en:"technique", ko:"기법" },
+  { en:"already", ko:"이미" },
+  { en:"known", ko:"알려진" },
+  { en:"want", ko:"원하다" },
+  { en:"familiar", ko:"익숙한" },
+  { en:"fall short", ko:"부족하다" },
+  { en:"come up with", ko:"생각해내다" },
+  { en:"innovative", ko:"혁신적인" },
+  { en:"solution", ko:"해결책" },
+
+  // 41~42번
+  { en:"researcher", ko:"연구자" },
+  { en:"view", ko:"간주하다, 바라보다" },
+  { en:"speak", ko:"말하다" },
+  { en:"language", ko:"언어" },
+  { en:"incomplete", ko:"불완전한" },
+  { en:"device", ko:"수단, 장치" },
+  { en:"capture", ko:"포착하다" },
+  { en:"precise", ko:"정확한" },
+  { en:"difference", ko:"차이" },
+  { en:"think", ko:"생각하다" },
+  { en:"number", ko:"숫자" },
+  { en:"represent", ko:"나타내다" },
+  { en:"neutral", ko:"중립적인" },
+  { en:"description", ko:"묘사" },
+  { en:"change", ko:"바꾸다" },
+  { en:"move toward", ko:"~로 향하다" },
+  { en:"accuracy", ko:"정확성" },
+  { en:"appropriate", ko:"적절한" },
+  { en:"picture", ko:"그림, 모습" },
+  { en:"world", ko:"세계" },
+  { en:"word", ko:"단어" },
+  { en:"music", ko:"음악" },
+  { en:"painting", ko:"그림" },
+  { en:"useful", ko:"유용한" },
+  { en:"purpose", ko:"목적" },
+  { en:"census", ko:"인구조사" },
+  { en:"distribution", ko:"분배" },
+  { en:"include", ko:"포함하다" },
+  { en:"enormous", ko:"거대한" },
+  { en:"value", ko:"가치" },
+  { en:"future", ko:"미래" },
+  { en:"life", ko:"삶" },
+  { en:"young", ko:"어린" },
+  { en:"student", ko:"학생" },
+  { en:"tie to", ko:"연결되다" },
+  { en:"score", ko:"점수" },
+  { en:"national", ko:"전국의" },
+  { en:"test", ko:"시험" },
+  { en:"education", ko:"교육" },
+  { en:"cost", ko:"비용" },
+  { en:"depend on", ko:"~에 달려 있다" },
+  { en:"handful", ko:"소수" },
+  { en:"account for", ko:"설명하다, 고려하다" },
+  { en:"quality", ko:"질" },
+  { en:"attend", ko:"다니다" },
+  { en:"tutor", ko:"과외하다" },
+  { en:"supportive", ko:"지지하는" },
+  { en:"parent", ko:"부모" },
+  { en:"anxiety", ko:"불안" },
+  { en:"put aside", ko:"제쳐두다" },
+  { en:"statistical", ko:"통계의" },
+  { en:"result", ko:"결과" },
+  { en:"manipulate", ko:"조작하다" },
+  { en:"turn into", ko:"~로 바꾸다" },
+  { en:"morally", ko:"도덕적으로" },
+  { en:"insulating", ko:"차단하는" },
+  { en:"crime", ko:"범죄" },
+  { en:"homelessness", ko:"노숙" },
+  { en:"spread", ko:"퍼지다" },
+  { en:"disease", ko:"질병" },
+  { en:"suffering", ko:"고통" },
+  { en:"read", ko:"읽다" },
+  { en:"report", ko:"보고" },
+  { en:"event", ko:"사건" },
+  { en:"distance", ko:"거리" },
+  { en:"allow", ko:"허용하다" },
+  { en:"escape", ko:"벗어나다" },
+  { en:"disturb", ko:"불편하게 하다" },
+  { en:"quantify", ko:"수량화하다" },
+  { en:"caution", ko:"주의" },
+
+  // 43~45번
+  { en:"farmer", ko:"농부" },
+  { en:"unhappy", ko:"불행한" },
+  { en:"make", ko:"만들다" },
+  { en:"enough", ko:"충분한" },
+  { en:"money", ko:"돈" },
+  { en:"work", ko:"일하다" },
+  { en:"improve", ko:"개선되다" },
+  { en:"sell", ko:"팔다" },
+  { en:"neighbor", ko:"이웃" },
+  { en:"wealthy", ko:"부유한" },
+  { en:"hope", ko:"희망하다" },
+  { en:"fresh", ko:"새로운" },
+  { en:"start", ko:"시작" },
+  { en:"leave", ko:"떠나다" },
+  { en:"big city", ko:"대도시" },
+  { en:"opportunity", ko:"기회" },
+  { en:"year", ko:"년" },
+  { en:"pass", ko:"지나가다" },
+  { en:"find", ko:"찾다" },
+  { en:"fortune", ko:"재산, 행운" },
+  { en:"look for", ko:"찾다" },
+  { en:"tired", ko:"지친" },
+  { en:"broke", ko:"무일푼의" },
+  { en:"return", ko:"돌아오다" },
+  { en:"area", ko:"지역" },
+  { en:"old", ko:"옛" },
+  { en:"land", ko:"땅" },
+  { en:"drive past", ko:"지나치다" },
+  { en:"shock", ko:"충격을 주다" },
+  { en:"seem", ko:"~처럼 보이다" },
+  { en:"live", ko:"살다" },
+  { en:"success", ko:"성공" },
+  { en:"tear down", ko:"철거하다" },
+  { en:"build", ko:"짓다" },
+  { en:"massive", ko:"거대한" },
+  { en:"place", ko:"장소" },
+  { en:"new", ko:"새로운" },
+  { en:"building", ko:"건물" },
+  { en:"tree", ko:"나무" },
+  { en:"flower", ko:"꽃" },
+  { en:"adorn", ko:"꾸미다" },
+  { en:"well-kept", ko:"잘 관리된" },
+  { en:"property", ko:"재산" },
+  { en:"believe", ko:"믿다" },
+  { en:"ever", ko:"한 번이라도" },
+  { en:"work", ko:"일하다" },
+  { en:"curious", ko:"궁금한" },
+  { en:"stop", ko:"멈추다" },
+  { en:"talk", ko:"이야기하다" },
+  { en:"owe", ko:"빚지다" },
+  { en:"diamond", ko:"다이아몬드" },
+  { en:"acre", ko:"에이커(면적 단위)" },
+  { en:"disbelief", ko:"불신" },
+  { en:"reach into", ko:"손을 넣다" },
+  { en:"pocket", ko:"주머니" },
+  { en:"carefully", ko:"조심스럽게" },
+  { en:"pull out", ko:"꺼내다" },
+  { en:"small", ko:"작은" },
+  { en:"shiny", ko:"반짝이는" },
+  { en:"hold", ko:"잡다" },
+  { en:"between", ko:"~사이에" },
+  { en:"finger", ko:"손가락" },
+  { en:"catch", ko:"잡다, 포착하다" },
+  { en:"light", ko:"빛" },
+  { en:"rock", ko:"돌" },
+  { en:"useless", ko:"쓸모없는" },
+  { en:"hard", ko:"힘든" },
+  { en:"laugh", ko:"웃다" },
+  { en:"know", ko:"알다" },
+  { en:"treasure", ko:"보물" },
+  { en:"hide", ko:"숨기다" },
+  { en:"in front of", ko:"앞에" }
+];
+
+/* =========================
+   게임 설정
+   ========================= */
+const PASS_MESSAGE = "축하합니다. 2025년 3월 고1 모의고사 38~45번 어휘 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
+
+/* =========================
+   유틸
+   ========================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* =========================
+   DOM
+   ========================= */
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+/* =========================
+   상태
+   ========================= */
+let deck = [];
+let idx = 0;
+let speed = baseSpeed;
+
+let choices = [];
+let raf = null;
+let running = false;
+let lastTs = 0;
+
+/* =========================
+   오버레이
+   ========================= */
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+/* =========================
+   게임 흐름
+   ========================= */
+function resetGame(){
+  deck = shuffle(words);
+  idx = 0;
+  speed = baseSpeed;
+  progressEl.textContent = `0 / ${deck.length}`;
+  englishEl.textContent = "단어 시험";
+  clearChoices();
+  stopLoop();
+}
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  speed = baseSpeed;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running) return;
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    fail("오답을 선택했습니다.");
+    return;
+  }
+  el.classList.add("good");
+  stopLoop();
+  setTimeout(() => {
+    idx += 1;
+    nextWord();
+  }, 200);
+}
+
+/* =========================
+   선택지 생성/이동
+   ========================= */
+function clearChoices(){
+  for(const el of choices) el.remove();
+  choices = [];
+}
+
+function spawnChoices(word){
+  clearChoices();
+
+  const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
+
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
+
+  const startYs = [-220, -320, -420, -520];
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+
+    el.dataset.correct = (txt === correct) ? "1" : "0";
+    el._y = startYs[i];
+
+    el.addEventListener("click", () => pick(el));
+    el.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      pick(el);
+    }, { passive:false });
+
+    el.style.top = "0px";
+    el.style.transform = `translateY(${el._y}px)`;
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+/* =========================
+   루프
+   ========================= */
+function startLoop(){
+  running = true;
+  lastTs = performance.now();
+  if(raf) cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(tick);
+}
+function stopLoop(){
+  running = false;
+  if(raf) cancelAnimationFrame(raf);
+  raf = null;
+}
+function tick(ts){
+  if(!running) return;
+  const dt = (ts - lastTs) / 1000;
+  lastTs = ts;
+
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    el._y += speed * dt;
+    el.style.transform = `translateY(${el._y}px)`;
+    if(el._y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+/* =========================
+   버튼
+   ========================= */
+startBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "단어 시험 시작",
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
+});
+
+showOverlay(
+  "단어 시험 시작",
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
+</script>
+
+</body>
+</html>
