@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2025년 3월 고1 모의고사 41~45번 어휘 단어 시험</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action: manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px; right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    transition: transform .08s ease, background .12s ease;
+  }
+  .choice:active{ transform: scale(.98); }
+  .choice.good{ background:#065f46; }
+  .choice.bad{ background:#7f1d1d; }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <div id="english">단어 시험</div>
+    <div id="progress"></div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">단어 시험 시작</h2>
+        <p id="ovText">
+          영어 단어에 맞는 한국어를 터치하세요.<br>
+          하나라도 바닥에 닿으면 종료됩니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const words = [
+
+{en:"researcher",ko:"연구자"},
+{en:"view",ko:"간주하다, 바라보다"},
+{en:"speak",ko:"말하다"},
+{en:"language",ko:"언어"},
+{en:"incomplete",ko:"불완전한"},
+{en:"device",ko:"수단, 장치"},
+{en:"capture",ko:"포착하다"},
+{en:"precise",ko:"정확한"},
+{en:"difference",ko:"차이"},
+{en:"think",ko:"생각하다"},
+{en:"number",ko:"숫자"},
+{en:"represent",ko:"나타내다"},
+{en:"neutral",ko:"중립적인"},
+{en:"description",ko:"묘사"},
+{en:"change",ko:"바꾸다"},
+{en:"move toward",ko:"~로 향하다"},
+{en:"accuracy",ko:"정확성"},
+{en:"appropriate",ko:"적절한"},
+{en:"picture",ko:"그림, 모습"},
+{en:"world",ko:"세계"},
+{en:"word",ko:"단어"},
+{en:"music",ko:"음악"},
+{en:"painting",ko:"그림"},
+{en:"useful",ko:"유용한"},
+{en:"purpose",ko:"목적"},
+{en:"census",ko:"인구조사"},
+{en:"distribution",ko:"분배"},
+{en:"include",ko:"포함하다"},
+{en:"enormous",ko:"거대한"},
+{en:"value",ko:"가치"},
+{en:"future",ko:"미래"},
+{en:"life",ko:"삶"},
+{en:"young",ko:"어린"},
+{en:"student",ko:"학생"},
+{en:"tie to",ko:"연결되다"},
+{en:"score",ko:"점수"},
+{en:"national",ko:"전국의"},
+{en:"test",ko:"시험"},
+{en:"education",ko:"교육"},
+{en:"cost",ko:"비용"},
+{en:"depend on",ko:"~에 달려 있다"},
+{en:"handful",ko:"소수"},
+{en:"account for",ko:"설명하다, 고려하다"},
+{en:"quality",ko:"질"},
+{en:"attend",ko:"다니다"},
+{en:"tutor",ko:"과외하다"},
+{en:"supportive",ko:"지지하는"},
+{en:"parent",ko:"부모"},
+{en:"anxiety",ko:"불안"},
+{en:"put aside",ko:"제쳐두다"},
+{en:"statistical",ko:"통계의"},
+{en:"result",ko:"결과"},
+{en:"manipulate",ko:"조작하다"},
+{en:"turn into",ko:"~로 바꾸다"},
+{en:"morally",ko:"도덕적으로"},
+{en:"insulating",ko:"차단하는"},
+{en:"crime",ko:"범죄"},
+{en:"homelessness",ko:"노숙"},
+{en:"spread",ko:"퍼지다"},
+{en:"disease",ko:"질병"},
+{en:"suffering",ko:"고통"},
+{en:"read",ko:"읽다"},
+{en:"report",ko:"보고"},
+{en:"event",ko:"사건"},
+{en:"distance",ko:"거리"},
+{en:"allow",ko:"허용하다"},
+{en:"escape",ko:"벗어나다"},
+{en:"disturb",ko:"불편하게 하다"},
+{en:"quantify",ko:"수량화하다"},
+{en:"caution",ko:"주의"},
+
+{en:"farmer",ko:"농부"},
+{en:"unhappy",ko:"불행한"},
+{en:"make",ko:"만들다"},
+{en:"enough",ko:"충분한"},
+{en:"money",ko:"돈"},
+{en:"work",ko:"일하다"},
+{en:"improve",ko:"개선되다"},
+{en:"sell",ko:"팔다"},
+{en:"neighbor",ko:"이웃"},
+{en:"wealthy",ko:"부유한"},
+{en:"hope",ko:"희망하다"},
+{en:"fresh",ko:"새로운"},
+{en:"start",ko:"시작"},
+{en:"leave",ko:"떠나다"},
+{en:"big city",ko:"대도시"},
+{en:"opportunity",ko:"기회"},
+{en:"year",ko:"년"},
+{en:"pass",ko:"지나가다"},
+{en:"find",ko:"찾다"},
+{en:"fortune",ko:"재산, 행운"},
+{en:"look for",ko:"찾다"},
+{en:"tired",ko:"지친"},
+{en:"broke",ko:"무일푼의"},
+{en:"return",ko:"돌아오다"},
+{en:"area",ko:"지역"},
+{en:"old",ko:"옛"},
+{en:"land",ko:"땅"},
+{en:"drive past",ko:"지나치다"},
+{en:"shock",ko:"충격을 주다"},
+{en:"seem",ko:"~처럼 보이다"},
+{en:"live",ko:"살다"},
+{en:"success",ko:"성공"},
+{en:"tear down",ko:"철거하다"},
+{en:"build",ko:"짓다"},
+{en:"massive",ko:"거대한"},
+{en:"place",ko:"장소"},
+{en:"new",ko:"새로운"},
+{en:"building",ko:"건물"},
+{en:"tree",ko:"나무"},
+{en:"flower",ko:"꽃"},
+{en:"adorn",ko:"꾸미다"},
+{en:"well-kept",ko:"잘 관리된"},
+{en:"property",ko:"재산"},
+{en:"believe",ko:"믿다"},
+{en:"ever",ko:"한 번이라도"},
+{en:"curious",ko:"궁금한"},
+{en:"stop",ko:"멈추다"},
+{en:"talk",ko:"이야기하다"},
+{en:"owe",ko:"빚지다"},
+{en:"diamond",ko:"다이아몬드"},
+{en:"acre",ko:"에이커"},
+{en:"disbelief",ko:"불신"},
+{en:"reach into",ko:"손을 넣다"},
+{en:"pocket",ko:"주머니"},
+{en:"carefully",ko:"조심스럽게"},
+{en:"pull out",ko:"꺼내다"},
+{en:"small",ko:"작은"},
+{en:"shiny",ko:"반짝이는"},
+{en:"hold",ko:"잡다"},
+{en:"between",ko:"~사이에"},
+{en:"finger",ko:"손가락"},
+{en:"catch",ko:"잡다, 포착하다"},
+{en:"light",ko:"빛"},
+{en:"rock",ko:"돌"},
+{en:"useless",ko:"쓸모없는"},
+{en:"hard",ko:"힘든"},
+{en:"laugh",ko:"웃다"},
+{en:"know",ko:"알다"},
+{en:"treasure",ko:"보물"},
+{en:"hide",ko:"숨기다"},
+{en:"in front of",ko:"앞에"}
+];
+
+const PASS_MESSAGE="축하합니다. 2025년 3월 고1 모의고사 41~45번 어휘 통과!";
+const baseSpeed=110;
+const floorHeight=60;
+const choiceHeight=56;
+
+function shuffle(arr){
+  const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+const gameEl=document.getElementById("game");
+const englishEl=document.getElementById("english");
+const progressEl=document.getElementById("progress");
+const overlay=document.getElementById("overlay");
+const startBtn=document.getElementById("startBtn");
+
+let deck=[],idx=0,speed=baseSpeed,choices=[],raf=null,running=false,lastTs=0;
+
+function resetGame(){
+  deck=shuffle(words);
+  idx=0;
+  progressEl.textContent=`0 / ${deck.length}`;
+}
+
+function startGame(){
+  resetGame();
+  overlay.style.display="none";
+  nextWord();
+}
+
+function nextWord(){
+  if(idx>=deck.length){
+    alert(PASS_MESSAGE);
+    location.reload();
+    return;
+  }
+  const w=deck[idx];
+  englishEl.textContent=w.en;
+  progressEl.textContent=`${idx+1} / ${deck.length}`;
+  spawnChoices(w);
+  startLoop();
+}
+
+function spawnChoices(word){
+  clearChoices();
+  const correct=word.ko;
+  const pool=Array.from(new Set(words.map(x=>x.ko))).filter(k=>k!==correct);
+  const wrongs=shuffle(pool).slice(0,3);
+  const options=shuffle([correct,...wrongs]);
+  const startYs=[-220,-320,-420,-520];
+
+  options.forEach((txt,i)=>{
+    const el=document.createElement("div");
+    el.className="choice";
+    el.textContent=txt;
+    el.dataset.correct=(txt===correct)?"1":"0";
+    el._y=startYs[i];
+    el.addEventListener("click",()=>pick(el));
+    el.style.transform=`translateY(${el._y}px)`;
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+function clearChoices(){
+  choices.forEach(el=>el.remove());
+  choices=[];
+}
+
+function pick(el){
+  if(!running)return;
+  if(el.dataset.correct!=="1"){
+    alert("오답입니다.");
+    location.reload();
+    return;
+  }
+  stopLoop();
+  idx++;
+  nextWord();
+}
+
+function startLoop(){
+  running=true;
+  lastTs=performance.now();
+  raf=requestAnimationFrame(tick);
+}
+
+function stopLoop(){
+  running=false;
+  cancelAnimationFrame(raf);
+}
+
+function tick(ts){
+  if(!running)return;
+  const dt=(ts-lastTs)/1000;
+  lastTs=ts;
+  const rect=gameEl.getBoundingClientRect();
+  const bottomLimit=rect.height-floorHeight-choiceHeight;
+
+  for(const el of choices){
+    el._y+=speed*dt;
+    el.style.transform=`translateY(${el._y}px)`;
+    if(el._y>=bottomLimit){
+      alert("바닥에 닿았습니다.");
+      location.reload();
+      return;
+    }
+  }
+  raf=requestAnimationFrame(tick);
+}
+
+startBtn.addEventListener("click",startGame);
+</script>
+
+</body>
+</html>
