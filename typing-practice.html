@@ -2,108 +2,547 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title>필사 타자연습</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>필사 타자연습 (타수 측정)</title>
 <style>
-body{
-  font-family: "Noto Sans KR", sans-serif;
-  background:#0f172a;
-  color:#fff;
-  margin:0;
-  padding:20px;
-}
-h1{margin-bottom:10px;}
-select,button{
-  padding:8px;
-  margin:5px 0;
-}
-#quoteBox{
-  background:#1e293b;
-  padding:15px;
-  border-radius:8px;
-  margin:15px 0;
-}
-textarea{
-  width:100%;
-  height:120px;
-  padding:10px;
-  font-size:16px;
-}
-#result{
-  margin-top:10px;
-  font-weight:bold;
-}
-.correct{color:#22c55e;}
-.wrong{color:#ef4444;}
+  :root{
+    --bg:#0b1220; --panel:#121c2e; --panel2:#0f172a;
+    --text:#e8eefc; --muted:#a8b3cf;
+    --ok:#22c55e; --bad:#ef4444; --line:#22304c;
+  }
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    min-height:100vh;
+  }
+  #wrap{max-width:860px; margin:0 auto; padding:18px 16px 28px;}
+  h1{margin:6px 0 14px; font-size:22px;}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  select, button, input{
+    background:var(--panel); color:var(--text);
+    border:1px solid var(--line); border-radius:10px;
+    padding:10px 12px; font-size:14px;
+  }
+  button{cursor:pointer;}
+  button:hover{filter:brightness(1.08);}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+  }
+  #prompt{
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px;
+    line-height:1.65;
+    font-size:16px;
+    white-space:pre-wrap;
+  }
+  textarea{
+    width:100%;
+    height:150px;
+    margin-top:12px;
+    background:#0a1020;
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px;
+    font-size:16px;
+    line-height:1.6;
+    resize:vertical;
+    outline:none;
+  }
+  .stats{
+    margin-top:12px;
+    display:grid;
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    gap:10px;
+  }
+  .stat{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px;
+  }
+  .label{color:var(--muted); font-size:12px; margin-bottom:6px;}
+  .value{font-size:18px; font-weight:700;}
+  .barWrap{
+    margin-top:12px;
+    background:#0a1020;
+    border:1px solid var(--line);
+    border-radius:999px;
+    height:12px;
+    overflow:hidden;
+  }
+  #bar{
+    height:100%;
+    width:0%;
+    background:rgba(34,197,94,.9);
+  }
+  .hint{color:var(--muted); font-size:13px; margin-top:10px; line-height:1.6;}
+  .diff{
+    margin-top:14px;
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px;
+    line-height:1.8;
+    word-break:break-word;
+  }
+  .ok{color:var(--ok); font-weight:700;}
+  .bad{color:var(--bad); font-weight:700;}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+  @media (max-width:720px){
+    .stats{grid-template-columns: repeat(2, minmax(140px, 1fr));}
+  }
 </style>
 </head>
 <body>
+  <div id="wrap">
+    <h1>⌨️ 필사 타자연습 (타수/KPM 측정)</h1>
 
-<h1>📚 필사 타자연습</h1>
+    <div class="row">
+      <select id="category">
+        <option value="quotes_ko">명언 (한국어)</option>
+        <option value="quotes_en">명언 (영어)</option>
+        <option value="economy_en">경제/금융 (영어)</option>
+        <option value="news_style">뉴스 문장 (영어)</option>
+        <option value="business_email">비즈니스 이메일 (영어)</option>
+        <option value="daily_dialog">일상 대화 (영어)</option>
+        <option value="exam_style">수능/학술 문장 (영어)</option>
+        <option value="science">과학/기술 (영어)</option>
+        <option value="history">역사/교양 (영어)</option>
+        <option value="literature_ko">문학 (한국어)</option>
+        <option value="literature_en">문학 (영어)</option>
+        <option value="bible">성경/잠언 (영/한)</option>
+      </select>
 
-<select id="category">
-<option value="quote">명언</option>
-<option value="economy">경제 영어</option>
-<option value="novel">고전 문학</option>
-<option value="bible">성경</option>
-<option value="exam">수능 스타일</option>
-</select>
+      <button id="btnLoad" type="button">문장 불러오기</button>
+      <button id="btnReset" type="button">초기화</button>
 
-<button onclick="loadText()">문장 불러오기</button>
+      <label class="hint" style="margin:0;">
+        문장 길이
+        <select id="length">
+          <option value="short">짧게</option>
+          <option value="medium" selected>보통</option>
+          <option value="long">길게</option>
+        </select>
+      </label>
+    </div>
 
-<div id="quoteBox"></div>
+    <div class="card" style="margin-top:12px;">
+      <div id="prompt" class="mono">문장을 불러오면 여기에 표시됩니다.</div>
+      <textarea id="inputBox" placeholder="문장을 그대로 필사하세요. 입력하는 순간 측정이 시작됩니다."></textarea>
 
-<textarea id="inputBox" placeholder="여기에 그대로 필사하세요..."></textarea>
+      <div class="barWrap" aria-label="진행률">
+        <div id="bar"></div>
+      </div>
 
-<button onclick="checkTyping()">확인</button>
+      <div class="stats">
+        <div class="stat">
+          <div class="label">경과 시간</div>
+          <div class="value" id="time">0.0s</div>
+        </div>
+        <div class="stat">
+          <div class="label">타수 (KPM, 분당)</div>
+          <div class="value" id="kpm">0</div>
+        </div>
+        <div class="stat">
+          <div class="label">정확도</div>
+          <div class="value" id="acc">0%</div>
+        </div>
+        <div class="stat">
+          <div class="label">진행률</div>
+          <div class="value" id="prog">0%</div>
+        </div>
+      </div>
 
-<div id="result"></div>
+      <div class="hint">
+        • <b>타수(KPM)</b>는 “입력한 글자 수(공백 포함)”를 기준으로 분당 환산합니다.<br>
+        • 정확도는 “현재까지 입력한 글자”가 원문과 같은 비율로 계산합니다.
+      </div>
+
+      <div class="diff" id="diff">
+        <span class="label">오타 표시</span><br>
+        아직 입력이 없습니다.
+      </div>
+    </div>
+  </div>
 
 <script>
-const texts = {
-quote:[
-"성공은 준비된 사람에게 기회가 왔을 때 일어난다.",
-"Action is the foundational key to all success.",
-"오늘 걷지 않으면 내일은 뛰어야 한다."
-],
-economy:[
-"Inflation reduces purchasing power over time.",
-"High interest rates can slow economic growth.",
-"Supply and demand determine market prices."
-],
-novel:[
-"모든 행복한 가정은 서로 닮았고, 불행한 가정은 제각기 불행하다.",
-"It was the best of times, it was the worst of times."
-],
-bible:[
-"In the beginning God created the heavens and the earth.",
-"여호와는 나의 목자시니 내가 부족함이 없으리로다."
-],
-exam:[
-"Humans tend to overestimate short-term gains and underestimate long-term risks.",
-"Technological innovation often reshapes social structures."
-]
-};
+  // ---------- 텍스트 데이터 ----------
+  // 길이별로 1~3문장 정도로 구성 (저작권 문제 없는 일반 문장/창작형 위주)
+  const TEXTS = {
+    quotes_ko: {
+      short: [
+        "꾸준함은 재능을 이긴다.",
+        "작은 습관이 큰 결과를 만든다.",
+        "오늘의 선택이 내일을 만든다."
+      ],
+      medium: [
+        "성공은 한 번의 점프가 아니라, 매일의 작은 발걸음이 쌓여 만들어진다.",
+        "완벽한 계획을 기다리기보다, 불완전한 실행으로 방향을 잡아가는 편이 더 빠르다.",
+        "처음엔 느려도 괜찮다. 멈추지 않는 사람이 결국 도착한다."
+      ],
+      long: [
+        "잘하는 사람은 타고나는 경우도 있지만, 오래가는 사람은 대부분 습관으로 만들어진다. 작은 반복을 가볍게 보지 말자.",
+        "성장은 늘 불편함을 동반한다. 불편함을 피하는 순간, 실력은 그 자리에서 멈춘다."
+      ]
+    },
 
-let currentText = "";
+    quotes_en: {
+      short: [
+        "Small steps compound.",
+        "Clarity comes from action.",
+        "Discipline beats motivation."
+      ],
+      medium: [
+        "Consistency turns ordinary days into extraordinary outcomes.",
+        "You don’t need perfect conditions, you need a repeatable routine.",
+        "Progress is often quiet, but it is rarely accidental."
+      ],
+      long: [
+        "A good habit is a contract you keep with your future self. Keep it simple, keep it daily, and let time do the heavy lifting.",
+        "Confidence is not a mood. It is the side effect of evidence, built through repeated, honest practice."
+      ]
+    },
 
-function loadText(){
-  const category = document.getElementById("category").value;
-  const arr = texts[category];
-  currentText = arr[Math.floor(Math.random()*arr.length)];
-  document.getElementById("quoteBox").innerText = currentText;
-  document.getElementById("inputBox").value="";
-  document.getElementById("result").innerText="";
-}
+    economy_en: {
+      short: [
+        "Inflation erodes purchasing power.",
+        "Rates influence borrowing costs.",
+        "Markets price expectations."
+      ],
+      medium: [
+        "When interest rates rise, borrowing becomes more expensive and spending often cools down.",
+        "A stronger currency can reduce import prices, but it may also pressure exporters.",
+        "Investors react not only to data, but to whether the data beats expectations."
+      ],
+      long: [
+        "In economics, the first effect is rarely the whole story. A policy change can move prices, shift behavior, and reshape incentives across the economy.",
+        "Risk is not just volatility. It is the possibility that reality diverges from the story you believed when you made the decision."
+      ]
+    },
 
-function checkTyping(){
-  const userInput = document.getElementById("inputBox").value;
-  if(userInput === currentText){
-    document.getElementById("result").innerHTML="<span class='correct'>정확합니다! 🎉</span>";
-  }else{
-    document.getElementById("result").innerHTML="<span class='wrong'>오타가 있습니다. 다시 확인하세요.</span>";
+    news_style: {
+      short: [
+        "Markets opened higher after the announcement.",
+        "Investors weighed mixed economic signals.",
+        "The report revised last month’s figures."
+      ],
+      medium: [
+        "Analysts noted that sentiment improved, even as uncertainty remained elevated.",
+        "The latest data suggested cooling demand, though the labor market stayed resilient.",
+        "Traders focused on guidance, not only the headline numbers."
+      ],
+      long: [
+        "Officials emphasized that future decisions will depend on incoming data. Investors, meanwhile, debated whether the economy is slowing or simply normalizing after a volatile period."
+      ]
+    },
+
+    business_email: {
+      short: [
+        "Thank you for your message. I’ll get back to you shortly.",
+        "Could you please confirm the schedule for tomorrow?",
+        "I appreciate your time and support."
+      ],
+      medium: [
+        "Thanks for reaching out. To move forward, could you share the updated timeline and the key requirements for this project?",
+        "I’m writing to confirm our meeting on Thursday. Please let me know if you prefer a different time.",
+        "Attached is the draft proposal. I’d welcome your feedback, especially on the scope and deliverables."
+      ],
+      long: [
+        "Thank you for the detailed notes. Based on our discussion, I summarized the next steps and responsibilities below. If anything looks off, please reply with corrections so we can finalize the plan today."
+      ]
+    },
+
+    daily_dialog: {
+      short: [
+        "How was your day?",
+        "Let’s take it step by step.",
+        "I’ll try again tomorrow."
+      ],
+      medium: [
+        "I thought it would be easy, but it took longer than I expected.",
+        "If you have a minute, could you help me check this one detail?",
+        "I’m not sure yet, but I’ll decide after I compare the options."
+      ],
+      long: [
+        "I used to rush decisions when I felt pressured, but now I pause and ask what would matter a week from now. That helps me choose more calmly."
+      ]
+    },
+
+    exam_style: {
+      short: [
+        "Context shapes interpretation.",
+        "Assumptions guide conclusions.",
+        "Evidence must be evaluated."
+      ],
+      medium: [
+        "People often confuse familiarity with understanding, especially when information is repeated frequently.",
+        "A persuasive argument may sound confident, but it still requires verifiable evidence and clear reasoning.",
+        "Technological progress can amplify benefits, yet it can also magnify existing inequalities."
+      ],
+      long: [
+        "Human judgment is influenced by framing. When the same outcome is described as a loss rather than a gain, decisions may shift even if the underlying facts remain identical."
+      ]
+    },
+
+    science: {
+      short: [
+        "Correlation is not causation.",
+        "Systems optimize trade-offs.",
+        "Feedback loops shape outcomes."
+      ],
+      medium: [
+        "A model is useful when it helps us predict, even if it does not capture every detail of reality.",
+        "In complex systems, small changes can produce large effects when they interact with feedback loops.",
+        "Good measurement reduces noise, but it never eliminates uncertainty entirely."
+      ],
+      long: [
+        "Innovation is not only about new tools; it is also about new methods. When the method changes, the range of possible solutions expands."
+      ]
+    },
+
+    history: {
+      short: [
+        "Ideas travel through networks.",
+        "Reform creates resistance.",
+        "Power shapes narratives."
+      ],
+      medium: [
+        "Historical change is rarely linear. It moves through compromise, conflict, and unexpected alliances.",
+        "Institutions outlive individuals, but individuals can redirect institutions at critical moments.",
+        "When resources shrink, competition intensifies and old agreements become fragile."
+      ],
+      long: [
+        "A society’s stability depends not only on rules, but on shared trust that the rules will be applied consistently. When that trust erodes, the cost of cooperation rises."
+      ]
+    },
+
+    literature_ko: {
+      short: [
+        "바람이 창문을 두드렸다.",
+        "골목 끝에서 불빛이 흔들렸다.",
+        "말하지 못한 마음이 남았다."
+      ],
+      medium: [
+        "나는 익숙한 길을 걸었지만, 오늘은 모든 것이 조금씩 낯설게 보였다.",
+        "어떤 약속은 지켜서 아름다운 것이 아니라, 지키려 애썼기에 아름다운 것이다.",
+        "시간은 멈추지 않지만, 기억은 종종 한 장면에 머문다."
+      ],
+      long: [
+        "그날 이후로 나는 종종 생각했다. 끝난 일이 아니라, 끝내지 못한 마음이 우리를 오래 붙잡는다는 것을."
+      ]
+    },
+
+    literature_en: {
+      short: [
+        "The street held its breath.",
+        "A quiet story began.",
+        "He left without a sound."
+      ],
+      medium: [
+        "She realized that bravery often looks like a small decision repeated many times.",
+        "Some goodbyes are not loud. They simply fade into ordinary days.",
+        "He carried hope like a fragile cup, careful not to spill it."
+      ],
+      long: [
+        "The past did not chase him with footsteps. It waited in familiar places, in ordinary words, until he turned and recognized it again."
+      ]
+    },
+
+    bible: {
+      short: [
+        "Be still, and know that I am God.",
+        "여호와는 나의 목자시니 내게 부족함이 없으리로다."
+      ],
+      medium: [
+        "For where your treasure is, there your heart will be also.",
+        "사랑은 오래 참고 사랑은 온유하며 시기하지 아니하며."
+      ],
+      long: [
+        "Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up."
+      ]
+    }
+  };
+
+  // ---------- 상태 ----------
+  let targetText = "";
+  let started = false;
+  let startTime = 0;
+  let rafId = null;
+
+  // ---------- 엘리먼트 ----------
+  const elPrompt = document.getElementById("prompt");
+  const elInput  = document.getElementById("inputBox");
+  const elTime   = document.getElementById("time");
+  const elKpm    = document.getElementById("kpm");
+  const elAcc    = document.getElementById("acc");
+  const elProg   = document.getElementById("prog");
+  const elDiff   = document.getElementById("diff");
+  const elBar    = document.getElementById("bar");
+
+  document.getElementById("btnLoad").addEventListener("click", loadText);
+  document.getElementById("btnReset").addEventListener("click", resetAll);
+
+  function pickRandom(arr){
+    return arr[Math.floor(Math.random() * arr.length)];
   }
-}
-</script>
 
+  function loadText(){
+    const cat = document.getElementById("category").value;
+    const len = document.getElementById("length").value;
+    const pool = (TEXTS[cat] && TEXTS[cat][len]) ? TEXTS[cat][len] : ["문장을 불러오지 못했습니다."];
+    targetText = pickRandom(pool);
+
+    elPrompt.textContent = targetText;
+    resetAll(false); // 타이머/상태만 리셋, 문장은 유지
+    elInput.focus();
+  }
+
+  function resetAll(clearPrompt = true){
+    started = false;
+    startTime = 0;
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+
+    elTime.textContent = "0.0s";
+    elKpm.textContent  = "0";
+    elAcc.textContent  = "0%";
+    elProg.textContent = "0%";
+    elBar.style.width  = "0%";
+
+    elInput.value = "";
+    elDiff.innerHTML = "<span class='label'>오타 표시</span><br>아직 입력이 없습니다.";
+
+    if(clearPrompt){
+      targetText = "";
+      elPrompt.textContent = "문장을 불러오면 여기에 표시됩니다.";
+    }
+  }
+
+  function nowMs(){ return performance.now(); }
+
+  function fmt1(n){ return (Math.round(n*10)/10).toFixed(1); }
+
+  function computeMetrics(input){
+    // 경과 시간
+    const t = started ? (nowMs() - startTime) / 1000 : 0;
+    const minutes = t / 60;
+
+    // "몇 타" = 보통 분당 타수(KPM). 공백 포함 문자 수로 환산.
+    const typedChars = input.length;
+    const kpm = (minutes > 0) ? Math.round(typedChars / minutes) : 0;
+
+    // 정확도: 입력한 범위에서 target과 일치하는 글자 수 / 입력 글자 수
+    let correct = 0;
+    const compareLen = Math.min(input.length, targetText.length);
+    for(let i=0;i<compareLen;i++){
+      if(input[i] === targetText[i]) correct++;
+    }
+    // 입력이 더 길면 그 초과분은 오타로 간주
+    const totalTyped = input.length;
+    const accuracy = (totalTyped > 0) ? Math.round((correct / totalTyped) * 100) : 0;
+
+    // 진행률: 원문 대비 입력 길이 비율
+    const progress = (targetText.length > 0) ? Math.min(100, Math.round((input.length / targetText.length) * 100)) : 0;
+
+    return {t, kpm, accuracy, progress, correct, compareLen};
+  }
+
+  function renderDiff(input){
+    if(!targetText){
+      elDiff.innerHTML = "<span class='label'>오타 표시</span><br>먼저 문장을 불러오세요.";
+      return;
+    }
+    if(input.length === 0){
+      elDiff.innerHTML = "<span class='label'>오타 표시</span><br>아직 입력이 없습니다.";
+      return;
+    }
+
+    // 문자 단위로 비교하여 오타를 강조 표시
+    const len = Math.max(input.length, targetText.length);
+    let html = "<span class='label'>오타 표시</span><br>";
+
+    for(let i=0;i<len;i++){
+      const tChar = targetText[i] ?? "";
+      const iChar = input[i] ?? "";
+
+      if(iChar === ""){
+        // 아직 입력 안 한 부분은 원문을 muted로
+        html += `<span style="color:var(--muted)">${escapeHtml(tChar)}</span>`;
+      } else if(tChar === iChar){
+        html += `<span class="ok">${escapeHtml(iChar)}</span>`;
+      } else {
+        html += `<span class="bad">${escapeHtml(iChar)}</span>`;
+      }
+    }
+
+    // 완주 표시
+    if(input === targetText){
+      html += `<br><br><span class="ok">완료! 정확히 입력했습니다.</span>`;
+    }
+
+    elDiff.innerHTML = html;
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function tick(){
+    const input = elInput.value;
+    const m = computeMetrics(input);
+
+    elTime.textContent = `${fmt1(m.t)}s`;
+    elKpm.textContent  = String(m.kpm);
+    elAcc.textContent  = `${m.accuracy}%`;
+    elProg.textContent = `${m.progress}%`;
+    elBar.style.width  = `${m.progress}%`;
+
+    // 완료 시 타이머 멈춤
+    if(targetText && input === targetText){
+      if(rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+      return;
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  elInput.addEventListener("input", () => {
+    if(!targetText){
+      // 문장 없는 상태에서 입력 방지
+      elInput.value = "";
+      elDiff.innerHTML = "<span class='label'>오타 표시</span><br>먼저 문장을 불러오세요.";
+      return;
+    }
+
+    // 시작 트리거
+    if(!started){
+      started = true;
+      startTime = nowMs();
+      if(!rafId) rafId = requestAnimationFrame(tick);
+    }
+
+    renderDiff(elInput.value);
+    const m = computeMetrics(elInput.value);
+    elProg.textContent = `${m.progress}%`;
+    elBar.style.width  = `${m.progress}%`;
+
+    // 입력 도중에도 즉시 수치 업데이트(체감)
+    elAcc.textContent = `${m.accuracy}%`;
+  });
+
+  // 최초 로드 시 한 번 기본 문장 로드(원하면 제거 가능)
+  loadText();
+</script>
 </body>
 </html>
