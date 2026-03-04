@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>수능만만 10장 어휘 테스트 (형태가 비슷한 어휘 2)</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action: manipulation;
+  }
+  #wrap{
+    max-width:520px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:.2px;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #subhint{
+    margin-top:6px;
+    font-size:12px;
+    opacity:.8;
+  }
+
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px; right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:17px;
+    font-weight:900;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    transition: transform .08s ease, background .12s ease;
+  }
+  .choice:active{ transform: scale(.98); }
+  .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
+  .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:460px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.55;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <div id="english">단어 시험</div>
+    <div id="progress"></div>
+    <div id="subhint">영어(품사) → 알맞은 한국어(품사)를 고르세요</div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">단어 시험 시작</h2>
+        <p id="ovText">
+          화면 위 영어 단어(품사 표시)에 맞는 한국어를 터치하세요.<br>
+          보기에는 <b>같은 단어의 다른 품사 뜻</b>도 섞여 나옵니다.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   ✅ 단어 목록 (수능만만 10장: 형태가 비슷한 어휘 2)
+   - en에 품사 힌트 포함: (v/n/adj/adv/prep/conj)
+   - ko도 품사 라벨 포함: (동/명/형/부/전/접)
+   ========================= */
+const words = [
+  // acquire / inquire / require
+  { en:"acquire (v)",  ko:"습득하다, 얻다(동)" },
+  { en:"inquire (v)",  ko:"묻다, 문의하다(동)" },
+  { en:"require (v)",  ko:"요구하다, 필요로 하다(동)" },
+
+  // alert / alter
+  { en:"alert (v)",    ko:"(위험 등을) 알리다(동)" },
+  { en:"alert (adj)",  ko:"경계하는, 기민한(형)" },
+  { en:"alter (v)",    ko:"바꾸다, 변경하다(동)" },
+
+  // attain / retain
+  { en:"attain (v)",   ko:"달성하다, 이루다(동)" },
+  { en:"retain (v)",   ko:"유지하다, 보유하다(동)" },
+
+  // award / reward
+  { en:"award (n)",    ko:"상(명)" },
+  { en:"award (v)",    ko:"수여하다(동)" },
+  { en:"reward (n)",   ko:"보상(명)" },
+  { en:"reward (v)",   ko:"보상하다(동)" },
+
+  // complement / compliment / commitment
+  { en:"complement (n)", ko:"보완물, 보충물(명)" },
+  { en:"complement (v)", ko:"보완하다(동)" },
+  { en:"compliment (n)", ko:"칭찬(명)" },
+  { en:"compliment (v)", ko:"칭찬하다(동)" },
+  { en:"commitment (n)", ko:"약속, 전념(명)" },
+
+  // conclude / include
+  { en:"conclude (v)",  ko:"결론을 내리다, 끝내다(동)" },
+  { en:"include (v)",   ko:"포함하다(동)" },
+
+  // consent / content / contend
+  { en:"consent (v)",   ko:"동의하다(동)" },
+  { en:"consent (n)",   ko:"동의, 허락(명)" },
+  { en:"content (n)",   ko:"내용(명)" },
+  { en:"content (v)",   ko:"만족시키다(동)" },
+  { en:"contend (v)",   ko:"주장하다; 다투다(동)" },
+
+  // conservation / conversation
+  { en:"conservation (n)", ko:"보호, 보존(명)" },
+  { en:"conversation (n)", ko:"대화, 회화(명)" },
+
+  // dedicate / indicate
+  { en:"dedicate (v)",  ko:"바치다, 헌정하다(동)" },
+  { en:"indicate (v)",  ko:"나타내다, 보여주다(동)" },
+
+  // designation / destination
+  { en:"designation (n)", ko:"지정, 지명, 명칭(명)" },
+  { en:"destination (n)", ko:"목적지, 도착지(명)" },
+
+  // emit / omit
+  { en:"emit (v)",      ko:"(빛·소리 등을) 내뿜다(동)" },
+  { en:"omit (v)",      ko:"빠뜨리다, 생략하다(동)" },
+
+  // expose / impose / oppose
+  { en:"expose (v)",    ko:"드러내다, 폭로하다(동)" },
+  { en:"impose (v)",    ko:"부과하다; 강요하다(동)" },
+  { en:"oppose (v)",    ko:"반대하다(동)" },
+
+  // fertile / futile
+  { en:"fertile (adj)", ko:"비옥한, 기름진(형)" },
+  { en:"futile (adj)",  ko:"헛된, 소용없는(형)" },
+
+  // leak / lack
+  { en:"leak (v)",      ko:"새다; 누설되다(동)" },
+  { en:"leak (n)",      ko:"누출, 누설(명)" },
+  { en:"lack (v)",      ko:"부족하다(동)" },
+  { en:"lack (n)",      ko:"부족(명)" },
+
+  // observe / preserve / reserve
+  { en:"observe (v)",   ko:"관찰하다; 지키다(동)" },
+  { en:"preserve (v)",  ko:"지키다, 보존하다(동)" },
+  { en:"reserve (v)",   ko:"예약하다; 보류하다(동)" },
+  { en:"reserve (n)",   ko:"비축량; 보호 구역(명)" },
+
+  // pray / prey
+  { en:"pray (v)",      ko:"기도하다; 간절히 바라다(동)" },
+  { en:"prey (n)",      ko:"먹잇감(명)" },
+
+  // statue / status
+  { en:"statue (n)",    ko:"조각상(명)" },
+  { en:"status (n)",    ko:"지위, 상태(명)" },
+
+  // sustain / contain
+  { en:"sustain (v)",   ko:"지탱하다; 지속시키다(동)" },
+  { en:"contain (v)",   ko:"포함하다; 담고 있다(동)" },
+
+  // through / thorough
+  { en:"through (prep)",   ko:"~을 통해; ~사이로(전)" },
+  { en:"thorough (adj)",   ko:"빈틈없는, 철저한(형)" }
+];
+
+/* =========================
+   게임 설정
+   ========================= */
+const PASS_MESSAGE = "축하합니다. 수능만만 10장 어휘 테스트 통과!";
+const baseSpeed = 112;
+const floorHeight = 60;
+const choiceHeight = 56;
+
+/* =========================
+   유틸
+   ========================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* =========================
+   DOM
+   ========================= */
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+/* =========================
+   상태
+   ========================= */
+let deck = [];
+let idx = 0;
+let speed = baseSpeed;
+
+let choices = [];
+let raf = null;
+let running = false;
+let lastTs = 0;
+
+/* =========================
+   오버레이
+   ========================= */
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+/* =========================
+   게임 흐름
+   ========================= */
+function resetGame(){
+  deck = shuffle(words);
+  idx = 0;
+  speed = baseSpeed;
+  progressEl.textContent = `0 / ${deck.length}`;
+  englishEl.textContent = "단어 시험";
+  clearChoices();
+  stopLoop();
+}
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>문항을 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  speed = baseSpeed;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running) return;
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    fail("오답을 선택했습니다.");
+    return;
+  }
+  el.classList.add("good");
+  stopLoop();
+  setTimeout(() => {
+    idx += 1;
+    nextWord();
+  }, 200);
+}
+
+/* =========================
+   선택지 생성/이동
+   - 품사 헷갈리게: 같은 철자(예: award) 다른 품사 의미도 pool에 존재
+   ========================= */
+function clearChoices(){
+  for(const el of choices) el.remove();
+  choices = [];
+}
+
+function spawnChoices(word){
+  clearChoices();
+
+  const correct = word.ko;
+
+  // 보기 풀: 한국어 보기(품사 라벨 포함) 전체에서 뽑기
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
+
+  // 오답 3개
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
+
+  const startYs = [-220, -320, -420, -520];
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+
+    el.dataset.correct = (txt === correct) ? "1" : "0";
+    el._y = startYs[i];
+
+    el.addEventListener("click", () => pick(el));
+    el.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      pick(el);
+    }, { passive:false });
+
+    el.style.top = "0px";
+    el.style.transform = `translateY(${el._y}px)`;
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+/* =========================
+   루프
+   ========================= */
+function startLoop(){
+  running = true;
+  lastTs = performance.now();
+  if(raf) cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(tick);
+}
+function stopLoop(){
+  running = false;
+  if(raf) cancelAnimationFrame(raf);
+  raf = null;
+}
+function tick(ts){
+  if(!running) return;
+  const dt = (ts - lastTs) / 1000;
+  lastTs = ts;
+
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    el._y += speed * dt;
+    el.style.transform = `translateY(${el._y}px)`;
+    if(el._y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+/* =========================
+   버튼
+   ========================= */
+startBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "단어 시험 시작",
+    `화면 위 영어 단어(품사 표시)에 맞는 한국어를 터치하세요.<br>
+     보기에는 <b>같은 단어의 다른 품사 뜻</b>도 섞여 나옵니다.<br>
+     <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
+});
+
+showOverlay(
+  "단어 시험 시작",
+  `화면 위 영어 단어(품사 표시)에 맞는 한국어를 터치하세요.<br>
+   보기에는 <b>같은 단어의 다른 품사 뜻</b>도 섞여 나옵니다.<br>
+   <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
+</script>
+
+</body>
+</html>
