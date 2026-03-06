@@ -3,126 +3,169 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>2020년 6월 고1 모의고사 31~32번 어휘 단어 시험</title>
+<title>2020년 6월 고1 모의고사 31~32번 영어 단어 뜻 맞추기 게임</title>
 <style>
   *{box-sizing:border-box}
   body{
     margin:0;
     background:#0b1220;
     color:#fff;
-    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;
     height:100vh;
     overflow:hidden;
     user-select:none;
     touch-action:manipulation;
   }
   #wrap{
-    max-width:520px;
+    max-width:540px;
     margin:0 auto;
     height:100vh;
     display:flex;
     flex-direction:column;
-    padding-bottom:env(safe-area-inset-bottom);
+    background:linear-gradient(180deg,#0b1220 0%, #0f172a 100%);
   }
   header{
     padding:14px 16px 12px;
-    background:#111a2b;
+    background:#111827;
     border-bottom:1px solid rgba(255,255,255,.08);
   }
   .title{
     font-size:20px;
-    font-weight:800;
+    font-weight:900;
     line-height:1.35;
     margin-bottom:8px;
   }
   .sub{
     font-size:13px;
-    color:#9fb0d1;
+    color:#b7c4dd;
     line-height:1.5;
   }
   .topbar{
     display:flex;
-    gap:8px;
     flex-wrap:wrap;
+    gap:8px;
     margin-top:10px;
   }
   .pill{
-    background:#18243a;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:999px;
     padding:7px 10px;
+    border-radius:999px;
+    background:#1e293b;
+    border:1px solid rgba(255,255,255,.08);
     font-size:13px;
-    font-weight:700;
+    font-weight:800;
+    color:#dbe7ff;
   }
   #stage{
     position:relative;
     flex:1;
     overflow:hidden;
     background:
-      radial-gradient(circle at 20% 10%, rgba(90,140,255,.18), transparent 28%),
-      radial-gradient(circle at 80% 0%, rgba(90,255,180,.10), transparent 25%),
-      linear-gradient(180deg, #0d1528 0%, #0b1220 100%);
+      radial-gradient(circle at 15% 12%, rgba(96,165,250,.18), transparent 22%),
+      radial-gradient(circle at 82% 8%, rgba(52,211,153,.12), transparent 22%),
+      linear-gradient(180deg, #0f172a 0%, #111827 100%);
   }
   #questionBox{
     position:absolute;
     left:12px;
     right:12px;
     top:12px;
-    z-index:5;
-    background:rgba(17,26,43,.92);
-    border:1px solid rgba(255,255,255,.1);
+    z-index:10;
+    background:rgba(17,24,39,.92);
+    border:1px solid rgba(255,255,255,.08);
     border-radius:18px;
     padding:14px 14px 12px;
     backdrop-filter:blur(8px);
-    box-shadow:0 10px 30px rgba(0,0,0,.25);
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
   }
   #qType{
     font-size:12px;
-    font-weight:800;
-    color:#8fb3ff;
-    margin-bottom:6px;
-    letter-spacing:.2px;
-  }
-  #question{
-    font-size:22px;
     font-weight:900;
-    line-height:1.4;
-    word-break:keep-all;
-    margin-bottom:10px;
+    color:#93c5fd;
+    margin-bottom:6px;
   }
-  #hint{
+  #english{
+    font-size:30px;
+    font-weight:900;
+    line-height:1.2;
+    margin-bottom:8px;
+    word-break:break-word;
+  }
+  #guide{
     font-size:13px;
-    color:#b9c7e3;
+    color:#c7d2e8;
     line-height:1.5;
   }
-  .falling{
+  .choice{
     position:absolute;
-    min-width:80px;
-    max-width:84%;
-    padding:10px 14px;
+    width:calc(50% - 18px);
+    min-height:60px;
+    padding:12px 12px;
     border-radius:18px;
-    background:#1d2b45;
-    border:1px solid rgba(255,255,255,.10);
+    background:#1d4ed8;
+    border:1px solid rgba(255,255,255,.12);
     color:#fff;
-    font-weight:800;
-    text-align:center;
+    font-weight:900;
+    font-size:18px;
     line-height:1.35;
-    box-shadow:0 10px 20px rgba(0,0,0,.25);
+    text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 10px 22px rgba(0,0,0,.28);
+    cursor:pointer;
+    transition:transform .08s ease;
     word-break:keep-all;
-    pointer-events:none;
   }
-  .correct{
-    background:#133a24 !important;
-    border-color:rgba(88,255,150,.35) !important;
+  .choice:active{
+    transform:scale(.98);
   }
-  .wrong{
-    background:#472030 !important;
-    border-color:rgba(255,110,140,.35) !important;
+  .choice .num{
+    position:absolute;
+    top:6px;
+    left:8px;
+    font-size:12px;
+    font-weight:900;
+    background:rgba(255,255,255,.18);
+    border-radius:999px;
+    padding:4px 7px;
+    line-height:1;
+  }
+  .choice.correct{
+    background:#15803d !important;
+    border-color:rgba(255,255,255,.25) !important;
+  }
+  .choice.wrong{
+    background:#be123c !important;
+    border-color:rgba(255,255,255,.25) !important;
+  }
+  #bottomLine{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:68px;
+    height:4px;
+    background:linear-gradient(90deg, transparent 0%, #f87171 20%, #f87171 80%, transparent 100%);
+    box-shadow:0 0 18px rgba(248,113,113,.65);
+  }
+  #message{
+    position:absolute;
+    left:12px;
+    right:12px;
+    bottom:12px;
+    z-index:12;
+    background:rgba(17,24,39,.92);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:10px 12px;
+    text-align:center;
+    font-size:14px;
+    font-weight:800;
+    color:#d7e3fb;
   }
   #inputArea{
-    padding:12px;
-    background:#111a2b;
+    background:#111827;
     border-top:1px solid rgba(255,255,255,.08);
+    padding:12px;
     display:flex;
     gap:8px;
   }
@@ -130,17 +173,16 @@
     flex:1;
     border:none;
     outline:none;
+    border-radius:14px;
     background:#0b1220;
     color:#fff;
-    border-radius:14px;
+    border:1px solid rgba(255,255,255,.10);
     padding:14px 14px;
     font-size:17px;
-    font-weight:700;
-    border:1px solid rgba(255,255,255,.1);
+    font-weight:800;
   }
   #answerInput::placeholder{
-    color:#7182a7;
-    font-weight:600;
+    color:#7f8da8;
   }
   button{
     border:none;
@@ -148,31 +190,12 @@
     border-radius:14px;
     padding:0 16px;
     font-size:15px;
-    font-weight:800;
+    font-weight:900;
     cursor:pointer;
   }
   #submitBtn{
-    background:#5b8cff;
-    color:#fff;
-  }
-  #restartBtn{
-    background:#22c55e;
-    color:#08130d;
-  }
-  #message{
-    position:absolute;
-    left:12px;
-    right:12px;
-    bottom:12px;
-    z-index:5;
-    text-align:center;
-    font-size:14px;
-    font-weight:800;
-    color:#d4def5;
-    background:rgba(17,26,43,.9);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;
-    padding:10px 12px;
+    background:#60a5fa;
+    color:#08111f;
   }
   #gameOver{
     position:absolute;
@@ -181,59 +204,66 @@
     display:none;
     align-items:center;
     justify-content:center;
-    background:rgba(5,9,18,.78);
+    background:rgba(3,7,18,.78);
     backdrop-filter:blur(6px);
     padding:20px;
   }
   .card{
-    width:min(92vw, 420px);
-    background:#101a2d;
-    border:1px solid rgba(255,255,255,.1);
+    width:min(92vw, 430px);
+    background:#111827;
+    border:1px solid rgba(255,255,255,.10);
     border-radius:24px;
     padding:24px 20px;
     text-align:center;
-    box-shadow:0 18px 50px rgba(0,0,0,.35);
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
   }
   .card h2{
-    margin:0 0 12px;
+    margin:0 0 10px;
     font-size:28px;
     line-height:1.3;
   }
   .card p{
     margin:8px 0;
-    color:#c5d1ea;
     font-size:16px;
     line-height:1.6;
+    color:#cad7ef;
   }
   .bigscore{
     font-size:42px;
     font-weight:900;
+    color:#93c5fd;
     margin:12px 0;
-    color:#8fb3ff;
+  }
+  #restartBtn{
+    margin-top:12px;
+    background:#22c55e;
+    color:#06110b;
+    padding:12px 18px;
   }
 </style>
 </head>
 <body>
 <div id="wrap">
   <header>
-    <div class="title">2020년 6월 고1 모의고사 31~32번 어휘 단어 시험</div>
-    <div class="sub">뜻을 보고 영어를 정확히 입력하세요. 정답 말풍선을 빠르게 맞히는 타이핑형 게임입니다.</div>
+    <div class="title">2020년 6월 고1 모의고사 31~32번 영어 단어 뜻 맞추기 게임</div>
+    <div class="sub">영어 단어를 보고, 내려오는 한국어 뜻 4개 중 정답을 바닥에 닿기 전에 맞히세요.</div>
     <div class="topbar">
       <div class="pill">점수 <span id="score">0</span></div>
       <div class="pill">목숨 <span id="lives">5</span></div>
-      <div class="pill">문제 <span id="solved">0</span>/<span id="total">0</span></div>
+      <div class="pill">진행 <span id="progress">0</span>/<span id="total">0</span></div>
       <div class="pill">속도 <span id="speedView">1.0x</span></div>
     </div>
   </header>
 
   <div id="stage">
     <div id="questionBox">
-      <div id="qType">뜻 → 영어</div>
-      <div id="question">문제가 준비되는 중입니다.</div>
-      <div id="hint">띄어쓰기와 철자까지 정확히 입력해야 정답 처리됩니다.</div>
+      <div id="qType">영어 → 한국어 뜻</div>
+      <div id="english">loading...</div>
+      <div id="guide">정답 번호 1~4를 입력하거나, 뜻 상자를 직접 클릭하세요.</div>
     </div>
 
-    <div id="message">Enter 또는 제출 버튼으로 정답 확인</div>
+    <div id="bottomLine"></div>
+    <div id="message">게임 준비 중...</div>
 
     <div id="gameOver">
       <div class="card">
@@ -246,92 +276,86 @@
   </div>
 
   <div id="inputArea">
-    <input id="answerInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="영어 정답 입력">
+    <input id="answerInput" type="text" inputmode="numeric" autocomplete="off" placeholder="정답 번호 입력 (1~4)">
     <button id="submitBtn">제출</button>
   </div>
 </div>
 
 <script>
 const vocab = [
-  // 31번
-  { q: "인내, 인내심", a: "patience" },
-  { q: "가장 중요하다", a: "be of the essence" },
-  { q: "사과, 사죄", a: "apology" },
-  { q: "받아들이다", a: "accept" },
-  { q: "사람, 개인", a: "individual" },
-  { q: "~의 말을 끝까지 듣다", a: "hear out" },
-  { q: "남기다", a: "leave" },
-  { q: "열린, 개방된", a: "open" },
-  { q: "여부와 시기", a: "if and when" },
-  { q: "소망하다", a: "wish" },
-  { q: "화해하다", a: "reconcile" },
-  { q: "알고 있는, 의식하는", a: "conscious" },
-  { q: "단지 ~했다고 해서", a: "just because" },
-  { q: "온전히, 완전히", a: "fully" },
-  { q: "시간이 걸리다", a: "take time" },
-  { q: "상처받은", a: "injured" },
-  { q: "측, 당사자", a: "party" },
-  { q: "완전히", a: "completely" },
-  { q: "(걱정·근심 등을) 떨쳐 버리다", a: "let go" },
-  { q: "믿다", a: "trust" },
-  { q: "거의 없는", a: "little" },
-  { q: "빨라지게 하다, 가속화하다", a: "speed up" },
-  { q: "과정", a: "process" },
-  { q: "사람", a: "person" },
-  { q: "진정으로", a: "truly" },
-  { q: "~하는 것이 가치가 있다", a: "be worthwhile to do" },
-  { q: "공간", a: "space" },
-  { q: "치유되다", a: "heal" },
-  { q: "(이전 상황·상태)로 돌아가다", a: "go back to" },
-  { q: "평상시처럼", a: "normally" },
-  { q: "즉시, 곧", a: "immediately" },
+  { en: "patience", ko: "인내, 인내심" },
+  { en: "be of the essence", ko: "가장 중요하다" },
+  { en: "apology", ko: "사과, 사죄" },
+  { en: "accept", ko: "받아들이다" },
+  { en: "individual", ko: "사람, 개인" },
+  { en: "hear out", ko: "~의 말을 끝까지 듣다" },
+  { en: "leave", ko: "남기다" },
+  { en: "open", ko: "열린, 개방된" },
+  { en: "if and when", ko: "여부와 시기" },
+  { en: "wish", ko: "소망하다" },
+  { en: "reconcile", ko: "화해하다" },
+  { en: "conscious", ko: "알고 있는, 의식하는" },
+  { en: "just because", ko: "단지 ~했다고 해서" },
+  { en: "fully", ko: "온전히, 완전히" },
+  { en: "take time", ko: "시간이 걸리다" },
+  { en: "injured", ko: "상처받은" },
+  { en: "party", ko: "측, 당사자" },
+  { en: "completely", ko: "완전히" },
+  { en: "let go", ko: "(걱정·근심 등을) 떨쳐 버리다" },
+  { en: "trust", ko: "믿다" },
+  { en: "little", ko: "거의 없는" },
+  { en: "speed up", ko: "빨라지게 하다, 가속화하다" },
+  { en: "process", ko: "과정" },
+  { en: "person", ko: "사람" },
+  { en: "truly", ko: "진정으로" },
+  { en: "be worthwhile to do", ko: "~하는 것이 가치가 있다" },
+  { en: "space", ko: "공간" },
+  { en: "heal", ko: "치유되다" },
+  { en: "go back to", ko: "(이전 상황·상태)로 돌아가다" },
+  { en: "normally", ko: "평상시처럼" },
+  { en: "immediately", ko: "즉시, 곧" },
 
-  // 32번
-  { q: "사업체", a: "business" },
-  { q: "훌륭한", a: "excellent" },
-  { q: "보통, 일반적으로", a: "typically" },
-  { q: "~할 여유가 있다", a: "afford" },
-  { q: "매우 적극적인, 공격적인", a: "aggressive" },
-  { q: "~하는 방법", a: "way to v" },
-  { q: "소문나게 하다", a: "get the word out" },
-  { q: "광고", a: "advertising" },
-  { q: "교환", a: "exchange" },
-  { q: "광고주", a: "advertiser" },
-  { q: "(광고를) 게시하다[내다]", a: "place" },
-  { q: "배너", a: "banner" },
-  { q: "서로", a: "each other" },
-  { q: "무료로", a: "for free" },
-  { q: "예를 들어", a: "for example" },
-  { q: "미용 제품", a: "beauty product" },
-  { q: "사이트", a: "site" },
-  { q: "그 다음에는", a: "in turn" },
-  { q: "둘 다 ~하지 않다", a: "neither" },
-  { q: "비용을 청구하다", a: "charge" },
-  { q: "광고", a: "ad" },
-  { q: "공간", a: "space" },
-  { q: "인기를 얻다", a: "gain in popularity" },
-  { q: "특히", a: "especially" },
-  { q: "~사이에", a: "among" },
-  { q: "영업팀", a: "sales team" },
-  { q: "교환하다", a: "trade" },
-  { q: "출구", a: "outlet" },
-  { q: "마케팅 담당자", a: "marketer" },
-  { q: "~와 접촉하다", a: "reach" },
-  { q: "목표 접속자", a: "target audience" },
-  { q: "그러지 않으면", a: "otherwise" },
-  { q: "~할 여유가 있다, 능력이 되다", a: "afford" }
+  { en: "business", ko: "사업체" },
+  { en: "excellent", ko: "훌륭한" },
+  { en: "typically", ko: "보통, 일반적으로" },
+  { en: "afford", ko: "~할 여유가 있다" },
+  { en: "aggressive", ko: "매우 적극적인, 공격적인" },
+  { en: "way to V", ko: "~하는 방법" },
+  { en: "get the word out", ko: "소문나게 하다" },
+  { en: "advertising", ko: "광고" },
+  { en: "exchange", ko: "교환" },
+  { en: "advertiser", ko: "광고주" },
+  { en: "place", ko: "(광고를) 게시하다[내다]" },
+  { en: "banner", ko: "배너" },
+  { en: "each other", ko: "서로" },
+  { en: "for free", ko: "무료로" },
+  { en: "for example", ko: "예를 들어" },
+  { en: "beauty product", ko: "미용 제품" },
+  { en: "site", ko: "사이트" },
+  { en: "in turn", ko: "그 다음에는" },
+  { en: "neither", ko: "둘 다 ~하지 않다" },
+  { en: "charge", ko: "비용을 청구하다" },
+  { en: "ad", ko: "광고" },
+  { en: "gain in popularity", ko: "인기를 얻다" },
+  { en: "especially", ko: "특히" },
+  { en: "among", ko: "~사이에" },
+  { en: "sales team", ko: "영업팀" },
+  { en: "trade", ko: "교환하다" },
+  { en: "outlet", ko: "출구" },
+  { en: "marketer", ko: "마케팅 담당자" },
+  { en: "reach", ko: "~와 접촉하다" },
+  { en: "target audience", ko: "목표 접속자" },
+  { en: "otherwise", ko: "그러지 않으면" }
 ];
 
 const stage = document.getElementById("stage");
-const questionEl = document.getElementById("question");
-const qTypeEl = document.getElementById("qType");
-const hintEl = document.getElementById("hint");
+const englishEl = document.getElementById("english");
 const scoreEl = document.getElementById("score");
 const livesEl = document.getElementById("lives");
-const solvedEl = document.getElementById("solved");
+const progressEl = document.getElementById("progress");
 const totalEl = document.getElementById("total");
 const speedViewEl = document.getElementById("speedView");
-const msgEl = document.getElementById("message");
+const messageEl = document.getElementById("message");
 const inputEl = document.getElementById("answerInput");
 const submitBtn = document.getElementById("submitBtn");
 const gameOverEl = document.getElementById("gameOver");
@@ -341,17 +365,17 @@ const restartBtn = document.getElementById("restartBtn");
 
 let score = 0;
 let lives = 5;
-let solved = 0;
+let progress = 0;
 let speedMultiplier = 1;
-let current = null;
-let currentBubble = null;
-let bubbleY = 0;
-let bubbleX = 0;
-let animationId = null;
-let bubbleSpeed = 0.9;
 let playing = true;
 let queue = [];
-let wrongLock = false;
+let currentQuestion = null;
+let currentChoices = [];
+let animId = null;
+
+const laneX = [12, null, 12, null];
+const laneY = [120, 120, 220, 220];
+const laneBaseSpeed = [0.65, 0.78, 0.72, 0.85];
 
 totalEl.textContent = vocab.length;
 
@@ -364,178 +388,209 @@ function shuffle(arr){
   return a;
 }
 
-function normalize(text){
-  return text
-    .toLowerCase()
-    .replace(/[’']/g, "'")
-    .replace(/\s+/g, " ")
-    .trim();
+function sampleWrongChoices(correctItem, count){
+  const pool = vocab.filter(v => v.ko !== correctItem.ko);
+  return shuffle(pool).slice(0, count);
+}
+
+function clearChoices(){
+  currentChoices.forEach(c => c.el.remove());
+  currentChoices = [];
 }
 
 function setMessage(text){
-  msgEl.textContent = text;
+  messageEl.textContent = text;
 }
 
-function makeQueue(){
-  queue = shuffle(vocab);
-}
-
-function spawnQuestion(){
-  if(!playing) return;
-
+function buildQuestion(){
   if(queue.length === 0){
     endGame(true);
     return;
   }
 
-  if(currentBubble){
-    currentBubble.remove();
-    currentBubble = null;
-  }
+  clearChoices();
 
-  current = queue.shift();
-  inputEl.value = "";
-  wrongLock = false;
+  currentQuestion = queue.shift();
+  englishEl.textContent = currentQuestion.en;
 
-  qTypeEl.textContent = "뜻 → 영어";
-  questionEl.textContent = current.q;
-  hintEl.textContent = "정답 철자와 띄어쓰기를 정확히 입력하세요.";
-
-  const bubble = document.createElement("div");
-  bubble.className = "falling";
-  bubble.textContent = current.a;
-
-  stage.appendChild(bubble);
+  const wrongs = sampleWrongChoices(currentQuestion, 3);
+  const options = shuffle([currentQuestion, ...wrongs]);
 
   const stageWidth = stage.clientWidth;
-  const safeLeft = 10;
-  const maxBubbleWidth = Math.min(stageWidth * 0.84, 320);
+  const cardWidth = Math.floor((stageWidth - 36) / 2);
+  laneX[1] = 24 + cardWidth;
+  laneX[3] = 24 + cardWidth;
 
-  bubble.style.maxWidth = maxBubbleWidth + "px";
-  bubble.style.visibility = "hidden";
-  bubble.style.left = "10px";
-  bubble.style.top = "0px";
+  currentChoices = options.map((item, idx) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.style.left = laneX[idx] + "px";
+    el.style.top = laneY[idx] + "px";
+    el.style.width = cardWidth + "px";
+    el.dataset.index = String(idx + 1);
+    el.dataset.correct = item.ko === currentQuestion.ko ? "true" : "false";
 
-  requestAnimationFrame(() => {
-    const bubbleWidth = bubble.offsetWidth;
-    bubbleX = Math.max(safeLeft, Math.floor(Math.random() * Math.max(1, stageWidth - bubbleWidth - safeLeft * 2)) + safeLeft);
-    bubbleY = 120;
-    bubble.style.left = bubbleX + "px";
-    bubble.style.top = bubbleY + "px";
-    bubble.style.visibility = "visible";
+    const num = document.createElement("div");
+    num.className = "num";
+    num.textContent = idx + 1;
+
+    const text = document.createElement("div");
+    text.textContent = item.ko;
+
+    el.appendChild(num);
+    el.appendChild(text);
+
+    el.addEventListener("click", () => {
+      if(!playing) return;
+      handleChoice(idx + 1);
+    });
+
+    stage.appendChild(el);
+
+    return {
+      el,
+      ko: item.ko,
+      isCorrect: item.ko === currentQuestion.ko,
+      y: laneY[idx],
+      speed: laneBaseSpeed[idx] * speedMultiplier
+    };
   });
 
-  currentBubble = bubble;
-  bubbleSpeed = (0.85 + Math.random() * 0.35) * speedMultiplier;
-  speedViewEl.textContent = speedMultiplier.toFixed(1) + "x";
+  inputEl.value = "";
   inputEl.focus();
+  setMessage("정답 번호를 입력하거나 뜻 상자를 클릭하세요.");
+}
+
+function nextQuestion(){
+  progress += 1;
+  progressEl.textContent = progress;
+
+  if(progress > 0 && progress % 5 === 0){
+    speedMultiplier += 0.08;
+    speedViewEl.textContent = speedMultiplier.toFixed(1) + "x";
+  }
+
+  buildQuestion();
+}
+
+function flashChoice(choiceObj, className){
+  choiceObj.el.classList.add(className);
+}
+
+function handleCorrect(choiceObj){
+  score += 10;
+  scoreEl.textContent = score;
+  flashChoice(choiceObj, "correct");
+  setMessage("정답! " + currentQuestion.en + " = " + currentQuestion.ko);
+
+  setTimeout(() => {
+    nextQuestion();
+  }, 320);
+}
+
+function handleWrong(choiceObj){
+  flashChoice(choiceObj, "wrong");
+  setMessage("오답! 다시 빠르게 보세요.");
+}
+
+function handleChoice(number){
+  if(!playing || !currentQuestion) return;
+
+  const idx = Number(number) - 1;
+  if(idx < 0 || idx > 3) return;
+
+  const picked = currentChoices[idx];
+  if(!picked) return;
+
+  if(picked.isCorrect){
+    handleCorrect(picked);
+  } else {
+    handleWrong(picked);
+  }
+}
+
+function submitAnswer(){
+  const v = inputEl.value.trim();
+  if(!v){
+    setMessage("1~4 중 번호를 입력하세요.");
+    return;
+  }
+  if(!/^[1-4]$/.test(v)){
+    setMessage("정답은 1, 2, 3, 4 중 하나입니다.");
+    return;
+  }
+  handleChoice(Number(v));
+  inputEl.value = "";
+  inputEl.focus();
+}
+
+function loseLifeByBottom(){
+  if(!playing) return;
+
+  lives -= 1;
+  livesEl.textContent = lives;
+
+  currentChoices.forEach(c => {
+    if(c.isCorrect){
+      c.el.classList.add("wrong");
+    }
+  });
+
+  setMessage("정답이 바닥에 닿았습니다! 정답: " + currentQuestion.ko);
+
+  if(lives <= 0){
+    setTimeout(() => endGame(false), 350);
+    return;
+  }
+
+  setTimeout(() => {
+    nextQuestion();
+  }, 380);
 }
 
 function animate(){
   if(!playing) return;
 
-  if(currentBubble){
-    bubbleY += bubbleSpeed;
-    currentBubble.style.top = bubbleY + "px";
+  const limit = stage.clientHeight - 132;
 
-    const bottomLimit = stage.clientHeight - 70;
-    if(bubbleY >= bottomLimit){
-      loseLife("놓쳤습니다! 정답: " + current.a);
+  let correctHitBottom = false;
+
+  currentChoices.forEach(choice => {
+    choice.y += choice.speed;
+    choice.el.style.top = choice.y + "px";
+
+    if(choice.isCorrect && choice.y >= limit){
+      correctHitBottom = true;
     }
-  }
+  });
 
-  animationId = requestAnimationFrame(animate);
-}
-
-function correctAnswer(){
-  if(!current || !currentBubble) return;
-
-  currentBubble.classList.add("correct");
-  score += 10;
-  solved += 1;
-
-  if(solved % 5 === 0){
-    speedMultiplier += 0.08;
-  }
-
-  scoreEl.textContent = score;
-  solvedEl.textContent = solved;
-  speedViewEl.textContent = speedMultiplier.toFixed(1) + "x";
-  setMessage("정답! " + current.q + " = " + current.a);
-
-  const bubbleToRemove = currentBubble;
-  currentBubble = null;
-  current = null;
-
-  setTimeout(() => {
-    if(bubbleToRemove) bubbleToRemove.remove();
-    spawnQuestion();
-  }, 260);
-}
-
-function loseLife(message){
-  if(!playing) return;
-
-  if(currentBubble){
-    currentBubble.classList.add("wrong");
-  }
-
-  lives -= 1;
-  livesEl.textContent = lives;
-  setMessage(message);
-
-  const bubbleToRemove = currentBubble;
-  currentBubble = null;
-  current = null;
-
-  if(lives <= 0){
-    setTimeout(() => endGame(false), 280);
+  if(correctHitBottom){
+    loseLifeByBottom();
     return;
   }
 
-  setTimeout(() => {
-    if(bubbleToRemove) bubbleToRemove.remove();
-    spawnQuestion();
-  }, 320);
+  animId = requestAnimationFrame(animate);
 }
 
-function submitAnswer(){
-  if(!playing || !current || wrongLock) return;
-
-  const user = normalize(inputEl.value);
-  const answer = normalize(current.a);
-
-  if(!user){
-    setMessage("정답을 입력해 주세요.");
-    return;
+function startLoop(){
+  cancelAnimationFrame(animId);
+  function loop(){
+    animate();
+    if(playing) animId = requestAnimationFrame(loop);
   }
-
-  if(user === answer){
-    correctAnswer();
-  } else {
-    wrongLock = true;
-    setMessage("오답입니다. 다시 입력해 보세요.");
-    setTimeout(() => {
-      wrongLock = false;
-      inputEl.focus();
-    }, 250);
-  }
+  animId = requestAnimationFrame(loop);
 }
 
 function endGame(clear){
   playing = false;
-  cancelAnimationFrame(animationId);
-
-  if(currentBubble){
-    currentBubble.remove();
-    currentBubble = null;
-  }
+  cancelAnimationFrame(animId);
+  clearChoices();
 
   finalScoreEl.textContent = score + "점";
   if(clear){
-    finalSummaryEl.textContent = "축하합니다. 모든 어휘를 끝까지 완료했습니다. 총 " + solved + "문제를 맞혔습니다.";
+    finalSummaryEl.textContent = "모든 단어를 끝까지 완료했습니다. 아주 좋습니다.";
   } else {
-    finalSummaryEl.textContent = "맞힌 문제 수: " + solved + "개 / 남은 생명이 모두 소진되었습니다.";
+    finalSummaryEl.textContent = "남은 목숨이 모두 소진되었습니다. 맞힌 만큼 실력이 쌓였습니다.";
   }
   gameOverEl.style.display = "flex";
 }
@@ -543,27 +598,22 @@ function endGame(clear){
 function startGame(){
   score = 0;
   lives = 5;
-  solved = 0;
+  progress = 0;
   speedMultiplier = 1;
-  current = null;
-  wrongLock = false;
   playing = true;
+  currentQuestion = null;
+  queue = shuffle(vocab);
 
   scoreEl.textContent = score;
   livesEl.textContent = lives;
-  solvedEl.textContent = solved;
+  progressEl.textContent = progress;
   speedViewEl.textContent = speedMultiplier.toFixed(1) + "x";
   gameOverEl.style.display = "none";
-  setMessage("게임 시작! 뜻을 보고 영어를 입력하세요.");
 
-  document.querySelectorAll(".falling").forEach(el => el.remove());
-
-  makeQueue();
-  spawnQuestion();
-  cancelAnimationFrame(animationId);
-  animate();
-
-  setTimeout(() => inputEl.focus(), 50);
+  clearChoices();
+  buildQuestion();
+  startLoop();
+  setMessage("게임 시작! 영어 단어의 뜻을 맞히세요.");
 }
 
 submitBtn.addEventListener("click", submitAnswer);
