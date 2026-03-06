@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2020년 3월 고1 모의고사 33~34번 어휘 단어 시험</title>
+
+<style>
+body{
+margin:0;
+background:#0b1220;
+color:#fff;
+font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;
+height:100vh;
+overflow:hidden;
+}
+
+#wrap{
+max-width:480px;
+margin:0 auto;
+height:100vh;
+display:flex;
+flex-direction:column;
+}
+
+header{
+padding:14px;
+background:#111a2b;
+border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+#english{
+font-size:22px;
+font-weight:800;
+}
+
+#progress{
+margin-top:6px;
+font-size:13px;
+opacity:.85;
+}
+
+#game{
+flex:1;
+position:relative;
+overflow:hidden;
+background:#0f172a;
+}
+
+.floor{
+position:absolute;
+bottom:0;
+left:0;
+right:0;
+height:60px;
+background:rgba(255,80,80,.22);
+border-top:1px solid rgba(255,80,80,.45);
+text-align:center;
+line-height:60px;
+font-size:13px;
+}
+
+.choice{
+position:absolute;
+left:10px;
+right:10px;
+height:56px;
+background:#1e293b;
+border-radius:14px;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+padding:0 10px;
+font-size:18px;
+font-weight:800;
+cursor:pointer;
+border:1px solid rgba(255,255,255,.1);
+}
+
+.choice.good{
+background:#065f46;
+}
+
+.choice.bad{
+background:#7f1d1d;
+}
+</style>
+</head>
+
+<body>
+
+<div id="wrap">
+
+<header>
+<div id="english">단어 시험</div>
+<div id="progress"></div>
+</header>
+
+<div id="game">
+<div class="floor">바닥 도달 = 즉시 불합격</div>
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+33~34번 단어
+========================= */
+
+const words=[
+
+{en:"motivation",ko:"동기 부여"},
+{en:"come from",ko:"~로부터 나오다"},
+{en:"several",ko:"여러"},
+{en:"source",ko:"원천"},
+{en:"respect",ko:"존중"},
+{en:"daily",ko:"매일의, 매일"},
+{en:"greeting",ko:"인사"},
+{en:"undivided",ko:"완전한"},
+{en:"attention",ko:"집중"},
+{en:"pat",ko:"토닥임"},
+{en:"whether",ko:"~이든"},
+{en:"accepting",ko:"포용적인"},
+{en:"simply",ko:"그저, 단순히"},
+{en:"most",ko:"가장"},
+{en:"consider",ko:"고려하다"},
+{en:"drop out of school",ko:"학교를 중퇴하다"},
+{en:"note",ko:"짧은 편지, 쪽지"},
+{en:"one of",ko:"~중의 하나"},
+{en:"frequent",ko:"잦은, 빈번한"},
+{en:"absence",ko:"결석"},
+{en:"make one's day",ko:"~을 매우 기쁘게 하다"},
+{en:"tear",ko:"눈물"},
+{en:"thank",ko:"고마워하다"},
+{en:"graduate",ko:"졸업하다"},
+{en:"whatever",ko:"무슨 ~든지 간에"},
+{en:"care about",ko:"~에 대해 신경쓰다"},
+{en:"technique",ko:"기법, 기술"},
+{en:"concern",ko:"관심"},
+{en:"genuine",ko:"진심 어린, 진짜의"},
+{en:"fool",ko:"속이다"},
+
+/* 34번 */
+
+{en:"Say~",ko:"~한다고 해보자"},
+{en:"normally",ko:"보통"},
+{en:"work out",ko:"운동하다"},
+{en:"maybe",ko:"아마도"},
+{en:"should",ko:"~하는 게 좋다"},
+{en:"connection",ko:"연결"},
+{en:"run into",ko:"~을 만나다"},
+{en:"never B until A",ko:"A하고 나서야 비로소 B하다"},
+{en:"comfort zone",ko:"안락 지대"},
+{en:"push",ko:"밀다"},
+{en:"move forward",ko:"앞으로 나아가다"},
+{en:"path",ko:"진로"},
+{en:"force ~ to do",ko:"~가 …하게 하다"},
+{en:"awaken",ko:"깨우치다"},
+{en:"spiritual",ko:"영적인, 정신적인"},
+{en:"level",ko:"차원, 수준"},
+{en:"benefit",ko:"이롭게 하다"},
+{en:"in the long run",ko:"결국"},
+{en:"variety",ko:"다양성"},
+{en:"spice",ko:"향신료, 양념"}
+
+]
+
+/* ========================= */
+
+let deck=[]
+let idx=0
+let speed=110
+
+const game=document.getElementById("game")
+const english=document.getElementById("english")
+const progress=document.getElementById("progress")
+
+function shuffle(arr){
+return arr.sort(()=>Math.random()-0.5)
+}
+
+function startGame(){
+deck=shuffle(words)
+idx=0
+nextWord()
+}
+
+function nextWord(){
+
+if(idx>=deck.length){
+alert("통과!")
+return
+}
+
+english.textContent=deck[idx].en
+progress.textContent=(idx+1)+" / "+deck.length
+
+spawnChoices(deck[idx])
+}
+
+function spawnChoices(word){
+
+document.querySelectorAll(".choice").forEach(e=>e.remove())
+
+let correct=word.ko
+
+let pool=[...new Set(words.map(x=>x.ko))].filter(k=>k!==correct)
+
+let wrong=shuffle(pool).slice(0,3)
+
+let options=shuffle([correct,...wrong])
+
+let start=[-200,-320,-440,-560]
+
+options.forEach((txt,i)=>{
+
+let el=document.createElement("div")
+
+el.className="choice"
+el.textContent=txt
+el.style.top="0px"
+el.style.transform=`translateY(${start[i]}px)`
+el.dataset.correct=(txt===correct)
+
+game.appendChild(el)
+
+el.onclick=()=>pick(el)
+
+})
+
+fall()
+}
+
+function pick(el){
+
+if(el.dataset.correct==="true"){
+idx++
+nextWord()
+}else{
+alert("오답")
+location.reload()
+}
+
+}
+
+function fall(){
+
+let els=document.querySelectorAll(".choice")
+
+let rect=game.getBoundingClientRect()
+
+let bottom=rect.height-60-56
+
+let id=setInterval(()=>{
+
+els.forEach(el=>{
+
+let y=parseFloat(el.style.transform.replace("translateY(","").replace("px)",""))
+
+y+=3
+
+el.style.transform=`translateY(${y}px)`
+
+if(y>bottom){
+clearInterval(id)
+alert("바닥 도달")
+location.reload()
+}
+
+})
+
+},16)
+
+}
+
+startGame()
+
+</script>
+
+</body>
+</html>
