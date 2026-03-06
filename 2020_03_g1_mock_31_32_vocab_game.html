@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2020년 3월 고1 모의고사 31~32번 어휘 테스트</title>
+
+<style>
+body{
+margin:0;
+background:#0b1220;
+color:#fff;
+font-family:system-ui;
+height:100vh;
+overflow:hidden;
+}
+
+#wrap{
+max-width:480px;
+margin:auto;
+height:100vh;
+display:flex;
+flex-direction:column;
+}
+
+header{
+padding:14px;
+background:#111a2b;
+}
+
+#english{
+font-size:22px;
+font-weight:800;
+}
+
+#progress{
+font-size:13px;
+margin-top:5px;
+}
+
+#game{
+flex:1;
+position:relative;
+background:#0f172a;
+overflow:hidden;
+}
+
+.floor{
+position:absolute;
+bottom:0;
+height:60px;
+width:100%;
+background:rgba(255,0,0,.25);
+text-align:center;
+line-height:60px;
+}
+
+.choice{
+position:absolute;
+left:10px;
+right:10px;
+height:56px;
+background:#1e293b;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:800;
+cursor:pointer;
+}
+
+.choice.good{background:#065f46;}
+.choice.bad{background:#7f1d1d;}
+
+#overlay{
+position:absolute;
+inset:0;
+background:rgba(0,0,0,.8);
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.card{
+background:#111a2b;
+padding:20px;
+border-radius:16px;
+text-align:center;
+}
+
+button{
+margin-top:12px;
+padding:10px;
+width:100%;
+font-weight:800;
+}
+</style>
+</head>
+
+<body>
+
+<div id="wrap">
+
+<header>
+<div id="english">단어시험</div>
+<div id="progress"></div>
+</header>
+
+<div id="game">
+<div class="floor">바닥 닿으면 탈락</div>
+
+<div id="overlay">
+<div class="card">
+<h2>단어 시험</h2>
+<p>올바른 뜻을 클릭하세요</p>
+<button id="startBtn">시작</button>
+</div>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const words=[
+
+//31번
+{en:"patience",ko:"인내, 인내심"},
+{en:"be of the essence",ko:"가장 중요하다"},
+{en:"apology",ko:"사과, 사죄"},
+{en:"accept",ko:"받아들이다"},
+{en:"individual",ko:"사람, 개인"},
+{en:"hear out",ko:"말을 끝까지 듣다"},
+{en:"leave",ko:"남기다"},
+{en:"open",ko:"열린, 개방된"},
+{en:"if and when",ko:"여부와 시기"},
+{en:"wish",ko:"소망하다"},
+{en:"reconcile",ko:"화해하다"},
+{en:"conscious",ko:"알고 있는, 의식하는"},
+{en:"just because",ko:"단지 ~했다고 해서"},
+{en:"fully",ko:"완전히"},
+{en:"take time",ko:"시간이 걸리다"},
+{en:"injured",ko:"상처받은"},
+{en:"party",ko:"측, 당사자"},
+{en:"completely",ko:"완전히"},
+{en:"let go",ko:"떨쳐 버리다"},
+{en:"trust",ko:"믿다"},
+{en:"little",ko:"거의 없는"},
+{en:"speed up",ko:"가속화하다"},
+{en:"process",ko:"과정"},
+{en:"person",ko:"사람"},
+{en:"truly",ko:"진정으로"},
+{en:"be worthwhile to",ko:"가치가 있다"},
+{en:"space",ko:"공간"},
+{en:"heal",ko:"치유되다"},
+{en:"go back to",ko:"돌아가다"},
+{en:"normally",ko:"평상시처럼"},
+{en:"immediately",ko:"즉시"},
+
+
+//32번
+{en:"business",ko:"사업체"},
+{en:"excellent",ko:"훌륭한"},
+{en:"typically",ko:"보통"},
+{en:"afford",ko:"여유가 있다"},
+{en:"aggressive",ko:"적극적인"},
+{en:"way to",ko:"방법"},
+{en:"get the word out",ko:"소문나게 하다"},
+{en:"advertising",ko:"광고"},
+{en:"exchange",ko:"교환"},
+{en:"advertiser",ko:"광고주"},
+{en:"place",ko:"게시하다"},
+{en:"banner",ko:"배너"},
+{en:"each other",ko:"서로"},
+{en:"for free",ko:"무료로"},
+{en:"for example",ko:"예를 들어"},
+{en:"beauty product",ko:"미용 제품"},
+{en:"site",ko:"사이트"},
+{en:"in turn",ko:"그 다음에는"},
+{en:"neither",ko:"둘 다 아니다"},
+{en:"charge",ko:"비용을 청구하다"},
+{en:"ad",ko:"광고"},
+{en:"space",ko:"공간"},
+{en:"gain popularity",ko:"인기를 얻다"},
+{en:"especially",ko:"특히"},
+{en:"among",ko:"사이에"},
+{en:"sales team",ko:"영업팀"},
+{en:"trade",ko:"교환하다"},
+{en:"outlet",ko:"출구"},
+{en:"marketer",ko:"마케팅 담당자"},
+{en:"reach",ko:"접촉하다"},
+{en:"target audience",ko:"목표 접속자"},
+{en:"otherwise",ko:"그러지 않으면"},
+{en:"afford",ko:"여유가 있다"}
+
+];
+
+let deck=[]
+let index=0
+let running=false
+
+const english=document.getElementById("english")
+const progress=document.getElementById("progress")
+const game=document.getElementById("game")
+
+function shuffle(a){
+return a.sort(()=>Math.random()-0.5)
+}
+
+function start(){
+deck=shuffle([...words])
+index=0
+next()
+}
+
+function next(){
+
+if(index>=deck.length){
+alert("모든 단어 완료")
+location.reload()
+return
+}
+
+const word=deck[index]
+english.textContent=word.en
+progress.textContent=index+1+" / "+deck.length
+
+spawn(word)
+
+}
+
+function spawn(word){
+
+document.querySelectorAll(".choice").forEach(e=>e.remove())
+
+let wrong=shuffle(words.filter(w=>w.ko!==word.ko)).slice(0,3)
+let options=shuffle([word,...wrong])
+
+options.forEach((w,i)=>{
+
+const el=document.createElement("div")
+el.className="choice"
+el.textContent=w.ko
+el.style.top=(-100-80*i)+"px"
+
+el.onclick=()=>{
+
+if(w.ko===word.ko){
+index++
+next()
+}else{
+alert("틀렸습니다")
+location.reload()
+}
+
+}
+
+game.appendChild(el)
+
+fall(el)
+
+})
+
+}
+
+function fall(el){
+
+let y=-100
+
+function move(){
+
+if(!running)return
+
+y+=2
+
+el.style.transform=`translateY(${y}px)`
+
+if(y>window.innerHeight-120){
+alert("바닥 닿음 탈락")
+location.reload()
+}
+
+requestAnimationFrame(move)
+
+}
+
+move()
+
+}
+
+document.getElementById("startBtn").onclick=()=>{
+running=true
+document.getElementById("overlay").style.display="none"
+start()
+}
+
+</script>
+
+</body>
+</html>
