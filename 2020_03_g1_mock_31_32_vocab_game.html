@@ -3,628 +3,449 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>2020년 6월 고1 모의고사 31~32번 영어 단어 뜻 맞추기 게임</title>
+<title>2020년 6월 고1 모의고사 31~32번 어휘 단어 시험</title>
 <style>
-  *{box-sizing:border-box}
   body{
     margin:0;
     background:#0b1220;
     color:#fff;
-    font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
     height:100vh;
     overflow:hidden;
     user-select:none;
-    touch-action:manipulation;
+    touch-action: manipulation;
   }
   #wrap{
-    max-width:540px;
+    max-width:480px;
     margin:0 auto;
     height:100vh;
     display:flex;
     flex-direction:column;
-    background:linear-gradient(180deg,#0b1220 0%, #0f172a 100%);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   header{
-    padding:14px 16px 12px;
-    background:#111827;
+    padding:14px;
+    background:#111a2b;
     border-bottom:1px solid rgba(255,255,255,.08);
   }
-  .title{
-    font-size:20px;
-    font-weight:900;
-    line-height:1.35;
-    margin-bottom:8px;
-  }
-  .sub{
-    font-size:13px;
-    color:#b7c4dd;
-    line-height:1.5;
-  }
-  .topbar{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-top:10px;
-  }
-  .pill{
-    padding:7px 10px;
-    border-radius:999px;
-    background:#1e293b;
-    border:1px solid rgba(255,255,255,.08);
-    font-size:13px;
-    font-weight:800;
-    color:#dbe7ff;
-  }
-  #stage{
-    position:relative;
-    flex:1;
-    overflow:hidden;
-    background:
-      radial-gradient(circle at 15% 12%, rgba(96,165,250,.18), transparent 22%),
-      radial-gradient(circle at 82% 8%, rgba(52,211,153,.12), transparent 22%),
-      linear-gradient(180deg, #0f172a 0%, #111827 100%);
-  }
-  #questionBox{
-    position:absolute;
-    left:12px;
-    right:12px;
-    top:12px;
-    z-index:10;
-    background:rgba(17,24,39,.92);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:18px;
-    padding:14px 14px 12px;
-    backdrop-filter:blur(8px);
-    box-shadow:0 12px 30px rgba(0,0,0,.25);
-  }
-  #qType{
-    font-size:12px;
-    font-weight:900;
-    color:#93c5fd;
-    margin-bottom:6px;
-  }
   #english{
-    font-size:30px;
-    font-weight:900;
-    line-height:1.2;
-    margin-bottom:8px;
-    word-break:break-word;
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
   }
-  #guide{
+  #progress{
+    margin-top:6px;
     font-size:13px;
-    color:#c7d2e8;
-    line-height:1.5;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
   }
   .choice{
     position:absolute;
-    width:calc(50% - 18px);
-    min-height:60px;
-    padding:12px 12px;
-    border-radius:18px;
-    background:#1d4ed8;
-    border:1px solid rgba(255,255,255,.12);
-    color:#fff;
-    font-weight:900;
-    font-size:18px;
-    line-height:1.35;
-    text-align:center;
+    left:10px; right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
     display:flex;
     align-items:center;
     justify-content:center;
-    box-shadow:0 10px 22px rgba(0,0,0,.28);
-    cursor:pointer;
-    transition:transform .08s ease;
-    word-break:keep-all;
-  }
-  .choice:active{
-    transform:scale(.98);
-  }
-  .choice .num{
-    position:absolute;
-    top:6px;
-    left:8px;
-    font-size:12px;
-    font-weight:900;
-    background:rgba(255,255,255,.18);
-    border-radius:999px;
-    padding:4px 7px;
-    line-height:1;
-  }
-  .choice.correct{
-    background:#15803d !important;
-    border-color:rgba(255,255,255,.25) !important;
-  }
-  .choice.wrong{
-    background:#be123c !important;
-    border-color:rgba(255,255,255,.25) !important;
-  }
-  #bottomLine{
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:68px;
-    height:4px;
-    background:linear-gradient(90deg, transparent 0%, #f87171 20%, #f87171 80%, transparent 100%);
-    box-shadow:0 0 18px rgba(248,113,113,.65);
-  }
-  #message{
-    position:absolute;
-    left:12px;
-    right:12px;
-    bottom:12px;
-    z-index:12;
-    background:rgba(17,24,39,.92);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;
-    padding:10px 12px;
     text-align:center;
-    font-size:14px;
+    padding:0 10px;
+    font-size:18px;
     font-weight:800;
-    color:#d7e3fb;
-  }
-  #inputArea{
-    background:#111827;
-    border-top:1px solid rgba(255,255,255,.08);
-    padding:12px;
-    display:flex;
-    gap:8px;
-  }
-  #answerInput{
-    flex:1;
-    border:none;
-    outline:none;
-    border-radius:14px;
-    background:#0b1220;
-    color:#fff;
-    border:1px solid rgba(255,255,255,.10);
-    padding:14px 14px;
-    font-size:17px;
-    font-weight:800;
-  }
-  #answerInput::placeholder{
-    color:#7f8da8;
-  }
-  button{
-    border:none;
-    outline:none;
-    border-radius:14px;
-    padding:0 16px;
-    font-size:15px;
-    font-weight:900;
     cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    transition: transform .08s ease, background .12s ease;
   }
-  #submitBtn{
-    background:#60a5fa;
-    color:#08111f;
-  }
-  #gameOver{
+  .choice:active{ transform: scale(.98); }
+  .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
+  .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
+
+  #overlay{
     position:absolute;
     inset:0;
-    z-index:20;
-    display:none;
+    background:rgba(0,0,0,.72);
+    display:flex;
     align-items:center;
     justify-content:center;
-    background:rgba(3,7,18,.78);
-    backdrop-filter:blur(6px);
-    padding:20px;
+    padding:18px;
+    z-index:3;
   }
   .card{
-    width:min(92vw, 430px);
-    background:#111827;
-    border:1px solid rgba(255,255,255,.10);
-    border-radius:24px;
-    padding:24px 20px;
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
     text-align:center;
-    box-shadow:0 20px 50px rgba(0,0,0,.35);
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
   }
   .card h2{
     margin:0 0 10px;
-    font-size:28px;
-    line-height:1.3;
+    font-size:20px;
   }
   .card p{
-    margin:8px 0;
-    font-size:16px;
-    line-height:1.6;
-    color:#cad7ef;
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
   }
-  .bigscore{
-    font-size:42px;
-    font-weight:900;
-    color:#93c5fd;
-    margin:12px 0;
-  }
-  #restartBtn{
+  button{
+    width:100%;
     margin-top:12px;
-    background:#22c55e;
-    color:#06110b;
-    padding:12px 18px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
   }
 </style>
 </head>
 <body>
+
 <div id="wrap">
   <header>
-    <div class="title">2020년 6월 고1 모의고사 31~32번 영어 단어 뜻 맞추기 게임</div>
-    <div class="sub">영어 단어를 보고, 내려오는 한국어 뜻 4개 중 정답을 바닥에 닿기 전에 맞히세요.</div>
-    <div class="topbar">
-      <div class="pill">점수 <span id="score">0</span></div>
-      <div class="pill">목숨 <span id="lives">5</span></div>
-      <div class="pill">진행 <span id="progress">0</span>/<span id="total">0</span></div>
-      <div class="pill">속도 <span id="speedView">1.0x</span></div>
-    </div>
+    <div id="english">단어 시험</div>
+    <div id="progress"></div>
   </header>
 
-  <div id="stage">
-    <div id="questionBox">
-      <div id="qType">영어 → 한국어 뜻</div>
-      <div id="english">loading...</div>
-      <div id="guide">정답 번호 1~4를 입력하거나, 뜻 상자를 직접 클릭하세요.</div>
-    </div>
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
 
-    <div id="bottomLine"></div>
-    <div id="message">게임 준비 중...</div>
-
-    <div id="gameOver">
+    <div id="overlay">
       <div class="card">
-        <h2>게임 종료</h2>
-        <div class="bigscore" id="finalScore">0점</div>
-        <p id="finalSummary">결과 요약</p>
-        <button id="restartBtn">다시 시작</button>
+        <h2 id="ovTitle">단어 시험 시작</h2>
+        <p id="ovText">
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
       </div>
     </div>
-  </div>
-
-  <div id="inputArea">
-    <input id="answerInput" type="text" inputmode="numeric" autocomplete="off" placeholder="정답 번호 입력 (1~4)">
-    <button id="submitBtn">제출</button>
   </div>
 </div>
 
 <script>
-const vocab = [
-  { en: "patience", ko: "인내, 인내심" },
-  { en: "be of the essence", ko: "가장 중요하다" },
-  { en: "apology", ko: "사과, 사죄" },
-  { en: "accept", ko: "받아들이다" },
-  { en: "individual", ko: "사람, 개인" },
-  { en: "hear out", ko: "~의 말을 끝까지 듣다" },
-  { en: "leave", ko: "남기다" },
-  { en: "open", ko: "열린, 개방된" },
-  { en: "if and when", ko: "여부와 시기" },
-  { en: "wish", ko: "소망하다" },
-  { en: "reconcile", ko: "화해하다" },
-  { en: "conscious", ko: "알고 있는, 의식하는" },
-  { en: "just because", ko: "단지 ~했다고 해서" },
-  { en: "fully", ko: "온전히, 완전히" },
-  { en: "take time", ko: "시간이 걸리다" },
-  { en: "injured", ko: "상처받은" },
-  { en: "party", ko: "측, 당사자" },
-  { en: "completely", ko: "완전히" },
-  { en: "let go", ko: "(걱정·근심 등을) 떨쳐 버리다" },
-  { en: "trust", ko: "믿다" },
-  { en: "little", ko: "거의 없는" },
-  { en: "speed up", ko: "빨라지게 하다, 가속화하다" },
-  { en: "process", ko: "과정" },
-  { en: "person", ko: "사람" },
-  { en: "truly", ko: "진정으로" },
-  { en: "be worthwhile to do", ko: "~하는 것이 가치가 있다" },
-  { en: "space", ko: "공간" },
-  { en: "heal", ko: "치유되다" },
-  { en: "go back to", ko: "(이전 상황·상태)로 돌아가다" },
-  { en: "normally", ko: "평상시처럼" },
-  { en: "immediately", ko: "즉시, 곧" },
+/* =========================
+   ✅ 단어 목록(2020년 6월 고1 모의고사 31~32번)
+   ========================= */
+const words = [
+  // 31번
+  {en:"patience", ko:"인내, 인내심"},
+  {en:"be of the essence", ko:"가장 중요하다"},
+  {en:"apology", ko:"사과, 사죄"},
+  {en:"accept", ko:"받아들이다"},
+  {en:"individual", ko:"사람, 개인"},
+  {en:"hear ~ out", ko:"~의 말을 끝까지 듣다"},
+  {en:"leave", ko:"남기다"},
+  {en:"open", ko:"열린, 개방된"},
+  {en:"if and when", ko:"여부와 시기"},
+  {en:"wish", ko:"소망하다"},
+  {en:"reconcile", ko:"화해하다"},
+  {en:"conscious", ko:"알고 있는, 의식하는"},
+  {en:"just because", ko:"단지 ~했다고 해서"},
+  {en:"fully", ko:"온전히, 완전히"},
+  {en:"take time", ko:"시간이 걸리다"},
+  {en:"injured", ko:"상처받은"},
+  {en:"party", ko:"측, 당사자"},
+  {en:"completely", ko:"완전히"},
+  {en:"let go", ko:"(걱정ㆍ근심 등을) 떨쳐 버리다"},
+  {en:"trust", ko:"믿다"},
+  {en:"little", ko:"거의 없는"},
+  {en:"speed up", ko:"빨라지게 하다, 가속화하다"},
+  {en:"process", ko:"과정"},
+  {en:"person", ko:"사람"},
+  {en:"truly", ko:"진정으로"},
+  {en:"be worthwhile to do", ko:"~하는 것이 가치가 있다"},
+  {en:"space", ko:"공간"},
+  {en:"heal", ko:"치유되다"},
+  {en:"go back to", ko:"(이전 상황ㆍ상태)로 돌아가다"},
+  {en:"normally", ko:"평상시처럼"},
+  {en:"immediately", ko:"즉시, 곧"},
 
-  { en: "business", ko: "사업체" },
-  { en: "excellent", ko: "훌륭한" },
-  { en: "typically", ko: "보통, 일반적으로" },
-  { en: "afford", ko: "~할 여유가 있다" },
-  { en: "aggressive", ko: "매우 적극적인, 공격적인" },
-  { en: "way to V", ko: "~하는 방법" },
-  { en: "get the word out", ko: "소문나게 하다" },
-  { en: "advertising", ko: "광고" },
-  { en: "exchange", ko: "교환" },
-  { en: "advertiser", ko: "광고주" },
-  { en: "place", ko: "(광고를) 게시하다[내다]" },
-  { en: "banner", ko: "배너" },
-  { en: "each other", ko: "서로" },
-  { en: "for free", ko: "무료로" },
-  { en: "for example", ko: "예를 들어" },
-  { en: "beauty product", ko: "미용 제품" },
-  { en: "site", ko: "사이트" },
-  { en: "in turn", ko: "그 다음에는" },
-  { en: "neither", ko: "둘 다 ~하지 않다" },
-  { en: "charge", ko: "비용을 청구하다" },
-  { en: "ad", ko: "광고" },
-  { en: "gain in popularity", ko: "인기를 얻다" },
-  { en: "especially", ko: "특히" },
-  { en: "among", ko: "~사이에" },
-  { en: "sales team", ko: "영업팀" },
-  { en: "trade", ko: "교환하다" },
-  { en: "outlet", ko: "출구" },
-  { en: "marketer", ko: "마케팅 담당자" },
-  { en: "reach", ko: "~와 접촉하다" },
-  { en: "target audience", ko: "목표 접속자" },
-  { en: "otherwise", ko: "그러지 않으면" }
+  // 32번
+  {en:"business", ko:"사업체"},
+  {en:"excellent", ko:"훌륭한"},
+  {en:"typically", ko:"보통, 일반적으로"},
+  {en:"afford", ko:"~할 여유가 있다"},
+  {en:"aggressive", ko:"매우 적극적인, 공격적인"},
+  {en:"way to V", ko:"~하는 방법"},
+  {en:"get the word out", ko:"소문나게 하다"},
+  {en:"advertising", ko:"광고"},
+  {en:"exchange", ko:"교환"},
+  {en:"advertiser", ko:"광고주"},
+  {en:"place", ko:"(광고를) 게시하다[내다]"},
+  {en:"banner", ko:"배너"},
+  {en:"each other", ko:"서로"},
+  {en:"for free", ko:"무료로"},
+  {en:"for example", ko:"예를 들어"},
+  {en:"beauty product", ko:"미용 제품"},
+  {en:"site", ko:"사이트"},
+  {en:"in turn", ko:"그 다음에는"},
+  {en:"neither", ko:"둘 다 ~하지 않다"},
+  {en:"charge", ko:"비용을 청구하다"},
+  {en:"ad", ko:"광고"},
+  {en:"space", ko:"공간"},
+  {en:"gain in popularity", ko:"인기를 얻다"},
+  {en:"especially", ko:"특히"},
+  {en:"among", ko:"~사이에"},
+  {en:"sales team", ko:"영업팀"},
+  {en:"trade", ko:"교환하다"},
+  {en:"outlet", ko:"출구"},
+  {en:"marketer", ko:"마케팅 담당자"},
+  {en:"reach", ko:"~와 접촉하다"},
+  {en:"target audience", ko:"목표 접속자"},
+  {en:"otherwise", ko:"그러지 않으면"},
+  {en:"afford", ko:"~할 여유가 있다, 능력이 되다"}
 ];
 
-const stage = document.getElementById("stage");
-const englishEl = document.getElementById("english");
-const scoreEl = document.getElementById("score");
-const livesEl = document.getElementById("lives");
-const progressEl = document.getElementById("progress");
-const totalEl = document.getElementById("total");
-const speedViewEl = document.getElementById("speedView");
-const messageEl = document.getElementById("message");
-const inputEl = document.getElementById("answerInput");
-const submitBtn = document.getElementById("submitBtn");
-const gameOverEl = document.getElementById("gameOver");
-const finalScoreEl = document.getElementById("finalScore");
-const finalSummaryEl = document.getElementById("finalSummary");
-const restartBtn = document.getElementById("restartBtn");
+/* =========================
+   게임 설정
+   ========================= */
+const PASS_MESSAGE = "축하합니다. 2020년 6월 고1 모의고사 31~32번 어휘 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
 
-let score = 0;
-let lives = 5;
-let progress = 0;
-let speedMultiplier = 1;
-let playing = true;
-let queue = [];
-let currentQuestion = null;
-let currentChoices = [];
-let animId = null;
-
-const laneX = [12, null, 12, null];
-const laneY = [120, 120, 220, 220];
-const laneBaseSpeed = [0.65, 0.78, 0.72, 0.85];
-
-totalEl.textContent = vocab.length;
-
+/* =========================
+   유틸
+   ========================= */
 function shuffle(arr){
-  const a = [...arr];
-  for(let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
 
-function sampleWrongChoices(correctItem, count){
-  const pool = vocab.filter(v => v.ko !== correctItem.ko);
-  return shuffle(pool).slice(0, count);
+/* =========================
+   DOM
+   ========================= */
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+/* =========================
+   상태
+   ========================= */
+let deck = [];
+let idx = 0;
+let speed = baseSpeed;
+
+let choices = [];
+let raf = null;
+let running = false;
+let lastTs = 0;
+
+/* =========================
+   오버레이
+   ========================= */
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+function hideOverlay(){
+  overlayEl.style.display = "none";
 }
 
-function clearChoices(){
-  currentChoices.forEach(c => c.el.remove());
-  currentChoices = [];
+/* =========================
+   게임 흐름
+   ========================= */
+function resetGame(){
+  deck = shuffle(words);
+  idx = 0;
+  speed = baseSpeed;
+  progressEl.textContent = `0 / ${deck.length}`;
+  englishEl.textContent = "단어 시험";
+  clearChoices();
+  stopLoop();
+}
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
 }
 
-function setMessage(text){
-  messageEl.textContent = text;
-}
-
-function buildQuestion(){
-  if(queue.length === 0){
-    endGame(true);
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
+      false,
+      true
+    );
     return;
   }
 
+  speed = baseSpeed;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running) return;
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    fail("오답을 선택했습니다.");
+    return;
+  }
+  el.classList.add("good");
+  stopLoop();
+  setTimeout(() => {
+    idx += 1;
+    nextWord();
+  }, 200);
+}
+
+/* =========================
+   선택지 생성/이동
+   ========================= */
+function clearChoices(){
+  for(const el of choices) el.remove();
+  choices = [];
+}
+
+function spawnChoices(word){
   clearChoices();
 
-  currentQuestion = queue.shift();
-  englishEl.textContent = currentQuestion.en;
+  const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
 
-  const wrongs = sampleWrongChoices(currentQuestion, 3);
-  const options = shuffle([currentQuestion, ...wrongs]);
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
 
-  const stageWidth = stage.clientWidth;
-  const cardWidth = Math.floor((stageWidth - 36) / 2);
-  laneX[1] = 24 + cardWidth;
-  laneX[3] = 24 + cardWidth;
+  const startYs = [-220, -320, -420, -520];
 
-  currentChoices = options.map((item, idx) => {
+  options.forEach((txt, i) => {
     const el = document.createElement("div");
     el.className = "choice";
-    el.style.left = laneX[idx] + "px";
-    el.style.top = laneY[idx] + "px";
-    el.style.width = cardWidth + "px";
-    el.dataset.index = String(idx + 1);
-    el.dataset.correct = item.ko === currentQuestion.ko ? "true" : "false";
+    el.textContent = txt;
 
-    const num = document.createElement("div");
-    num.className = "num";
-    num.textContent = idx + 1;
+    el.dataset.correct = (txt === correct) ? "1" : "0";
+    el._y = startYs[i];
 
-    const text = document.createElement("div");
-    text.textContent = item.ko;
+    el.addEventListener("click", () => pick(el));
+    el.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      pick(el);
+    }, { passive:false });
 
-    el.appendChild(num);
-    el.appendChild(text);
+    el.style.top = "0px";
+    el.style.transform = `translateY(${el._y}px)`;
 
-    el.addEventListener("click", () => {
-      if(!playing) return;
-      handleChoice(idx + 1);
-    });
-
-    stage.appendChild(el);
-
-    return {
-      el,
-      ko: item.ko,
-      isCorrect: item.ko === currentQuestion.ko,
-      y: laneY[idx],
-      speed: laneBaseSpeed[idx] * speedMultiplier
-    };
+    gameEl.appendChild(el);
+    choices.push(el);
   });
-
-  inputEl.value = "";
-  inputEl.focus();
-  setMessage("정답 번호를 입력하거나 뜻 상자를 클릭하세요.");
 }
 
-function nextQuestion(){
-  progress += 1;
-  progressEl.textContent = progress;
-
-  if(progress > 0 && progress % 5 === 0){
-    speedMultiplier += 0.08;
-    speedViewEl.textContent = speedMultiplier.toFixed(1) + "x";
-  }
-
-  buildQuestion();
-}
-
-function flashChoice(choiceObj, className){
-  choiceObj.el.classList.add(className);
-}
-
-function handleCorrect(choiceObj){
-  score += 10;
-  scoreEl.textContent = score;
-  flashChoice(choiceObj, "correct");
-  setMessage("정답! " + currentQuestion.en + " = " + currentQuestion.ko);
-
-  setTimeout(() => {
-    nextQuestion();
-  }, 320);
-}
-
-function handleWrong(choiceObj){
-  flashChoice(choiceObj, "wrong");
-  setMessage("오답! 다시 빠르게 보세요.");
-}
-
-function handleChoice(number){
-  if(!playing || !currentQuestion) return;
-
-  const idx = Number(number) - 1;
-  if(idx < 0 || idx > 3) return;
-
-  const picked = currentChoices[idx];
-  if(!picked) return;
-
-  if(picked.isCorrect){
-    handleCorrect(picked);
-  } else {
-    handleWrong(picked);
-  }
-}
-
-function submitAnswer(){
-  const v = inputEl.value.trim();
-  if(!v){
-    setMessage("1~4 중 번호를 입력하세요.");
-    return;
-  }
-  if(!/^[1-4]$/.test(v)){
-    setMessage("정답은 1, 2, 3, 4 중 하나입니다.");
-    return;
-  }
-  handleChoice(Number(v));
-  inputEl.value = "";
-  inputEl.focus();
-}
-
-function loseLifeByBottom(){
-  if(!playing) return;
-
-  lives -= 1;
-  livesEl.textContent = lives;
-
-  currentChoices.forEach(c => {
-    if(c.isCorrect){
-      c.el.classList.add("wrong");
-    }
-  });
-
-  setMessage("정답이 바닥에 닿았습니다! 정답: " + currentQuestion.ko);
-
-  if(lives <= 0){
-    setTimeout(() => endGame(false), 350);
-    return;
-  }
-
-  setTimeout(() => {
-    nextQuestion();
-  }, 380);
-}
-
-function animate(){
-  if(!playing) return;
-
-  const limit = stage.clientHeight - 132;
-
-  let correctHitBottom = false;
-
-  currentChoices.forEach(choice => {
-    choice.y += choice.speed;
-    choice.el.style.top = choice.y + "px";
-
-    if(choice.isCorrect && choice.y >= limit){
-      correctHitBottom = true;
-    }
-  });
-
-  if(correctHitBottom){
-    loseLifeByBottom();
-    return;
-  }
-
-  animId = requestAnimationFrame(animate);
-}
-
+/* =========================
+   루프
+   ========================= */
 function startLoop(){
-  cancelAnimationFrame(animId);
-  function loop(){
-    animate();
-    if(playing) animId = requestAnimationFrame(loop);
+  running = true;
+  lastTs = performance.now();
+  if(raf) cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(tick);
+}
+function stopLoop(){
+  running = false;
+  if(raf) cancelAnimationFrame(raf);
+  raf = null;
+}
+function tick(ts){
+  if(!running) return;
+  const dt = (ts - lastTs) / 1000;
+  lastTs = ts;
+
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    el._y += speed * dt;
+    el.style.transform = `translateY(${el._y}px)`;
+    if(el._y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
   }
-  animId = requestAnimationFrame(loop);
+  raf = requestAnimationFrame(tick);
 }
 
-function endGame(clear){
-  playing = false;
-  cancelAnimationFrame(animId);
-  clearChoices();
-
-  finalScoreEl.textContent = score + "점";
-  if(clear){
-    finalSummaryEl.textContent = "모든 단어를 끝까지 완료했습니다. 아주 좋습니다.";
-  } else {
-    finalSummaryEl.textContent = "남은 목숨이 모두 소진되었습니다. 맞힌 만큼 실력이 쌓였습니다.";
-  }
-  gameOverEl.style.display = "flex";
-}
-
-function startGame(){
-  score = 0;
-  lives = 5;
-  progress = 0;
-  speedMultiplier = 1;
-  playing = true;
-  currentQuestion = null;
-  queue = shuffle(vocab);
-
-  scoreEl.textContent = score;
-  livesEl.textContent = lives;
-  progressEl.textContent = progress;
-  speedViewEl.textContent = speedMultiplier.toFixed(1) + "x";
-  gameOverEl.style.display = "none";
-
-  clearChoices();
-  buildQuestion();
-  startLoop();
-  setMessage("게임 시작! 영어 단어의 뜻을 맞히세요.");
-}
-
-submitBtn.addEventListener("click", submitAnswer);
-inputEl.addEventListener("keydown", (e) => {
-  if(e.key === "Enter"){
-    submitAnswer();
-  }
+/* =========================
+   버튼
+   ========================= */
+startBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "단어 시험 시작",
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
 });
-restartBtn.addEventListener("click", startGame);
 
-startGame();
+showOverlay(
+  "단어 시험 시작",
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
 </script>
+
 </body>
 </html>
