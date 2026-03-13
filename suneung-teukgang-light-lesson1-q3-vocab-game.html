@@ -1,418 +1,436 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>수능특강 라이트 1강 3번 어휘 게임</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>수능특강 라이트 1강 3번 어휘 단어 시험</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action: manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px; right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    transition: transform .08s ease, background .12s ease;
+  }
+  .choice:active{ transform: scale(.98); }
+  .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
+  .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #dff6ff, #ffffff);
-      overflow: hidden;
-    }
-
-    #game-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    #question-box {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #ffffff;
-      padding: 14px 24px;
-      border-radius: 16px;
-      font-size: 28px;
-      font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 20;
-      text-align: center;
-      min-width: 280px;
-    }
-
-    #score-board {
-      position: absolute;
-      top: 90px;
-      left: 20px;
-      background: rgba(255,255,255,0.95);
-      padding: 10px 16px;
-      border-radius: 12px;
-      font-size: 20px;
-      font-weight: bold;
-      z-index: 20;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    #life-board {
-      position: absolute;
-      top: 90px;
-      right: 20px;
-      background: rgba(255,255,255,0.95);
-      padding: 10px 16px;
-      border-radius: 12px;
-      font-size: 20px;
-      font-weight: bold;
-      z-index: 20;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    .falling-word {
-      position: absolute;
-      top: -60px;
-      min-width: 120px;
-      max-width: 220px;
-      padding: 12px 16px;
-      background: #fffbcc;
-      border: 2px solid #222;
-      border-radius: 14px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      cursor: pointer;
-      user-select: none;
-      touch-action: manipulation;
-      box-shadow: 0 6px 10px rgba(0,0,0,0.12);
-    }
-
-    #message {
-      position: absolute;
-      top: 45%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 42px;
-      font-weight: bold;
-      color: #222;
-      background: rgba(255,255,255,0.96);
-      padding: 24px 36px;
-      border-radius: 20px;
-      z-index: 50;
-      display: none;
-      text-align: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-    }
-
-    #restart-btn {
-      display: none;
-      position: absolute;
-      top: 60%;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 60;
-      padding: 14px 26px;
-      font-size: 22px;
-      font-weight: bold;
-      border: none;
-      border-radius: 14px;
-      background: #222;
-      color: white;
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      #question-box {
-        font-size: 22px;
-        padding: 12px 18px;
-        top: 14px;
-      }
-
-      #score-board, #life-board {
-        font-size: 16px;
-        top: 72px;
-      }
-
-      .falling-word {
-        font-size: 18px;
-        padding: 10px 12px;
-        min-width: 90px;
-        max-width: 180px;
-      }
-
-      #message {
-        font-size: 28px;
-        width: 84%;
-        padding: 20px;
-      }
-
-      #restart-btn {
-        font-size: 18px;
-      }
-    }
-  </style>
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
 </head>
 <body>
-  <div id="game-container">
-    <div id="question-box">문제</div>
-    <div id="score-board">점수: 0</div>
-    <div id="life-board">기회: 3</div>
-    <div id="message"></div>
-    <button id="restart-btn" onclick="restartGame()">다시 시작</button>
+
+<div id="wrap">
+  <header>
+    <div id="english">단어 시험</div>
+    <div id="progress"></div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">단어 시험 시작</h2>
+        <p id="ovText">
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
   </div>
+</div>
 
-  <script>
-    const words = [
-      {en:"message", ko:"메시지"},
-      {en:"find", ko:"발견하다"},
-      {en:"well", ko:"건강한 상태로"},
-      {en:"sincerely", ko:"진심으로"},
-      {en:"appreciate", ko:"감사하다"},
-      {en:"purchase", ko:"구매"},
-      {en:"high-efficiency", ko:"고효율의"},
-      {en:"air conditioner", ko:"에어컨"},
-      {en:"last month", ko:"지난달"},
-      {en:"product", ko:"제품"},
-      {en:"select", ko:"선택하다"},
-      {en:"provide", ko:"제공하다"},
-      {en:"comfort", ko:"편안함"},
-      {en:"contribute", ko:"기여하다"},
-      {en:"energy", ko:"에너지"},
-      {en:"saving", ko:"절약"},
-      {en:"further", ko:"더 나아가"},
-      {en:"support", ko:"지원하다"},
-      {en:"customer", ko:"고객"},
-      {en:"government", ko:"정부"},
-      {en:"offer", ko:"제공하다"},
-      {en:"cash-back", ko:"현금 환급"},
-      {en:"incentive", ko:"장려책"},
-      {en:"program", ko:"프로그램"},
-      {en:"refund", ko:"환급"},
-      {en:"purchase price", ko:"구매 가격"},
-      {en:"reward", ko:"보상"},
-      {en:"choose", ko:"선택하다"},
-      {en:"eco-friendly", ko:"친환경의"},
-      {en:"appliance", ko:"가전제품"},
-      {en:"apply", ko:"신청하다"},
-      {en:"complete", ko:"작성하다"},
-      {en:"application", ko:"신청서"},
-      {en:"form", ko:"양식"},
-      {en:"submit", ko:"제출하다"},
-      {en:"copy", ko:"사본"},
-      {en:"receipt", ko:"영수증"},
-      {en:"detailed", ko:"자세한"},
-      {en:"instruction", ko:"지침"},
-      {en:"available", ko:"이용 가능한"},
-      {en:"official", ko:"공식적인"},
-      {en:"website", ko:"웹사이트"},
-      {en:"need", ko:"필요하다"},
-      {en:"assistance", ko:"도움"},
-      {en:"process", ko:"절차"},
-      {en:"customer service", ko:"고객 서비스"},
-      {en:"team", ko:"팀"},
-      {en:"guide", ko:"안내하다"},
-      {en:"step by step", ko:"단계적으로"},
-      {en:"trust", ko:"신뢰"},
-      {en:"support", ko:"지지하다"},
-      {en:"efficiency", ko:"효율성"},
-    ];
+<script>
+/* =========================
+   ✅ 단어 목록 (수능특강 라이트 1강 3번)
+   ========================= */
+const words = [
+  { en:"message", ko:"메시지" },
+  { en:"find", ko:"발견하다" },
+  { en:"well", ko:"건강한 상태로" },
+  { en:"sincerely", ko:"진심으로" },
+  { en:"appreciate", ko:"감사하다" },
+  { en:"purchase", ko:"구매" },
+  { en:"high-efficiency", ko:"고효율의" },
+  { en:"air conditioner", ko:"에어컨" },
+  { en:"last month", ko:"지난달" },
+  { en:"product", ko:"제품" },
+  { en:"select", ko:"선택하다" },
+  { en:"provide", ko:"제공하다" },
+  { en:"comfort", ko:"편안함" },
+  { en:"contribute", ko:"기여하다" },
+  { en:"energy", ko:"에너지" },
+  { en:"saving", ko:"절약" },
+  { en:"further", ko:"더 나아가" },
+  { en:"support", ko:"지원하다" },
+  { en:"customer", ko:"고객" },
+  { en:"government", ko:"정부" },
+  { en:"offer", ko:"제공하다" },
+  { en:"cash-back", ko:"현금 환급" },
+  { en:"incentive", ko:"장려책" },
+  { en:"program", ko:"프로그램" },
+  { en:"refund", ko:"환급" },
+  { en:"purchase price", ko:"구매 가격" },
+  { en:"reward", ko:"보상" },
+  { en:"choose", ko:"선택하다" },
+  { en:"eco-friendly", ko:"친환경의" },
+  { en:"appliance", ko:"가전제품" },
+  { en:"apply", ko:"신청하다" },
+  { en:"complete", ko:"작성하다" },
+  { en:"application", ko:"신청서" },
+  { en:"form", ko:"양식" },
+  { en:"submit", ko:"제출하다" },
+  { en:"copy", ko:"사본" },
+  { en:"receipt", ko:"영수증" },
+  { en:"detailed", ko:"자세한" },
+  { en:"instruction", ko:"지침" },
+  { en:"available", ko:"이용 가능한" },
+  { en:"official", ko:"공식적인" },
+  { en:"website", ko:"웹사이트" },
+  { en:"need", ko:"필요하다" },
+  { en:"assistance", ko:"도움" },
+  { en:"process", ko:"절차" },
+  { en:"customer service", ko:"고객 서비스" },
+  { en:"team", ko:"팀" },
+  { en:"guide", ko:"안내하다" },
+  { en:"step by step", ko:"단계적으로" },
+  { en:"trust", ko:"신뢰" },
+  { en:"support", ko:"지지하다" },
+  { en:"efficiency", ko:"효율성" }
+];
 
-    const gameContainer = document.getElementById("game-container");
-    const questionBox = document.getElementById("question-box");
-    const scoreBoard = document.getElementById("score-board");
-    const lifeBoard = document.getElementById("life-board");
-    const messageBox = document.getElementById("message");
-    const restartBtn = document.getElementById("restart-btn");
+/* =========================
+   게임 설정
+   ========================= */
+const PASS_MESSAGE = "축하합니다. 수능특강 라이트 1강 3번 어휘 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
 
-    let score = 0;
-    let lives = 3;
-    let currentQuestion = null;
-    let currentAnswer = null;
-    let gameOver = false;
-    let activeWords = [];
-    let animationId = null;
-    let spawnInterval = null;
+/* =========================
+   유틸
+   ========================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
+/* =========================
+   DOM
+   ========================= */
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+/* =========================
+   상태
+   ========================= */
+let deck = [];
+let idx = 0;
+let speed = baseSpeed;
+
+let choices = [];
+let raf = null;
+let running = false;
+let lastTs = 0;
+
+/* =========================
+   오버레이
+   ========================= */
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+/* =========================
+   게임 흐름
+   ========================= */
+function resetGame(){
+  deck = shuffle(words);
+  idx = 0;
+  speed = baseSpeed;
+  progressEl.textContent = `0 / ${deck.length}`;
+  englishEl.textContent = "단어 시험";
+  clearChoices();
+  stopLoop();
+}
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  speed = baseSpeed;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running) return;
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    fail("오답을 선택했습니다.");
+    return;
+  }
+  el.classList.add("good");
+  stopLoop();
+  setTimeout(() => {
+    idx += 1;
+    nextWord();
+  }, 200);
+}
+
+/* =========================
+   선택지 생성/이동
+   ========================= */
+function clearChoices(){
+  for(const el of choices) el.remove();
+  choices = [];
+}
+
+function spawnChoices(word){
+  clearChoices();
+
+  const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
+
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
+
+  const startYs = [-220, -320, -420, -520];
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+
+    el.dataset.correct = (txt === correct) ? "1" : "0";
+    el._y = startYs[i];
+
+    el.addEventListener("click", () => pick(el));
+    el.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      pick(el);
+    }, { passive:false });
+
+    el.style.top = "0px";
+    el.style.transform = `translateY(${el._y}px)`;
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+/* =========================
+   루프
+   ========================= */
+function startLoop(){
+  running = true;
+  lastTs = performance.now();
+  if(raf) cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(tick);
+}
+function stopLoop(){
+  running = false;
+  if(raf) cancelAnimationFrame(raf);
+  raf = null;
+}
+function tick(ts){
+  if(!running) return;
+  const dt = (ts - lastTs) / 1000;
+  lastTs = ts;
+
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    el._y += speed * dt;
+    el.style.transform = `translateY(${el._y}px)`;
+    if(el._y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
     }
+  }
+  raf = requestAnimationFrame(tick);
+}
 
-    function getRandomWord() {
-      return words[Math.floor(Math.random() * words.length)];
-    }
+/* =========================
+   버튼
+   ========================= */
+startBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "단어 시험 시작",
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
+});
 
-    function getChoices(correctWord) {
-      const wrongChoices = shuffle(
-        words.filter(w => w.ko !== correctWord.ko)
-      ).slice(0, 3);
+showOverlay(
+  "단어 시험 시작",
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
+</script>
 
-      const choices = shuffle([correctWord, ...wrongChoices]);
-      return choices;
-    }
-
-    function setQuestion() {
-      currentQuestion = getRandomWord();
-      currentAnswer = currentQuestion.ko;
-      questionBox.textContent = currentQuestion.en;
-    }
-
-    function createFallingWord(text, isCorrect) {
-      const div = document.createElement("div");
-      div.className = "falling-word";
-      div.textContent = text;
-      div.dataset.correct = isCorrect ? "true" : "false";
-      div.style.left = Math.random() * (window.innerWidth - 180) + "px";
-      div.style.top = "-60px";
-
-      const speed = 1.2 + Math.random() * 1.0;
-
-      const wordObj = {
-        el: div,
-        y: -60,
-        speed: speed
-      };
-
-      div.addEventListener("click", () => handleWordClick(wordObj));
-      div.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        handleWordClick(wordObj);
-      }, { passive: false });
-
-      gameContainer.appendChild(div);
-      activeWords.push(wordObj);
-    }
-
-    function spawnWords() {
-      if (gameOver) return;
-
-      const choices = getChoices(currentQuestion);
-      choices.forEach(choice => {
-        createFallingWord(choice.ko, choice.ko === currentAnswer);
-      });
-    }
-
-    function handleWordClick(wordObj) {
-      if (gameOver) return;
-
-      const isCorrect = wordObj.el.dataset.correct === "true";
-
-      removeWord(wordObj);
-
-      if (isCorrect) {
-        score++;
-        scoreBoard.textContent = "점수: " + score;
-
-        if (score >= 10) {
-          endGame(true);
-          return;
-        }
-
-        clearAllWords();
-        setQuestion();
-        spawnWords();
-      } else {
-        lives--;
-        lifeBoard.textContent = "기회: " + lives;
-
-        if (lives <= 0) {
-          endGame(false);
-        }
-      }
-    }
-
-    function removeWord(wordObj) {
-      if (wordObj.el.parentNode) {
-        wordObj.el.parentNode.removeChild(wordObj.el);
-      }
-      activeWords = activeWords.filter(w => w !== wordObj);
-    }
-
-    function clearAllWords() {
-      activeWords.forEach(wordObj => {
-        if (wordObj.el.parentNode) {
-          wordObj.el.parentNode.removeChild(wordObj.el);
-        }
-      });
-      activeWords = [];
-    }
-
-    function updateWords() {
-      if (gameOver) return;
-
-      activeWords.forEach(wordObj => {
-        wordObj.y += wordObj.speed;
-        wordObj.el.style.top = wordObj.y + "px";
-      });
-
-      const toRemove = [];
-
-      activeWords.forEach(wordObj => {
-        if (wordObj.y > window.innerHeight - 70) {
-          if (wordObj.el.dataset.correct === "true") {
-            lives--;
-            lifeBoard.textContent = "기회: " + lives;
-
-            if (lives <= 0) {
-              endGame(false);
-              return;
-            }
-
-            clearAllWords();
-            setQuestion();
-            spawnWords();
-          } else {
-            toRemove.push(wordObj);
-          }
-        }
-      });
-
-      toRemove.forEach(removeWord);
-
-      animationId = requestAnimationFrame(updateWords);
-    }
-
-    function endGame(isWin) {
-      gameOver = true;
-      clearInterval(spawnInterval);
-      cancelAnimationFrame(animationId);
-      clearAllWords();
-
-      messageBox.style.display = "block";
-      restartBtn.style.display = "block";
-
-      if (isWin) {
-        messageBox.textContent = "PASS! 🎉";
-      } else {
-        messageBox.textContent = "FAIL 😢";
-      }
-    }
-
-    function restartGame() {
-      score = 0;
-      lives = 3;
-      gameOver = false;
-      activeWords = [];
-
-      scoreBoard.textContent = "점수: 0";
-      lifeBoard.textContent = "기회: 3";
-      messageBox.style.display = "none";
-      restartBtn.style.display = "none";
-
-      setQuestion();
-      spawnWords();
-      updateWords();
-
-      spawnInterval = setInterval(() => {
-        if (!gameOver && activeWords.length < 8) {
-          const extraWrong = shuffle(words).find(w => w.ko !== currentAnswer);
-          if (extraWrong) {
-            createFallingWord(extraWrong.ko, false);
-          }
-        }
-      }, 1500);
-    }
-
-    restartGame();
-  </script>
 </body>
 </html>
