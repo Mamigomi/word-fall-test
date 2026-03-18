@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>능률보카 어원편 Day 3 테스트</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action: manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px; right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    transition: transform .08s ease, background .12s ease;
+  }
+  .choice:active{ transform: scale(.98); }
+  .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
+  .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <div id="english">능률보카 어원편 Day 3 테스트</div>
+    <div id="progress"></div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">단어 시험 시작</h2>
+        <p id="ovText">
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   ✅ 능률보카 어원편 Day 3
+   기본어 + 파생어 + 유의어 + 반의어 + 표현
+   validation check: 총 88개 항목
+   ========================= */
+const words = [
+  { en:"forehead", ko:"이마" },
+  { en:"brow", ko:"이마, 눈썹뼈 부위" },
+
+  { en:"forefather", ko:"선조, 조상" },
+  { en:"ancestor", ko:"조상" },
+  { en:"descendant", ko:"후손" },
+
+  { en:"foresee", ko:"예견하다, 예지하다" },
+  { en:"foreseeable", ko:"예견할 수 있는" },
+  { en:"in the foreseeable future", ko:"가까운 미래에" },
+  { en:"predict", ko:"예측하다" },
+  { en:"forecast", ko:"예보하다, 예측하다" },
+  { en:"foretell", ko:"예언하다" },
+  { en:"predictable", ko:"예측 가능한" },
+
+  { en:"foremost", ko:"가장 중요한, 최고의" },
+  { en:"foremost", ko:"선두의, 맨 앞의, 먼저의" },
+  { en:"leading", ko:"가장 중요한, 선두의" },
+  { en:"first and foremost", ko:"무엇보다도 가장 중요한" },
+
+  { en:"former", ko:"이전의, 예전의" },
+  { en:"former", ko:"전자의, 앞의" },
+
+  { en:"overcome", ko:"극복하다, 이겨내다" },
+  { en:"overcome", ko:"이기다" },
+  { en:"get over", ko:"극복하다" },
+  { en:"overcame", ko:"극복했다, 이겨냈다" },
+  { en:"overcome (p.p.)", ko:"극복된, 이겨낸" },
+
+  { en:"overlook", ko:"간과하다, 못 보고 넘어가다" },
+  { en:"overlook", ko:"눈감아 주다" },
+  { en:"overlook", ko:"내려다보다" },
+  { en:"miss", ko:"놓치다" },
+  { en:"neglect", ko:"소홀히 하다, 간과하다" },
+  { en:"disregard", ko:"무시하다" },
+  { en:"excuse", ko:"눈감아 주다" },
+  { en:"forgive", ko:"용서하다" },
+
+  { en:"overseas", ko:"해외로, 해외에서" },
+  { en:"overseas", ko:"해외의, 외국의" },
+  { en:"abroad", ko:"해외로, 해외에서" },
+
+  { en:"overwhelm", ko:"압도하다" },
+  { en:"overwhelm", ko:"당황하게 하다, 어쩔 줄 모르게 하다" },
+  { en:"overwhelming", ko:"압도적인" },
+  { en:"overwhelmed", ko:"압도된" },
+  { en:"overwhelming majority", ko:"압도적인 다수" },
+  { en:"be overwhelmed by", ko:"~에 압도되다" },
+  { en:"be overwhelmed with", ko:"~에 압도되다, ~에 당황하다" },
+
+  { en:"overall", ko:"전반적인" },
+  { en:"overall", ko:"전반적으로" },
+
+  { en:"overhead", ko:"머리 위에, 하늘 높이" },
+  { en:"overhead", ko:"머리 위의, 머리 위를 지나는" },
+
+  { en:"overtake", ko:"능가하다" },
+  { en:"overtake", ko:"추월하다, 따라잡다" },
+  { en:"overtake", ko:"덮치다, 압도하다" },
+  { en:"catch up with", ko:"따라잡다" },
+  { en:"overtook", ko:"추월했다, 따라잡았다" },
+  { en:"overtaken", ko:"추월된, 따라잡힌" },
+
+  { en:"overlap", ko:"겹치다, 포개지다" },
+  { en:"overlap", ko:"중복되다, 부분적으로 일치하다" },
+  { en:"overlap (n.)", ko:"겹침, 중복" },
+
+  { en:"overflow", ko:"넘치다, 범람하다" },
+  { en:"overflow", ko:"~로 넘쳐나다" },
+  { en:"overflow (n.)", ko:"넘침, 범람" },
+  { en:"overflow (n.)", ko:"초과, 초과분" },
+  { en:"spill over", ko:"넘치다" },
+  { en:"flood", ko:"범람하다, 홍수" },
+  { en:"excess", ko:"과잉, 초과" },
+
+  { en:"overshadow", ko:"빛을 잃게 하다, 무색하게 하다" },
+  { en:"overestimate", ko:"과대평가하다" },
+  { en:"overload", ko:"과적하다, 너무 많이 주다" },
+  { en:"overload", ko:"과부하" },
+  { en:"overcharge", ko:"과잉 청구하다" },
+  { en:"overcharge", ko:"과다 요금" },
+  { en:"overeat", ko:"과식하다" },
+
+  { en:"extraordinary", ko:"이상한" },
+  { en:"extraordinary", ko:"비범한, 대단한" },
+  { en:"unusual", ko:"이상한, 보통이 아닌" },
+  { en:"exceptional", ko:"비범한, 뛰어난" },
+  { en:"incredible", ko:"대단한, 놀라운" },
+  { en:"common", ko:"흔한, 보통의" },
+  { en:"ordinary", ko:"보통의, 평범한" },
+
+  { en:"extracurricular", ko:"정규 교과 과정 이외의, 과외의" },
+
+  { en:"extraterrestrial", ko:"지구 밖의, 외계의" },
+  { en:"extraterrestrial", ko:"외계인, 우주인" },
+  { en:"extraterritorial", ko:"치외법권의" },
+
+  { en:"extrovert", ko:"외향적인 사람" },
+  { en:"extroverted", ko:"외향적인, 외향성의" },
+  { en:"introvert", ko:"내향적인 사람" },
+  { en:"introverted", ko:"내향적인" },
+
+  { en:"external", ko:"외부의, 밖의" },
+  { en:"exterior", ko:"외부의, 겉의" },
+  { en:"internal", ko:"내부의" },
+  { en:"externally", ko:"외부적으로, 외부에서" },
+  { en:"externalize", ko:"표면화하다" },
+  { en:"internally", ko:"내부적으로" },
+  { en:"internalize", ko:"내면화하다" },
+  { en:"externality", ko:"외부성, 외부 효과" },
+
+  { en:"undergo", ko:"겪다, 경험하다" },
+  { en:"experience", ko:"경험하다" },
+  { en:"go through", ko:"겪다" },
+  { en:"undergo surgery", ko:"수술을 받다" },
+  { en:"underwent", ko:"겪었다, 경험했다" },
+  { en:"undergone", ko:"겪은, 경험한" },
+
+  { en:"undertake", ko:"~의 책임을 지다, 떠맡다" },
+  { en:"undertake", ko:"착수하다" },
+  { en:"undertake", ko:"약속하다" },
+  { en:"take on", ko:"떠맡다" },
+  { en:"promise", ko:"약속하다" },
+  { en:"undertook", ko:"떠맡았다, 착수했다" },
+  { en:"undertaken", ko:"떠맡은, 착수한" },
+
+  { en:"undergraduate", ko:"대학생, 학부생" },
+  { en:"undergraduate", ko:"대학생의, 학부생의" },
+  { en:"graduate", ko:"졸업생, 학사" },
+
+  { en:"underlying", ko:"근본적인, 근원적인" },
+  { en:"fundamental", ko:"근본적인" },
+  { en:"underlie", ko:"기저를 이루다, 기본이 되다" }
+];
+
+/* =========================
+   게임 설정
+   ========================= */
+const PASS_MESSAGE = "축하합니다. 능률보카 어원편 Day 3 테스트 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
+
+/* =========================
+   유틸
+   ========================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* =========================
+   DOM
+   ========================= */
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+/* =========================
+   상태
+   ========================= */
+let deck = [];
+let idx = 0;
+let speed = baseSpeed;
+
+let choices = [];
+let raf = null;
+let running = false;
+let lastTs = 0;
+
+/* =========================
+   오버레이
+   ========================= */
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+/* =========================
+   게임 흐름
+   ========================= */
+function resetGame(){
+  deck = shuffle(words);
+  idx = 0;
+  speed = baseSpeed;
+  progressEl.textContent = `0 / ${deck.length}`;
+  englishEl.textContent = "능률보카 어원편 Day 3 테스트";
+  clearChoices();
+  stopLoop();
+}
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  speed = baseSpeed;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running) return;
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    fail("오답을 선택했습니다.");
+    return;
+  }
+  el.classList.add("good");
+  stopLoop();
+  setTimeout(() => {
+    idx += 1;
+    nextWord();
+  }, 200);
+}
+
+/* =========================
+   선택지 생성/이동
+   ========================= */
+function clearChoices(){
+  for(const el of choices) el.remove();
+  choices = [];
+}
+
+function spawnChoices(word){
+  clearChoices();
+
+  const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
+
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
+
+  const startYs = [-220, -320, -420, -520];
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+
+    el.dataset.correct = (txt === correct) ? "1" : "0";
+    el._y = startYs[i];
+
+    el.addEventListener("click", () => pick(el));
+    el.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      pick(el);
+    }, { passive:false });
+
+    el.style.top = "0px";
+    el.style.transform = `translateY(${el._y}px)`;
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+/* =========================
+   루프
+   ========================= */
+function startLoop(){
+  running = true;
+  lastTs = performance.now();
+  if(raf) cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(tick);
+}
+function stopLoop(){
+  running = false;
+  if(raf) cancelAnimationFrame(raf);
+  raf = null;
+}
+function tick(ts){
+  if(!running) return;
+  const dt = (ts - lastTs) / 1000;
+  lastTs = ts;
+
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    el._y += speed * dt;
+    el.style.transform = `translateY(${el._y}px)`;
+    if(el._y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+/* =========================
+   버튼
+   ========================= */
+startBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "단어 시험 시작",
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
+});
+
+showOverlay(
+  "단어 시험 시작",
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
+</script>
+
+</body>
+</html>
