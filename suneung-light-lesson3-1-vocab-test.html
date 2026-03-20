@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>수능특강 라이트 3강 1번 어휘 시험</title>
+
+<meta property="og:title" content="수능특강 라이트 3강 1번 어휘 시험">
+<meta property="og:description" content="단어 떨어지기 게임으로 빠르게 암기하세요.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:url" content="https://mamigomi.github.io/word-fall-test/suneung-light-lesson3-1-vocab-test.html">
+
+<style>
+body{
+  margin:0;
+  background:#0b1220;
+  color:#fff;
+  font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+  height:100vh;
+  overflow:hidden;
+}
+#wrap{
+  max-width:480px;
+  margin:0 auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+header{
+  padding:14px;
+  background:#111a2b;
+}
+#english{
+  font-size:22px;
+  font-weight:800;
+}
+#progress{
+  font-size:13px;
+  opacity:.8;
+}
+#game{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+}
+.floor{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:60px;
+  background:rgba(255,80,80,.3);
+  text-align:center;
+  line-height:60px;
+}
+.choice{
+  position:absolute;
+  left:10px; right:10px;
+  height:56px;
+  background:#1e293b;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  cursor:pointer;
+}
+.choice.good{ background:#065f46; }
+.choice.bad{ background:#7f1d1d; }
+
+#overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.card{
+  background:#111a2b;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+}
+button{
+  margin-top:10px;
+  padding:10px;
+  width:100%;
+  font-weight:800;
+}
+</style>
+</head>
+
+<body>
+
+<div id="wrap">
+<header>
+<div id="english">단어 시험</div>
+<div id="progress"></div>
+</header>
+
+<div id="game">
+<div class="floor">바닥 닿으면 탈락</div>
+
+<div id="overlay">
+<div class="card">
+<h2>시작</h2>
+<p>맞는 뜻을 누르세요</p>
+<button id="startBtn">시작</button>
+</div>
+</div>
+
+</div>
+</div>
+
+<script>
+const words = [
+{en:"take time",ko:"시간을 갖다"},
+{en:"bored",ko:"지루한"},
+{en:"one time",ko:"어느 날"},
+{en:"hear",ko:"듣다"},
+{en:"coworker",ko:"동료"},
+{en:"get busy",ko:"바빠지다"},
+{en:"truth",ko:"사실"},
+{en:"creative",ko:"창의적인"},
+{en:"sit around",ko:"가만히 있다"},
+{en:"do nothing",ko:"아무것도 하지 않다"},
+{en:"idea",ko:"아이디어"},
+{en:"take to",ko:"맡기다"},
+{en:"cleaners",ko:"세탁소"},
+{en:"iron",ko:"다리다"},
+{en:"boring",ko:"지루한"},
+{en:"be out of",ko:"부족하다"},
+{en:"wash dishes",ko:"설거지하다"},
+{en:"take a walk",ko:"산책하다"},
+{en:"stare",ko:"응시하다"},
+{en:"spot",ko:"지점"},
+{en:"as long as",ko:"~하는 한"},
+{en:"artist",ko:"예술가"},
+{en:"avoid",ko:"피하다"},
+{en:"work",ko:"일"},
+{en:"focus",ko:"집중하다"},
+{en:"mind",ko:"마음"},
+{en:"mess around",ko:"빈둥거리다"},
+{en:"get lost",ko:"길을 잃다"},
+{en:"wander",ko:"돌아다니다"},
+{en:"never know",ko:"결코 알지 못하다"},
+{en:"lead",ko:"이끌다"}
+];
+
+let index=0;
+let speed=100;
+let choices=[];
+
+const game=document.getElementById("game");
+const english=document.getElementById("english");
+const progress=document.getElementById("progress");
+const overlay=document.getElementById("overlay");
+
+function shuffle(a){
+return a.sort(()=>Math.random()-0.5);
+}
+
+function start(){
+overlay.style.display="none";
+next();
+}
+
+function next(){
+if(index>=words.length){
+alert("완료!");
+location.reload();
+return;
+}
+english.textContent=words[index].en;
+progress.textContent=(index+1)+" / "+words.length;
+
+spawn(words[index]);
+}
+
+function spawn(word){
+clear();
+let correct=word.ko;
+let pool=words.map(w=>w.ko).filter(x=>x!==correct);
+let opts=shuffle([correct,...shuffle(pool).slice(0,3)]);
+
+opts.forEach((txt,i)=>{
+let el=document.createElement("div");
+el.className="choice";
+el.textContent=txt;
+el.style.top=(-100*i)+"px";
+
+el.onclick=()=>{
+if(txt===correct){
+el.classList.add("good");
+setTimeout(()=>{
+index++;
+next();
+},200);
+}else{
+el.classList.add("bad");
+alert("틀림");
+location.reload();
+}
+};
+
+game.appendChild(el);
+choices.push(el);
+});
+
+move();
+}
+
+function clear(){
+choices.forEach(e=>e.remove());
+choices=[];
+}
+
+function move(){
+let interval=setInterval(()=>{
+choices.forEach(el=>{
+let top=el.offsetTop+5;
+el.style.top=top+"px";
+if(top>window.innerHeight-100){
+alert("탈락");
+location.reload();
+}
+});
+},50);
+}
+
+document.getElementById("startBtn").onclick=start;
+</script>
+
+</body>
+</html>
