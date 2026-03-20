@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>수특라이트 3강 2번 어휘 테스트</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action: manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{ font-size:22px; font-weight:800; }
+  #progress{ margin-top:6px; font-size:13px; opacity:.85; }
+
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+
+  .floor{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+  }
+
+  .choice{
+    position:absolute;
+    left:10px; right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.1);
+  }
+
+  .choice.good{ background:#065f46; }
+  .choice.bad{ background:#7f1d1d; }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    text-align:center;
+    width:90%;
+  }
+
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-weight:900;
+    border:none;
+    border-radius:12px;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="wrap">
+<header>
+  <div id="english">단어 시험</div>
+  <div id="progress"></div>
+</header>
+
+<div id="game">
+  <div class="floor">바닥 도달 = 탈락</div>
+
+  <div id="overlay">
+    <div class="card">
+      <h2>3강 2번 어휘 테스트</h2>
+      <p>정답을 터치하세요. 하나라도 바닥 닿으면 끝.</p>
+      <button onclick="startGame()">시작</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const words = [
+{en:"easier said than done",ko:"말은 쉽지만 실행은 어려운"},
+{en:"invaluable",ko:"매우 귀중한"},
+{en:"entrepreneur",ko:"기업가"},
+{en:"frivolous",ko:"하찮은"},
+{en:"mindset",ko:"사고방식"},
+{en:"face",ko:"직면하다"},
+{en:"consequence",ko:"결과"},
+{en:"down the road",ko:"앞으로"},
+{en:"epidemic",ko:"유행"},
+{en:"burnout",ko:"번아웃"},
+{en:"stem from",ko:"~에서 비롯되다"},
+{en:"always-on",ko:"항상 켜져 있는"},
+{en:"plugged-in",ko:"연결된"},
+{en:"nature",ko:"특성"},
+{en:"true",ko:"사실"},
+{en:"par for the course",ko:"흔한 일"},
+{en:"whatever",ko:"무엇이든"},
+{en:"pull away",ko:"벗어나다"},
+{en:"let",ko:"~하게 하다"},
+{en:"rest",ko:"쉬다"},
+{en:"play",ko:"놀다"},
+{en:"pay back",ko:"보상하다"},
+{en:"productivity",ko:"생산성"},
+{en:"creativity",ko:"창의성"},
+{en:"believe",ko:"믿다"},
+{en:"espouse",ko:"지지하다"},
+{en:"benefit",ko:"이점"},
+{en:"be stuck",ko:"막히다"},
+{en:"certain",ko:"특정한"},
+{en:"power through",ko:"밀어붙이다"},
+{en:"take time away",ko:"시간을 내다"},
+{en:"play the violin",ko:"바이올린을 연주하다"},
+{en:"attribute A to B",ko:"~을 ~덕분으로 돌리다"},
+{en:"breakthrough",ko:"돌파구"}
+];
+
+let deck=[], idx=0, speed=110, choices=[], running=false;
+
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+
+function startGame(){
+  deck=shuffle([...words]);
+  idx=0;
+  document.getElementById("overlay").style.display="none";
+  next();
+}
+
+function next(){
+  if(idx>=deck.length){
+    alert("통과 🎉");
+    location.reload();
+    return;
+  }
+  document.getElementById("english").textContent=deck[idx].en;
+  document.getElementById("progress").textContent=(idx+1)+" / "+deck.length;
+  spawn(deck[idx]);
+}
+
+function spawn(word){
+  clear();
+  const correct=word.ko;
+  const pool=words.map(x=>x.ko).filter(x=>x!==correct);
+  const opts=shuffle([correct,...shuffle(pool).slice(0,3)]);
+
+  opts.forEach((t,i)=>{
+    const el=document.createElement("div");
+    el.className="choice";
+    el.textContent=t;
+    el.style.top=(-100-100*i)+"px";
+    el.onclick=()=>pick(el,t===correct);
+    document.getElementById("game").appendChild(el);
+    choices.push(el);
+  });
+
+  running=true;
+  loop();
+}
+
+function pick(el,ok){
+  if(!running) return;
+  if(!ok){ alert("오답 ❌"); location.reload(); }
+  idx++; next();
+}
+
+function clear(){ choices.forEach(e=>e.remove()); choices=[]; }
+
+function loop(){
+  if(!running) return;
+  const limit=window.innerHeight-120;
+  choices.forEach(el=>{
+    let y=parseInt(el.style.top)+2;
+    el.style.top=y+"px";
+    if(y>limit){ alert("탈락 ❌"); location.reload(); }
+  });
+  requestAnimationFrame(loop);
+}
+</script>
+
+</body>
+</html>
