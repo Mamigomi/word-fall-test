@@ -13,7 +13,7 @@
     height:100vh;
     overflow:hidden;
     user-select:none;
-    touch-action: manipulation;
+    touch-action:manipulation;
   }
   #wrap{
     max-width:480px;
@@ -21,7 +21,7 @@
     height:100vh;
     display:flex;
     flex-direction:column;
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom:env(safe-area-inset-bottom);
   }
   header{
     padding:14px;
@@ -58,7 +58,8 @@
   }
   .choice{
     position:absolute;
-    left:10px; right:10px;
+    left:10px;
+    right:10px;
     height:56px;
     background:#1e293b;
     border-radius:14px;
@@ -71,13 +72,18 @@
     font-weight:800;
     cursor:pointer;
     border:1px solid rgba(255,255,255,.10);
-    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
     z-index:1;
-    transition: transform .08s ease, background .12s ease;
+    top:0;
   }
-  .choice:active{ transform: scale(.98); }
-  .choice.good{ background:#065f46; border-color: rgba(94,234,212,.35); }
-  .choice.bad{ background:#7f1d1d; border-color: rgba(251,113,133,.55); }
+  .choice.good{
+    background:#065f46;
+    border-color:rgba(94,234,212,.35);
+  }
+  .choice.bad{
+    background:#7f1d1d;
+    border-color:rgba(251,113,133,.55);
+  }
 
   #overlay{
     position:absolute;
@@ -97,7 +103,7 @@
     max-width:420px;
     text-align:center;
     border:1px solid rgba(255,255,255,.10);
-    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    box-shadow:0 18px 50px rgba(0,0,0,.35);
   }
   .card h2{
     margin:0 0 10px;
@@ -153,9 +159,6 @@
 </div>
 
 <script>
-/* =========================
-   ✅ 단어 목록(수특라이트 3강 2번)
-   ========================= */
 const words = [
   { en:"easier said than done", ko:"말은 쉽지만 실행은 어려운" },
   { en:"invaluable", ko:"매우 귀중한" },
@@ -193,29 +196,21 @@ const words = [
   { en:"breakthrough", ko:"돌파구" }
 ];
 
-/* =========================
-   게임 설정
-   ========================= */
 const PASS_MESSAGE = "축하합니다. 수특라이트 3강 2번 어휘 테스트 통과!";
-const baseSpeed = 110;
+const baseSpeed = 110;      // px per second
 const floorHeight = 60;
 const choiceHeight = 56;
+const startYs = [-220, -320, -420, -520];
 
-/* =========================
-   유틸
-   ========================= */
 function shuffle(arr){
   const a = arr.slice();
-  for(let i=a.length-1; i>0; i--){
-    const j = Math.floor(Math.random()*(i+1));
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
 
-/* =========================
-   DOM
-   ========================= */
 const gameEl = document.getElementById("game");
 const englishEl = document.getElementById("english");
 const progressEl = document.getElementById("progress");
@@ -226,21 +221,14 @@ const ovText = document.getElementById("ovText");
 const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
 
-/* =========================
-   상태
-   ========================= */
 let deck = [];
 let idx = 0;
-let speed = baseSpeed;
-
 let choices = [];
 let raf = null;
 let running = false;
-let lastTs = 0;
+let roundStartTs = 0;
+let locked = false;
 
-/* =========================
-   오버레이
-   ========================= */
 function showOverlay(title, htmlText, showStart, showRestart){
   ovTitle.textContent = title;
   ovText.innerHTML = htmlText;
@@ -248,22 +236,36 @@ function showOverlay(title, htmlText, showStart, showRestart){
   startBtn.style.display = showStart ? "" : "none";
   restartBtn.style.display = showRestart ? "" : "none";
 }
+
 function hideOverlay(){
   overlayEl.style.display = "none";
 }
 
-/* =========================
-   게임 흐름
-   ========================= */
+function clearChoices(){
+  for(const el of choices){
+    el.remove();
+  }
+  choices = [];
+}
+
+function stopLoop(){
+  running = false;
+  if(raf){
+    cancelAnimationFrame(raf);
+    raf = null;
+  }
+}
+
 function resetGame(){
+  stopLoop();
+  clearChoices();
   deck = shuffle(words);
   idx = 0;
-  speed = baseSpeed;
-  progressEl.textContent = `0 / ${deck.length}`;
+  locked = false;
   englishEl.textContent = "단어 시험";
-  clearChoices();
-  stopLoop();
+  progressEl.textContent = `0 / ${deck.length}`;
 }
+
 function startGame(){
   resetGame();
   hideOverlay();
@@ -283,7 +285,7 @@ function nextWord(){
     return;
   }
 
-  speed = baseSpeed;
+  locked = false;
 
   const w = deck[idx];
   englishEl.textContent = w.en;
@@ -305,98 +307,81 @@ function fail(reason){
 }
 
 function pick(el){
-  if(!running) return;
+  if(!running || locked) return;
+  locked = true;
+
   if(el.dataset.correct !== "1"){
     el.classList.add("bad");
-    fail("오답을 선택했습니다.");
+    setTimeout(() => fail("오답을 선택했습니다."), 120);
     return;
   }
+
   el.classList.add("good");
   stopLoop();
+
   setTimeout(() => {
+    clearChoices();
     idx += 1;
     nextWord();
-  }, 200);
-}
-
-/* =========================
-   선택지 생성/이동
-   ========================= */
-function clearChoices(){
-  for(const el of choices) el.remove();
-  choices = [];
+  }, 180);
 }
 
 function spawnChoices(word){
   clearChoices();
 
   const correct = word.ko;
-  const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
-
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(v => v !== correct);
   const wrongs = shuffle(pool).slice(0, 3);
   const options = shuffle([correct, ...wrongs]);
-
-  const startYs = [-220, -320, -420, -520];
 
   options.forEach((txt, i) => {
     const el = document.createElement("div");
     el.className = "choice";
     el.textContent = txt;
+    el.dataset.correct = txt === correct ? "1" : "0";
+    el.dataset.startY = String(startYs[i]);
+    el.style.top = `${startYs[i]}px`;
 
-    el.dataset.correct = (txt === correct) ? "1" : "0";
-    el._y = startYs[i];
-
-    el.addEventListener("click", () => pick(el));
-    el.addEventListener("touchstart", (e) => {
+    el.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       pick(el);
-    }, { passive:false });
-
-    el.style.top = "0px";
-    el.style.transform = `translateY(${el._y}px)`;
+    });
 
     gameEl.appendChild(el);
     choices.push(el);
   });
 }
 
-/* =========================
-   루프
-   ========================= */
 function startLoop(){
+  stopLoop();
   running = true;
-  lastTs = performance.now();
-  if(raf) cancelAnimationFrame(raf);
+  roundStartTs = performance.now();
   raf = requestAnimationFrame(tick);
 }
-function stopLoop(){
-  running = false;
-  if(raf) cancelAnimationFrame(raf);
-  raf = null;
-}
+
 function tick(ts){
   if(!running) return;
-  const dt = (ts - lastTs) / 1000;
-  lastTs = ts;
 
+  const elapsed = (ts - roundStartTs) / 1000;
   const rect = gameEl.getBoundingClientRect();
   const bottomLimit = rect.height - floorHeight - choiceHeight;
 
   for(const el of choices){
-    el._y += speed * dt;
-    el.style.transform = `translateY(${el._y}px)`;
-    if(el._y >= bottomLimit){
+    const startY = Number(el.dataset.startY);
+    const y = startY + baseSpeed * elapsed;
+    el.style.top = `${y}px`;
+
+    if(y >= bottomLimit){
       fail("선택지가 바닥에 닿았습니다.");
       return;
     }
   }
+
   raf = requestAnimationFrame(tick);
 }
 
-/* =========================
-   버튼
-   ========================= */
 startBtn.addEventListener("click", startGame);
+
 restartBtn.addEventListener("click", () => {
   showOverlay(
     "단어 시험 시작",
