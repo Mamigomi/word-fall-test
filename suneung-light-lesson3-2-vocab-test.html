@@ -142,7 +142,7 @@
       <div class="card">
         <h2 id="ovTitle">단어 시험 시작</h2>
         <p id="ovText">
-          화면 위 영어 표현에 맞는 한국어를 터치하세요.<br>
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
           <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
         </p>
         <button id="startBtn">시험 시작</button>
@@ -264,7 +264,6 @@ function resetGame(){
   clearChoices();
   stopLoop();
 }
-
 function startGame(){
   resetGame();
   hideOverlay();
@@ -277,7 +276,7 @@ function nextWord(){
     clearChoices();
     showOverlay(
       "합격",
-      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>개 어휘를 모두 통과했습니다.`,
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
       false,
       true
     );
@@ -307,16 +306,13 @@ function fail(reason){
 
 function pick(el){
   if(!running) return;
-
   if(el.dataset.correct !== "1"){
     el.classList.add("bad");
     fail("오답을 선택했습니다.");
     return;
   }
-
   el.classList.add("good");
   stopLoop();
-
   setTimeout(() => {
     idx += 1;
     nextWord();
@@ -336,6 +332,7 @@ function spawnChoices(word){
 
   const correct = word.ko;
   const pool = Array.from(new Set(words.map(x => x.ko))).filter(ko => ko !== correct);
+
   const wrongs = shuffle(pool).slice(0, 3);
   const options = shuffle([correct, ...wrongs]);
 
@@ -372,16 +369,13 @@ function startLoop(){
   if(raf) cancelAnimationFrame(raf);
   raf = requestAnimationFrame(tick);
 }
-
 function stopLoop(){
   running = false;
   if(raf) cancelAnimationFrame(raf);
   raf = null;
 }
-
 function tick(ts){
   if(!running) return;
-
   const dt = (ts - lastTs) / 1000;
   lastTs = ts;
 
@@ -391,13 +385,11 @@ function tick(ts){
   for(const el of choices){
     el._y += speed * dt;
     el.style.transform = `translateY(${el._y}px)`;
-
     if(el._y >= bottomLimit){
       fail("선택지가 바닥에 닿았습니다.");
       return;
     }
   }
-
   raf = requestAnimationFrame(tick);
 }
 
@@ -405,11 +397,10 @@ function tick(ts){
    버튼
    ========================= */
 startBtn.addEventListener("click", startGame);
-
 restartBtn.addEventListener("click", () => {
   showOverlay(
     "단어 시험 시작",
-    `화면 위 영어 표현에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
     true,
     false
   );
@@ -417,7 +408,7 @@ restartBtn.addEventListener("click", () => {
 
 showOverlay(
   "단어 시험 시작",
-  `화면 위 영어 표현에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
   true,
   false
 );
