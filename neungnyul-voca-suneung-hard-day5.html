@@ -1,64 +1,485 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Word Flight Day 5</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DAY 5 어휘 테스트</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action:manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+    line-height:1.25;
+    word-break:break-word;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px;
+    right:10px;
+    min-height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:10px 12px;
+    font-size:17px;
+    font-weight:800;
+    line-height:1.35;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    top:0;
+    word-break:keep-all;
+  }
+  .choice.good{
+    background:#065f46;
+    border-color:rgba(94,234,212,.35);
+  }
+  .choice.bad{
+    background:#7f1d1d;
+    border-color:rgba(251,113,133,.55);
+  }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
 </head>
 <body>
-  <main class="app-shell">
-    <section class="phone-frame">
-      <header class="hud">
-        <div class="hud-top">
-          <div class="badge">WORD FLIGHT DAY 05</div>
-          <div class="score-wrap">
-            <span class="score-label">SCORE</span>
-            <strong id="score">0</strong>
-          </div>
-        </div>
-        <div class="prompt-card">
-          <p class="prompt-label">위 영어 표현의 맞는 뜻을 들이받으세요</p>
-          <h1 id="target-word">credit</h1>
-        </div>
-      </header>
 
-      <section class="game-stage">
-        <canvas id="gameCanvas" width="390" height="844" aria-label="Day 5 단어 비행 게임"></canvas>
+<div id="wrap">
+  <header>
+    <div id="english">DAY 5 어휘 시험</div>
+    <div id="progress"></div>
+  </header>
 
-        <div class="overlay" id="startOverlay">
-          <div class="overlay-card">
-            <p class="overlay-kicker">DAY 5 TEST</p>
-            <h2>파생어까지 맞히기</h2>
-            <p>
-              이미지 속 Day 5 어휘와 파생어만 나옵니다.
-              위 영어 표현의 정확한 한국어 뜻 카드만 맞히고, 오답 카드를 건드리면 게임오버입니다.
-            </p>
-            <button id="startButton" class="primary-button">게임 시작</button>
-          </div>
-        </div>
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
 
-        <div class="overlay hidden" id="gameOverOverlay">
-          <div class="overlay-card">
-            <p class="overlay-kicker danger">GAME OVER</p>
-            <h2 id="gameOverTitle">오답 뜻과 충돌했어요</h2>
-            <p id="finalScoreText">최종 점수 0점</p>
-            <button id="restartButton" class="primary-button">다시 하기</button>
-          </div>
-        </div>
-      </section>
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">DAY 5 단어 시험 시작</h2>
+        <p id="ovText">
+          화면 위 영어 표현에 맞는 한국어 뜻을 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.<br>
+          이미지 속 파생어와 구문도 포함되어 있습니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-      <footer class="controls">
-        <button class="control-button" id="leftButton" aria-label="왼쪽 이동">LEFT</button>
-        <div class="control-hint">화면 드래그 또는 좌우 버튼 사용</div>
-        <button class="control-button" id="rightButton" aria-label="오른쪽 이동">RIGHT</button>
-      </footer>
-    </section>
-  </main>
+<script>
+const words = [
+  { en:"mercury", ko:"수은" },
+  { en:"weave", ko:"1. 짜다, 엮다 2. 이야기를 엮다" },
+  { en:"weaver", ko:"베 짜는 사람, 직공" },
+  { en:"concise", ko:"간결한" },
+  { en:"concisely", ko:"간결하게" },
+  { en:"depth", ko:"1. 깊이 2. 심오함" },
+  { en:"in-depth", ko:"면밀한, 상세한" },
+  { en:"sector", ko:"부문, 분야, 영역" },
+  { en:"public sector", ko:"공공 부문" },
+  { en:"federal", ko:"1. 연방(제)의 2. 연방 정부의" },
+  { en:"a federal republic", ko:"연방 공화국" },
+  { en:"federation", ko:"1. 연방 국가 2. 연합(연맹)체" },
 
-  <script src="./game.js"></script>
+  { en:"credit", ko:"1. 신용, 신뢰 2. 칭찬 3. 학점 4. 입금하다 5. 공으로 인정하다" },
+  { en:"get credit for", ko:"~에 대해 인정받다" },
+  { en:"adequate", ko:"충분한, 적절한" },
+  { en:"adequately", ko:"충분히, 적절히" },
+  { en:"adequacy", ko:"충분함, 적당함" },
+  { en:"symbolic", ko:"상징적인, 상징하는" },
+  { en:"symbol", ko:"1. 상징(물) 2. 기호, 부호" },
+  { en:"symbolize", ko:"상징하다" },
+  { en:"trait", ko:"특성, 특징" },
+  { en:"lifespan", ko:"수명" },
+
+  { en:"fragment", ko:"1. 파편, 조각 2. 산산이 부수다[부서지다]" },
+  { en:"fragmentation", ko:"분열, 파편화" },
+  { en:"fragmentary", ko:"단편적인, 부분적인" },
+  { en:"thorough", ko:"철저한, 빈틈없는" },
+  { en:"thoroughly", ko:"면밀히, 철저히" },
+  { en:"oppose", ko:"1. 반대하다 2. 겨루다" },
+  { en:"opposite", ko:"1. 정반대의 2. 맞은편의 3. 정반대의 것" },
+  { en:"opposition", ko:"1. 반대(측) 2. 대립" },
+  { en:"as opposed to", ko:"~와는 대조적으로" },
+  { en:"summarize", ko:"요약하다, 간추리다" },
+  { en:"summary", ko:"요약, 개요" },
+  { en:"to summarize", ko:"요약하면" },
+  { en:"instinct", ko:"1. 본능 2. 직감" },
+  { en:"instinctive", ko:"본능적인, 본능[직감]에 따른" },
+  { en:"instinctively", ko:"본능적으로" },
+
+  { en:"array", ko:"1. 모음, 집합(체) 2. 배열 3. 배열[진열]하다" },
+  { en:"an array of", ko:"다수의" },
+  { en:"glance", ko:"1. 흘끗 보다, 흘어보다 2. 흘끗 봄" },
+  { en:"at a glance", ko:"한눈에, 첫눈에" },
+  { en:"disperse", ko:"1. 흩어지다, 해산하다[시키다] 2. 확산하다[시키다]" },
+  { en:"dispersion", ko:"확산, 분산" },
+  { en:"dispersal", ko:"1. 해산, 분산 2. 확산" },
+  { en:"affinity", ko:"1. 친밀감, 좋아함 2. 유사성" },
+  { en:"criterion", ko:"표준, 기준, 척도" },
+
+  { en:"democratic", ko:"1. 민주주의의, 민주적인 2. 평등한" },
+  { en:"democracy", ko:"1. 민주주의 2. 민주주의 국가" },
+  { en:"analytical", ko:"분석적인, 분석의" },
+  { en:"analyze", ko:"분석하다" },
+  { en:"analysis", ko:"분석" },
+  { en:"analyst", ko:"분석가" },
+  { en:"statistics", ko:"1. 통계, 통계 자료 2. 통계학" },
+  { en:"statistical", ko:"통계의, 통계적인" },
+  { en:"statistically", ko:"통계적으로" },
+  { en:"statistician", ko:"통계학자" },
+  { en:"slippery", ko:"1. 미끄러운 2. 믿기 어려운 3. 파악하기 힘든" },
+  { en:"a slippery concept", ko:"파악하기 힘든 개념" },
+  { en:"inevitable", ko:"불가피한, 필연적인" },
+  { en:"inevitably", ko:"불가피하게, 필연적으로" },
+
+  { en:"prospect", ko:"1. 가망, 가능성 2. 전망, 예상" },
+  { en:"prospective", ko:"1. 장래의, 유망한 2. 곧 있을" },
+  { en:"proposition", ko:"1. 제안 2. 일, 과제 3. 명제, 진술" },
+  { en:"mathematical proposition", ko:"수학적 명제" },
+  { en:"propose", ko:"1. 제안하다 2. 청혼하다" },
+  { en:"equivalent", ko:"1. 동등한, 상당하는 2. 동등한 것" },
+  { en:"equivalence", ko:"등가, 동등함" },
+  { en:"intake", ko:"1. 섭취(량) 2. 입학[채용] 인원수 3. 흡입구" },
+  { en:"diabetes", ko:"당뇨병" },
+  { en:"diabetic", ko:"1. 당뇨병의, 당뇨병이 있는 2. 당뇨병 환자" },
+
+  { en:"confine", ko:"1. 국한[제한]하다 2. 가두다, 감금하다" },
+  { en:"confined", ko:"좁고 사방이 막힌" },
+  { en:"confinement", ko:"감금" },
+  { en:"mobilize", ko:"동원하다, 결집시키다" },
+  { en:"mobilization", ko:"동원" },
+  { en:"schema", ko:"개요, 도식" },
+  { en:"schematic", ko:"도식의, 개요의" },
+  { en:"feature", ko:"1. 특징 2. 이목구비 3. 특집 4. 특징으로 삼다, 포함하다" },
+  { en:"desperate", ko:"1. 절망적인 2. 절박한, 필사적인 3. 간절히 원하는" },
+  { en:"desperately", ko:"필사적으로, 절실히" },
+  { en:"desperation", ko:"1. 자포자기 2. 필사적임" },
+  { en:"empirical", ko:"경험[실험]에 따른, 실증적인" },
+  { en:"empirically", ko:"경험적으로" },
+
+  { en:"drawback", ko:"결점, 문제점" },
+  { en:"extension", ko:"1. 연장 2. 확장, 확대 3. 내선 전화" },
+  { en:"extend", ko:"1. 연장하다 2. 확장[확대]하다 3. 뻗다" },
+  { en:"extensive", ko:"광범위한, 폭넓은" },
+  { en:"by extension", ko:"더 나아가" },
+  { en:"extent", ko:"1. 정도, 범위 2. 규모, 크기" },
+  { en:"to some extent", ko:"어느 정도까지, 얼마간" },
+  { en:"leak", ko:"1. 새다 2. 누설하다 3. 새는 곳 4. 유출, 누설" },
+  { en:"leakage", ko:"누출, 새어나감" },
+  { en:"leaky", ko:"새는" },
+  { en:"conspicuous", ko:"눈에 잘 띄는, 뚜렷한" },
+  { en:"conspicuously", ko:"두드러지게, 현저히" },
+  { en:"stand for", ko:"1. 나타내다, 의미하다 2. 지지[옹호]하다" },
+
+  { en:"pick on", ko:"(부당하게) ~을 괴롭히다" },
+  { en:"bump into", ko:"1. 우연히 ~와 마주치다 2. ~에 부딪치다" },
+  { en:"carry on", ko:"~을 계속하다" }
+];
+
+const PASS_MESSAGE = "축하합니다. DAY 5 어휘 테스트 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
+const startYs = [-220, -320, -420, -520];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+let deck = [];
+let idx = 0;
+let choices = [];
+let raf = null;
+let running = false;
+let roundStartTs = 0;
+let locked = false;
+
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+function clearChoices(){
+  for(const el of choices){
+    el.remove();
+  }
+  choices = [];
+}
+
+function stopLoop(){
+  running = false;
+  if(raf){
+    cancelAnimationFrame(raf);
+    raf = null;
+  }
+}
+
+function resetGame(){
+  stopLoop();
+  clearChoices();
+  deck = shuffle(words);
+  idx = 0;
+  locked = false;
+  englishEl.textContent = "DAY 5 어휘 시험";
+  progressEl.textContent = `0 / ${deck.length}`;
+}
+
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>문항을 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  locked = false;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running || locked) return;
+  locked = true;
+
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    setTimeout(() => fail("오답을 선택했습니다."), 120);
+    return;
+  }
+
+  el.classList.add("good");
+  stopLoop();
+
+  setTimeout(() => {
+    clearChoices();
+    idx += 1;
+    nextWord();
+  }, 180);
+}
+
+function getWrongOptions(correct){
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(v => v !== correct);
+  return shuffle(pool).slice(0, 3);
+}
+
+function spawnChoices(word){
+  clearChoices();
+
+  const correct = word.ko;
+  const wrongs = getWrongOptions(correct);
+  const options = shuffle([correct, ...wrongs]);
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+    el.dataset.correct = txt === correct ? "1" : "0";
+    el.dataset.startY = String(startYs[i]);
+    el.style.top = `${startYs[i]}px`;
+
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      pick(el);
+    });
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+function startLoop(){
+  stopLoop();
+  running = true;
+  roundStartTs = performance.now();
+  raf = requestAnimationFrame(tick);
+}
+
+function tick(ts){
+  if(!running) return;
+
+  const elapsed = (ts - roundStartTs) / 1000;
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    const startY = Number(el.dataset.startY);
+    const y = startY + baseSpeed * elapsed;
+    el.style.top = `${y}px`;
+
+    if(y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+
+  raf = requestAnimationFrame(tick);
+}
+
+startBtn.addEventListener("click", startGame);
+
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "DAY 5 단어 시험 시작",
+    `화면 위 영어 표현에 맞는 한국어 뜻을 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.<br>이미지 속 파생어와 구문도 포함되어 있습니다.`,
+    true,
+    false
+  );
+});
+
+showOverlay(
+  "DAY 5 단어 시험 시작",
+  `화면 위 영어 표현에 맞는 한국어 뜻을 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.<br>이미지 속 파생어와 구문도 포함되어 있습니다.`,
+  true,
+  false
+);
+</script>
+
 </body>
 </html>
