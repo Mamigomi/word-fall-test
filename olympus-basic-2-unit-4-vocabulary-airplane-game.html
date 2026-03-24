@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>Olympus English Reading Comprehension 2 Unit 3 Airplane Monster Vocab Game</title>
+  <style>
+    :root {
+      --bg-top: #13203f;
+      --bg-mid: #274a7a;
+      --bg-bottom: #87c7ff;
+      --panel: rgba(9, 21, 44, 0.78);
+      --panel-border: rgba(255, 255, 255, 0.18);
+      --accent: #ffd75e;
+      --accent-2: #ff8c42;
+      --danger: #ff5d73;
+      --success: #6cf2a3;
+      --text: #f8fbff;
+      --muted: #c5d6f2;
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Trebuchet MS", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.16), transparent 28%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 52%, var(--bg-bottom) 100%);
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+    }
+
+    .game-shell {
+      position: relative;
+      width: min(100vw - 24px, 430px);
+      height: min(100vh - 24px, 920px);
+      min-height: 640px;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 24px 65px rgba(2, 7, 18, 0.45);
+      background:
+        radial-gradient(circle at 50% 15%, rgba(255,255,255,0.14), transparent 22%),
+        linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+    }
+
+    .sky-layer,
+    .mountains,
+    .arena,
+    .ui-layer,
+    .overlay,
+    .effects-layer {
+      position: absolute;
+      inset: 0;
+    }
+
+    .sky-layer::before,
+    .sky-layer::after {
+      content: "";
+      position: absolute;
+      inset: auto;
+      width: 160px;
+      height: 48px;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.14);
+      filter: blur(2px);
+      animation: drift 18s linear infinite;
+    }
+
+    .sky-layer::before { top: 18%; left: -18%; }
+    .sky-layer::after { top: 32%; right: -22%; width: 220px; animation-duration: 25s; }
+
+    .stars {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 14%, rgba(255,255,255,0.8) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 76% 10%, rgba(255,255,255,0.75) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 58% 25%, rgba(255,255,255,0.6) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 27% 38%, rgba(255,255,255,0.55) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 88% 30%, rgba(255,255,255,0.58) 0 1px, transparent 1.5px);
+      opacity: 0.7;
+    }
+
+    .mountains {
+      background:
+        linear-gradient(180deg, transparent 0 74%, rgba(10, 25, 55, 0.16) 74% 100%),
+        linear-gradient(145deg, transparent 0 58%, rgba(26, 58, 95, 0.72) 58% 100%),
+        linear-gradient(210deg, transparent 0 59%, rgba(18, 44, 77, 0.68) 59% 100%);
+      pointer-events: none;
+    }
+
+    .hud {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .hud-card {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+    }
+
+    .hud-label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .hud-value {
+      font-weight: 800;
+      font-size: 1.35rem;
+    }
+
+    .hp-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      min-height: 28px;
+      font-size: 1.25rem;
+    }
+
+    .heart.off {
+      filter: grayscale(1);
+      opacity: 0.35;
+    }
+
+    .boss-zone {
+      position: absolute;
+      top: 86px;
+      left: 16px;
+      right: 16px;
+      height: 205px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .boss-shadow {
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.24);
+      filter: blur(8px);
+    }
+
+    .boss {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: min(100%, 340px);
+      height: 190px;
+      border-radius: 42% 42% 36% 36% / 42% 42% 48% 48%;
+      background:
+        radial-gradient(circle at 50% 36%, rgba(255,255,255,0.18), transparent 30%),
+        linear-gradient(180deg, #ff7b54 0%, #f03a62 52%, #862448 100%);
+      border: 4px solid rgba(255,255,255,0.16);
+      box-shadow: 0 18px 38px rgba(67, 9, 29, 0.42);
+      animation: bossFloat 2.4s ease-in-out infinite;
+    }
+
+    .boss::before,
+    .boss::after {
+      content: "";
+      position: absolute;
+      top: -22px;
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(180deg, #ffd75e, #ff8d38);
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      filter: drop-shadow(0 6px 4px rgba(0,0,0,0.18));
+    }
+
+    .boss::before { left: 58px; transform: rotate(-12deg); }
+    .boss::after { right: 58px; transform: rotate(12deg); }
+
+    .boss-face {
+      position: absolute;
+      inset: 0;
+    }
+
+    .eye {
+      position: absolute;
+      top: 44px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid rgba(0,0,0,0.15);
+    }
+
+    .eye.left { left: 58px; }
+    .eye.right { right: 58px; }
+
+    .eye::after {
+      content: "";
+      position: absolute;
+      top: 17px;
+      left: 17px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #2e275c;
+      box-shadow: 8px 0 0 -4px rgba(255,255,255,0.85);
+    }
+
+    .mouth {
+      position: absolute;
+      left: 50%;
+      bottom: 32px;
+      transform: translateX(-50%);
+      width: 124px;
+      height: 34px;
+      border-radius: 0 0 44px 44px;
+      background: rgba(89, 6, 28, 0.45);
+      border: 3px solid rgba(255,255,255,0.14);
+    }
+
+    .word-badge {
+      position: absolute;
+      left: 50%;
+      top: 92px;
+      transform: translateX(-50%);
+      width: calc(100% - 92px);
+      min-height: 64px;
+      padding: 12px 16px;
+      border-radius: 20px;
+      background: rgba(24, 16, 48, 0.3);
+      border: 1px solid rgba(255,255,255,0.18);
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(1.3rem, 4vw, 1.95rem);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      text-shadow: 0 4px 14px rgba(0,0,0,0.26);
+      line-height: 1.15;
+      word-break: break-word;
+    }
+
+    .word-badge.flash-success { box-shadow: 0 0 0 4px rgba(108, 242, 163, 0.3); }
+    .word-badge.flash-danger { box-shadow: 0 0 0 4px rgba(255, 93, 115, 0.28); }
+
+    .arena {
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .lane-guide {
+      position: absolute;
+      top: 260px;
+      bottom: 136px;
+      width: 1px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), transparent 75%);
+      opacity: 0.28;
+    }
+
+    .rock {
+      position: absolute;
+      width: calc(25% - 16px);
+      min-width: 76px;
+      min-height: 74px;
+      padding: 10px 8px;
+      border-radius: 34px 30px 28px 32px;
+      background:
+        radial-gradient(circle at 30% 28%, rgba(255,255,255,0.3), transparent 22%),
+        linear-gradient(180deg, #8f8f95, #63636a);
+      border: 2px solid rgba(255,255,255,0.12);
+      box-shadow: 0 12px 18px rgba(27, 27, 41, 0.28);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: clamp(0.83rem, 2.5vw, 1rem);
+      font-weight: 800;
+      line-height: 1.18;
+      word-break: keep-all;
+      user-select: none;
+      transform: rotate(var(--rot));
+    }
+
+    .rock.correct {
+      box-shadow: 0 0 0 2px rgba(255, 215, 94, 0.22), 0 12px 18px rgba(27, 27, 41, 0.28);
+    }
+
+    .airplane-zone {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 84px;
+      height: 112px;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .airplane {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 76px;
+      height: 88px;
+      transform: translateX(-50%);
+      filter: drop-shadow(0 12px 14px rgba(6, 28, 63, 0.36));
+      transition: transform 0.08s linear;
+    }
+
+    .airplane-body {
+      position: absolute;
+      inset: 12px 22px 16px;
+      border-radius: 999px 999px 22px 22px;
+      background: linear-gradient(180deg, #fefefe, #cfecff 52%, #66b8ff);
+      border: 2px solid rgba(17, 60, 110, 0.22);
+    }
+
+    .airplane-nose {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 28px;
+      border-radius: 18px 18px 10px 10px;
+      background: linear-gradient(180deg, #ffffff, #a8dcff);
+      border: 2px solid rgba(17, 60, 110, 0.18);
+    }
+
+    .airplane-wing {
+      position: absolute;
+      top: 36px;
+      width: 32px;
+      height: 20px;
+      background: linear-gradient(180deg, #dff3ff, #6ebefc);
+      border-radius: 18px;
+      border: 2px solid rgba(17, 60, 110, 0.18);
+    }
+
+    .airplane-wing.left {
+      left: 4px;
+      transform: rotate(-18deg);
+    }
+
+    .airplane-wing.right {
+      right: 4px;
+      transform: rotate(18deg);
+    }
+
+    .airplane-tail {
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      width: 24px;
+      height: 24px;
+      transform: translateX(-50%);
+      clip-path: polygon(50% 0%, 100% 100%, 0 100%);
+      background: linear-gradient(180deg, #74c8ff, #1882d8);
+    }
+
+    .controls {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      z-index: 6;
+    }
+
+    .control-btn,
+    .main-btn,
+    .ghost-btn {
+      border: 0;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .control-btn {
+      width: 88px;
+      height: 64px;
+      border-radius: 22px;
+      background: rgba(7, 18, 39, 0.68);
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 900;
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .control-btn:active,
+    .control-btn.active {
+      transform: translateY(2px) scale(0.98);
+      background: rgba(255, 140, 66, 0.85);
+    }
+
+    .control-hint {
+      flex: 1;
+      text-align: center;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: rgba(7, 18, 39, 0.45);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.35;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .message {
+      position: absolute;
+      top: 300px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 6;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(10, 20, 38, 0.78);
+      border: 1px solid rgba(255,255,255,0.18);
+      font-size: 0.95rem;
+      font-weight: 800;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      pointer-events: none;
+    }
+
+    .message.show { opacity: 1; }
+    .message.success { color: var(--success); }
+    .message.danger { color: #ffd7dd; }
+
+    .overlay {
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(4, 10, 25, 0.58);
+      backdrop-filter: blur(10px);
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .panel {
+      width: min(100%, 340px);
+      padding: 24px 22px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(15, 31, 57, 0.95), rgba(17, 24, 44, 0.92));
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.34);
+      text-align: center;
+    }
+
+    .panel h1,
+    .panel h2 {
+      margin: 0 0 10px;
+      line-height: 1.08;
+    }
+
+    .panel h1 { font-size: 1.85rem; }
+    .panel h2 { font-size: 1.7rem; }
+
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.98rem;
+    }
+
+    .rules {
+      margin: 16px 0 20px;
+      text-align: left;
+      padding: 0 0 0 18px;
+      color: var(--text);
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }
+
+    .main-btn,
+    .ghost-btn {
+      min-width: 150px;
+      padding: 14px 20px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      box-shadow: var(--shadow);
+    }
+
+    .main-btn {
+      background: linear-gradient(180deg, var(--accent), #ff9b3f);
+      color: #2b1300;
+    }
+
+    .ghost-btn {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .result-score {
+      margin: 16px 0 18px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .particle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    @keyframes bossFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(8px); }
+    }
+
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(180vw); }
+    }
+
+    @media (max-width: 390px) {
+      .game-shell { min-height: 600px; }
+      .boss-zone { top: 82px; height: 190px; }
+      .boss { height: 178px; }
+      .word-badge { width: calc(100% - 76px); font-size: 1.2rem; }
+      .controls { gap: 8px; }
+      .control-btn { width: 80px; height: 60px; }
+      .rock { font-size: 0.78rem; min-height: 70px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-shell" id="gameShell">
+    <div class="sky-layer">
+      <div class="stars"></div>
+    </div>
+    <div class="mountains"></div>
+
+    <div class="ui-layer">
+      <div class="hud">
+        <div class="hud-card">
+          <span class="hud-label">Score</span>
+          <div class="hud-value" id="scoreValue">0</div>
+        </div>
+        <div class="hud-card">
+          <span class="hud-label">HP</span>
+          <div class="hp-row" id="hpValue"></div>
+        </div>
+      </div>
+
+      <div class="boss-zone">
+        <div class="boss-shadow"></div>
+        <div class="boss">
+          <div class="boss-face">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+            <div class="word-badge" id="wordBadge">Ready?</div>
+            <div class="mouth"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="message" id="messageBox"></div>
+
+      <div class="airplane-zone" id="airplaneZone">
+        <div class="airplane" id="airplane">
+          <div class="airplane-nose"></div>
+          <div class="airplane-body"></div>
+          <div class="airplane-wing left"></div>
+          <div class="airplane-wing right"></div>
+          <div class="airplane-tail"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="control-btn" id="leftBtn" aria-label="Move left">◀</button>
+        <div class="control-hint">Touch the arrows or drag the airplane. Desktop: use left/right arrow keys.</div>
+        <button class="control-btn" id="rightBtn" aria-label="Move right">▶</button>
+      </div>
+    </div>
+
+    <div class="arena" id="arena"></div>
+    <div class="effects-layer" id="effectsLayer"></div>
+
+    <div class="overlay" id="startOverlay">
+      <div class="panel">
+        <h1>Airplane vs Monster</h1>
+        <p>Crash into the rock with the correct Korean meaning before the boss overwhelms your plane.</p>
+        <ol class="rules">
+          <li>The monster shows an English word.</li>
+          <li>Only one falling rock has the correct Korean meaning.</li>
+          <li>Hit the correct rock to score and move to the next word.</li>
+          <li>Wrong collisions cost 1 HP. You only have 3.</li>
+        </ol>
+        <button class="main-btn" id="startBtn">Start Game</button>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="gameOverOverlay">
+      <div class="panel">
+        <h2>Game Over</h2>
+        <p>The boss won this round. Try again and beat your high score.</p>
+        <div class="result-score" id="finalScore">Final Score: 0</div>
+        <button class="main-btn" id="restartBtn">Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Parsing assumptions used when generating this file:
+    // 1) Vocabulary was extracted from slash-separated segments shaped like "English : Korean".
+    // 2) Parenthetical English hints such as "concept (idea)" were trimmed to the headword/phrase.
+    // 3) Duplicate English entries were deduplicated by keeping the first pair found.
+    const VOCAB_DATA = [{"en":"concept","ko":"개념"},{"en":"justice","ko":"정의"},{"en":"law","ko":"법"},{"en":"narrow","ko":"좁은"},{"en":"rather","ko":"오히려"},{"en":"principle","ko":"원칙"},{"en":"involve","ko":"포함하다"},{"en":"ensure","ko":"보장하다"},{"en":"benefit","ko":"혜택을 받다"},{"en":"distribution","ko":"분배"},{"en":"access","ko":"접근"},{"en":"apply","ko":"적용하다"},{"en":"accept","ko":"인정하다"},{"en":"value","ko":"가치 있게 여기다"},{"en":"difference","ko":"차이"},{"en":"diversity","ko":"다양성"},{"en":"patient","ko":"환자"},{"en":"cultural","ko":"문화의"},{"en":"racial","ko":"인종의"},{"en":"religious","ko":"종교의"},{"en":"background","ko":"배경"},{"en":"therefore","ko":"따라서"},{"en":"fairness","ko":"공정성"},{"en":"respect","ko":"존중하다"},{"en":"recognise","ko":"인정하다"},{"en":"disadvantage","ko":"불이익을 주다"},{"en":"in this regard","ko":"이러한 점에서"},{"en":"consider","ko":"고려하다"},{"en":"treat","ko":"대하다"},{"en":"importantly","ko":"중요하게"},{"en":"advocate","ko":"옹호하다"},{"en":"on behalf of","ko":"을 대신하여"},{"en":"perspective","ko":"관점"},{"en":"possible","ko":"가능한"},{"en":"justifiably","ko":"정당하게"},{"en":"present with","ko":"을 나타내다"},{"en":"ailment","ko":"질병"},{"en":"complaint","ko":"고충"},{"en":"recently","ko":"최근에"},{"en":"increase","ko":"증가"},{"en":"greening","ko":"친환경화"},{"en":"despite","ko":"에도 불구하고"},{"en":"sweeping","ko":"광범위한"},{"en":"legislation","ko":"법률"},{"en":"enact","ko":"제정하다"},{"en":"simply","ko":"간단히"},{"en":"recognize","ko":"인식하다"},{"en":"provide","ko":"제공하다"},{"en":"resident","ko":"주민"},{"en":"quality of life","ko":"삶의 질"},{"en":"compete","ko":"경쟁하다"},{"en":"manufacturing-based","ko":"제조업 기반의"},{"en":"transform","ko":"변화시키다"},{"en":"knowledge economy","ko":"지식 경제"},{"en":"information age","ko":"정보화 시대"},{"en":"environmental quality","ko":"환경의 질"},{"en":"asset","ko":"자산"},{"en":"skilled worker","ko":"숙련 노동자"},{"en":"increasingly","ko":"점점 더"},{"en":"footloose","ko":"자유로운"},{"en":"settle","ko":"정착하다"},{"en":"broadband","ko":"광대역"},{"en":"be drawn to","ko":"끌리다"},{"en":"aesthetically","ko":"미적으로"},{"en":"moreover","ko":"게다가"},{"en":"demonstrate","ko":"보여주다"},{"en":"alleged","ko":"주장되는"},{"en":"trade-off","ko":"상충 관계"},{"en":"false","ko":"잘못된"},{"en":"dichotomy","ko":"이분법"},{"en":"produce","ko":"만들어내다"},{"en":"polluted","ko":"오염된"},{"en":"cost","ko":"손실을 초래하다"},{"en":"brevity","ko":"간결함"},{"en":"make sure","ko":"반드시 확인하다"},{"en":"communicate","ko":"전달하다"},{"en":"end up","ko":"결국 ~하게 되다"},{"en":"for example","ko":"예를 들어"},{"en":"include","ko":"포함하다"},{"en":"call back","ko":"다시 전화하다"},{"en":"forget","ko":"잊다"},{"en":"detail","ko":"세부 사항"},{"en":"practically","ko":"사실상"},{"en":"pointless","ko":"무의미한"},{"en":"sacrifice","ko":"희생하다"},{"en":"content","ko":"내용"},{"en":"simply because","ko":"단지 ~라는 이유로"},{"en":"brief","ko":"간결한"},{"en":"fit","ko":"담다"},{"en":"opt","ko":"선택하다"},{"en":"instead","ko":"대신에"},{"en":"transmit","ko":"전달하다"},{"en":"omit","ko":"생략하다"},{"en":"critical","ko":"중요한"},{"en":"for the sake of","ko":"을 위해"},{"en":"relatively","ko":"비교적"},{"en":"uncontroversial","ko":"논란의 여지가 없는"},{"en":"structural","ko":"구조적인"},{"en":"functional","ko":"기능적인"},{"en":"contribute to","ko":"기여하다"},{"en":"performance","ko":"수행"},{"en":"spatial","ko":"공간의"},{"en":"verbal","ko":"언어의"},{"en":"paramount","ko":"매우 중요한"},{"en":"overlook","ko":"간과하다"},{"en":"similarity","ko":"유사성"},{"en":"outweigh","ko":"더 중요하다"},{"en":"among","ko":"사이에서"},{"en":"discover","ko":"발견하다"},{"en":"tentative","ko":"잠정적인"},{"en":"suggestive","ko":"암시적인"},{"en":"attend to","ko":"주목하다"},{"en":"abound","ko":"풍부하다"},{"en":"fundamentally","ko":"근본적으로"},{"en":"similar","ko":"비슷한"},{"en":"different","ko":"다른"}];
+
+    const MAX_HP = 3;
+    const ROCK_COUNT = 4;
+    const TOP_SAFE_ZONE = 250;
+    const BOTTOM_SAFE_ZONE = 142;
+
+    const gameShell = document.getElementById('gameShell');
+    const arena = document.getElementById('arena');
+    const airplane = document.getElementById('airplane');
+    const airplaneZone = document.getElementById('airplaneZone');
+    const effectsLayer = document.getElementById('effectsLayer');
+    const wordBadge = document.getElementById('wordBadge');
+    const scoreValue = document.getElementById('scoreValue');
+    const hpValue = document.getElementById('hpValue');
+    const messageBox = document.getElementById('messageBox');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const finalScore = document.getElementById('finalScore');
+    const leftBtn = document.getElementById('leftBtn');
+    const rightBtn = document.getElementById('rightBtn');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let state = {
+      playing: false,
+      score: 0,
+      hp: MAX_HP,
+      order: [],
+      roundIndex: 0,
+      currentEntry: null,
+      rocks: [],
+      lastTime: 0,
+      moveDir: 0,
+      planeX: 0,
+      planeTargetX: 0,
+      planeWidth: 76,
+      planeSpeed: 360,
+      roundLock: false,
+      laneCenters: [],
+      arenaRect: null,
+      shellRect: null,
+      planeRect: null,
+      dragOffset: 0,
+      dragging: false,
+      loopId: 0,
+      respawnTimer: null,
+      flashTimer: null
+    };
+
+    function shuffle(array) {
+      const copy = array.slice();
+      for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function resizeGame() {
+      state.shellRect = gameShell.getBoundingClientRect();
+      state.arenaRect = arena.getBoundingClientRect();
+      state.planeWidth = airplane.offsetWidth;
+      state.planeRect = airplaneZone.getBoundingClientRect();
+
+      const width = state.arenaRect.width;
+      const laneWidth = width / ROCK_COUNT;
+      state.laneCenters = Array.from({ length: ROCK_COUNT }, (_, index) => laneWidth * index + laneWidth / 2);
+
+      arena.querySelectorAll('.lane-guide').forEach((guide) => guide.remove());
+      state.laneCenters.slice(0, -1).forEach((center, index) => {
+        const guide = document.createElement('div');
+        guide.className = 'lane-guide';
+        guide.style.left = `${state.laneCenters[index] + laneWidth / 2}px`;
+        arena.appendChild(guide);
+      });
+
+      const minX = state.planeWidth / 2 + 10;
+      const maxX = state.arenaRect.width - state.planeWidth / 2 - 10;
+      if (!state.planeX) {
+        state.planeX = state.arenaRect.width / 2;
+      }
+      state.planeX = Math.max(minX, Math.min(maxX, state.planeX));
+      state.planeTargetX = state.planeX;
+      updatePlane();
+    }
+
+    function updateHud() {
+      scoreValue.textContent = String(state.score);
+      hpValue.innerHTML = '';
+      for (let i = 0; i < MAX_HP; i += 1) {
+        const span = document.createElement('span');
+        span.className = `heart${i < state.hp ? '' : ' off'}`;
+        span.textContent = '❤';
+        hpValue.appendChild(span);
+      }
+    }
+
+    function setWord(word) {
+      wordBadge.textContent = word;
+    }
+
+    function flashWord(type) {
+      clearTimeout(state.flashTimer);
+      wordBadge.classList.remove('flash-success', 'flash-danger');
+      wordBadge.classList.add(type === 'success' ? 'flash-success' : 'flash-danger');
+      state.flashTimer = setTimeout(() => {
+        wordBadge.classList.remove('flash-success', 'flash-danger');
+      }, 220);
+    }
+
+    function showMessage(text, type) {
+      messageBox.textContent = text;
+      messageBox.className = `message show ${type}`;
+      clearTimeout(showMessage.timer);
+      showMessage.timer = setTimeout(() => {
+        messageBox.className = 'message';
+      }, 850);
+    }
+
+    function clearRocks() {
+      state.rocks.forEach((rock) => rock.el.remove());
+      state.rocks = [];
+    }
+
+    function nextEntry() {
+      if (state.roundIndex >= state.order.length) {
+        state.order = shuffle(VOCAB_DATA);
+        state.roundIndex = 0;
+      }
+      state.currentEntry = state.order[state.roundIndex];
+      state.roundIndex += 1;
+      setWord(state.currentEntry.en);
+    }
+
+    function pickWrongMeanings(correctMeaning) {
+      const pool = shuffle(VOCAB_DATA.filter((item) => item.ko !== correctMeaning));
+      const picks = [];
+      const seen = new Set([correctMeaning]);
+      for (const item of pool) {
+        if (!seen.has(item.ko)) {
+          picks.push(item.ko);
+          seen.add(item.ko);
+        }
+        if (picks.length === ROCK_COUNT - 1) break;
+      }
+      return picks;
+    }
+
+    function spawnRound() {
+      clearTimeout(state.respawnTimer);
+      clearRocks();
+      state.roundLock = false;
+
+      if (!state.currentEntry) {
+        nextEntry();
+      }
+
+      const options = [state.currentEntry.ko, ...pickWrongMeanings(state.currentEntry.ko)];
+      const shuffledOptions = shuffle(options);
+      const shuffledLanes = shuffle(state.laneCenters.map((center, index) => ({ center, index })));
+
+      shuffledOptions.forEach((meaning, index) => {
+        const lane = shuffledLanes[index];
+        const el = document.createElement('div');
+        const isCorrect = meaning === state.currentEntry.ko;
+        el.className = `rock${isCorrect ? ' correct' : ''}`;
+        el.textContent = meaning;
+        const width = Math.max(76, Math.min(108, state.arenaRect.width / ROCK_COUNT - 12));
+        const x = lane.center - width / 2;
+        const startY = -110 - index * 84 - Math.random() * 24;
+        const speed = 124 + Math.random() * 24 + index * 6;
+        const rot = `${(-12 + Math.random() * 24).toFixed(1)}deg`;
+        el.style.width = `${width}px`;
+        el.style.left = `${x}px`;
+        el.style.top = `${startY}px`;
+        el.style.setProperty('--rot', rot);
+        arena.appendChild(el);
+
+        state.rocks.push({
+          el,
+          meaning,
+          isCorrect,
+          x,
+          y: startY,
+          speed,
+          width,
+          height: 78,
+          lane: lane.index
+        });
+      });
+    }
+
+    function updatePlane() {
+      airplane.style.left = `${state.planeX}px`;
+      airplane.style.transform = `translateX(-50%) ${state.moveDir === 0 ? 'rotate(0deg)' : state.moveDir < 0 ? 'rotate(-6deg)' : 'rotate(6deg)'}`;
+    }
+
+    function setMoveDir(dir) {
+      state.moveDir = dir;
+      leftBtn.classList.toggle('active', dir < 0);
+      rightBtn.classList.toggle('active', dir > 0);
+    }
+
+    function getPlaneHitbox() {
+      const shellTop = state.shellRect.top;
+      const shellLeft = state.shellRect.left;
+      const rect = airplane.getBoundingClientRect();
+      return {
+        left: rect.left - shellLeft + 12,
+        right: rect.right - shellLeft - 12,
+        top: rect.top - shellTop + 10,
+        bottom: rect.bottom - shellTop - 8
+      };
+    }
+
+    function explodeAt(x, y, color) {
+      for (let i = 0; i < 8; i += 1) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.background = color;
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        effectsLayer.appendChild(particle);
+        const angle = (Math.PI * 2 * i) / 8;
+        const distance = 18 + Math.random() * 26;
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+        particle.animate([
+          { transform: 'translate(0,0) scale(1)', opacity: 0.95 },
+          { transform: `translate(${dx}px, ${dy}px) scale(0.2)`, opacity: 0 }
+        ], { duration: 420, easing: 'ease-out' }).onfinish = () => particle.remove();
+      }
+    }
+
+    function handleCollision(rock) {
+      if (state.roundLock || !state.playing) return;
+      state.roundLock = true;
+      const rockRect = rock.el.getBoundingClientRect();
+      const shellRect = gameShell.getBoundingClientRect();
+      const burstX = rockRect.left - shellRect.left + rockRect.width / 2;
+      const burstY = rockRect.top - shellRect.top + rockRect.height / 2;
+
+      if (rock.isCorrect) {
+        state.score += 1;
+        updateHud();
+        showMessage('Correct hit!', 'success');
+        flashWord('success');
+        explodeAt(burstX, burstY, '#6cf2a3');
+        nextEntry();
+        state.respawnTimer = setTimeout(spawnRound, 280);
+      } else {
+        state.hp -= 1;
+        updateHud();
+        showMessage('Wrong meaning!', 'danger');
+        flashWord('danger');
+        explodeAt(burstX, burstY, '#ff8a9a');
+        if (state.hp <= 0) {
+          endGame();
+          return;
+        }
+        state.respawnTimer = setTimeout(spawnRound, 420);
+      }
+    }
+
+    function updateRocks(delta) {
+      if (!state.playing) return;
+      const plane = getPlaneHitbox();
+      let allGone = true;
+
+      state.rocks.forEach((rock) => {
+        rock.y += rock.speed * delta;
+        rock.el.style.top = `${rock.y}px`;
+
+        const rockTop = rock.y;
+        const rockBottom = rock.y + rock.el.offsetHeight;
+        const rockLeft = rock.x;
+        const rockRight = rock.x + rock.el.offsetWidth;
+
+        if (rockBottom > TOP_SAFE_ZONE && rockTop < state.shellRect.height - BOTTOM_SAFE_ZONE) {
+          if (rockRight > plane.left && rockLeft < plane.right && rockBottom > plane.top && rockTop < plane.bottom) {
+            handleCollision(rock);
+          }
+        }
+
+        if (rockTop < state.shellRect.height - BOTTOM_SAFE_ZONE + 24) {
+          allGone = false;
+        }
+      });
+
+      if (!state.roundLock && allGone) {
+        state.respawnTimer = setTimeout(spawnRound, 240);
+        state.roundLock = true;
+      }
+    }
+
+    function updatePlaneMovement(delta) {
+      const minX = state.planeWidth / 2 + 10;
+      const maxX = state.arenaRect.width - state.planeWidth / 2 - 10;
+      if (state.dragging) {
+        state.planeX = Math.max(minX, Math.min(maxX, state.planeTargetX));
+      } else if (state.moveDir !== 0) {
+        state.planeX += state.moveDir * state.planeSpeed * delta;
+        state.planeX = Math.max(minX, Math.min(maxX, state.planeX));
+      }
+      updatePlane();
+    }
+
+    function loop(timestamp) {
+      if (!state.lastTime) state.lastTime = timestamp;
+      const delta = Math.min(0.032, (timestamp - state.lastTime) / 1000);
+      state.lastTime = timestamp;
+      updatePlaneMovement(delta);
+      updateRocks(delta);
+      state.loopId = requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      state.score = 0;
+      state.hp = MAX_HP;
+      state.order = shuffle(VOCAB_DATA);
+      state.roundIndex = 0;
+      state.currentEntry = null;
+      state.lastTime = 0;
+      state.playing = true;
+      state.roundLock = false;
+      setMoveDir(0);
+      clearRocks();
+      resizeGame();
+      updateHud();
+      nextEntry();
+      spawnRound();
+      startOverlay.classList.add('hidden');
+      gameOverOverlay.classList.add('hidden');
+      cancelAnimationFrame(state.loopId);
+      state.loopId = requestAnimationFrame(loop);
+    }
+
+    function endGame() {
+      state.playing = false;
+      clearTimeout(state.respawnTimer);
+      cancelAnimationFrame(state.loopId);
+      finalScore.textContent = `Final Score: ${state.score}`;
+      gameOverOverlay.classList.remove('hidden');
+      clearRocks();
+    }
+
+    function pointerMove(clientX) {
+      const bounds = state.shellRect || gameShell.getBoundingClientRect();
+      state.planeTargetX = clientX - bounds.left - state.dragOffset;
+    }
+
+    function bindHoldButton(button, dir) {
+      const start = (event) => {
+        event.preventDefault();
+        setMoveDir(dir);
+      };
+      const stop = () => {
+        if (!state.dragging) setMoveDir(0);
+      };
+      button.addEventListener('pointerdown', start);
+      button.addEventListener('pointerup', stop);
+      button.addEventListener('pointerleave', stop);
+      button.addEventListener('pointercancel', stop);
+    }
+
+    bindHoldButton(leftBtn, -1);
+    bindHoldButton(rightBtn, 1);
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        setMoveDir(-1);
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        setMoveDir(1);
+      }
+    });
+
+    window.addEventListener('keyup', (event) => {
+      if (event.key === 'ArrowLeft' && state.moveDir < 0) setMoveDir(0);
+      if (event.key === 'ArrowRight' && state.moveDir > 0) setMoveDir(0);
+    });
+
+    airplane.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      state.dragging = true;
+      const rect = airplane.getBoundingClientRect();
+      state.dragOffset = event.clientX - rect.left - rect.width / 2;
+      pointerMove(event.clientX);
+      airplane.setPointerCapture(event.pointerId);
+    });
+
+    airplane.addEventListener('pointermove', (event) => {
+      if (!state.dragging) return;
+      pointerMove(event.clientX);
+    });
+
+    airplane.addEventListener('pointerup', (event) => {
+      state.dragging = false;
+      airplane.releasePointerCapture(event.pointerId);
+    });
+
+    airplane.addEventListener('pointercancel', () => {
+      state.dragging = false;
+    });
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+    window.addEventListener('resize', resizeGame);
+
+    resizeGame();
+    updateHud();
+    setWord('Tap Start');
+  </script>
+</body>
+</html>
