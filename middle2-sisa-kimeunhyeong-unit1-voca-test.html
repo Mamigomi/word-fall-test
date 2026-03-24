@@ -2,186 +2,448 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>중2 시사 김은형 1과 어휘 테스트</title>
-
 <style>
-body{
-  margin:0;
-  background:#0b1220;
-  color:#fff;
-  font-family:system-ui;
-  overflow:hidden;
-}
-#wrap{
-  max-width:480px;
-  margin:0 auto;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-}
-header{
-  padding:14px;
-  background:#111a2b;
-}
-#english{
-  font-size:22px;
-  font-weight:bold;
-}
-#game{
-  flex:1;
-  position:relative;
-}
-.choice{
-  position:absolute;
-  left:10px;
-  right:10px;
-  height:50px;
-  background:#1f2a44;
-  border-radius:10px;
-  text-align:center;
-  line-height:50px;
-  cursor:pointer;
-}
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action:manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px;
+    right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    top:0;
+  }
+  .choice.good{
+    background:#065f46;
+    border-color:rgba(94,234,212,.35);
+  }
+  .choice.bad{
+    background:#7f1d1d;
+    border-color:rgba(251,113,133,.55);
+  }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
 </style>
 </head>
-
 <body>
+
 <div id="wrap">
+  <header>
+    <div id="english">단어 시험</div>
+    <div id="progress"></div>
+  </header>
 
-<header>
-  <div id="english">READY</div>
-</header>
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
 
-<div id="game"></div>
-
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">단어 시험 시작</h2>
+        <p id="ovText">
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-
 const words = [
-{q:"often", a:"종종, 자주"},
-{q:"usually", a:"주로, 보통"},
-{q:"fantasy novel", a:"판타지 소설"},
-{q:"go jogging", a:"조깅하러 가다"},
-{q:"these days", a:"요즘에"},
-{q:"take a class", a:"수업을 듣다"},
-{q:"twice", a:"두 번"},
-{q:"goal", a:"목표"},
-{q:"plan", a:"계획"},
-{q:"practice", a:"연습하다"},
-{q:"every day", a:"매일"},
-{q:"language", a:"언어"},
-{q:"weekend", a:"주말"},
-{q:"improve", a:"향상시키다"},
-{q:"robot", a:"로봇"},
-{q:"club", a:"동아리"},
-{q:"join", a:"가입하다"},
-{q:"poster", a:"포스터"},
-{q:"board", a:"게시판"},
-{q:"scan", a:"스캔하다"},
-{q:"own", a:"자신의"},
-{q:"daily", a:"매일의"},
-{q:"routine", a:"일상"},
-{q:"wake up", a:"일어나다"},
-{q:"cheerful", a:"쾌활한"},
-{q:"curtain", a:"커튼"},
-{q:"sunlight", a:"햇빛"},
-{q:"fill", a:"채우다"},
-{q:"brush one's teeth", a:"이를 닦다"},
-{q:"schedule", a:"일정"},
-{q:"weather", a:"날씨"},
-{q:"break", a:"휴식"},
-{q:"have fun", a:"재미있게 보내다"},
-{q:"healthy", a:"건강한"},
-{q:"breakfast", a:"아침 식사"},
-{q:"guide", a:"안내하다"},
-{q:"virtual", a:"가상의"},
-{q:"trip", a:"여행"},
-{q:"Egypt", a:"이집트"},
-{q:"goggles", a:"고글"},
-{q:"walk along", a:"~을 따라 걷다"},
-{q:"Nile River", a:"나일강"},
-{q:"enter", a:"들어가다"},
-{q:"grand", a:"웅장한"},
-{q:"pyramid", a:"피라미드"},
-{q:"Pharaoh", a:"파라오"},
-{q:"ancient", a:"고대의"},
-{q:"life", a:"삶"},
-{q:"wall painting", a:"벽화"},
-{q:"Egyptian", a:"이집트의"},
-{q:"believe in", a:"믿다"},
-{q:"death", a:"죽음"},
-{q:"explore", a:"탐험하다"},
-{q:"wonderful", a:"멋진"},
-{q:"outside", a:"밖에"},
-{q:"cheer for", a:"응원하다"},
-{q:"each other", a:"서로"},
-{q:"reach", a:"도달하다"},
-{q:"exercise", a:"운동"},
-{q:"review", a:"복습하다"},
-{q:"solve", a:"풀다"},
-{q:"question", a:"문제"},
-{q:"explain", a:"설명하다"},
-{q:"tip", a:"조언"},
-{q:"be ready for", a:"준비되다"},
-{q:"by the way", a:"그런데"},
-{q:"history", a:"역사"},
-{q:"recommend", a:"추천하다"},
-{q:"video clip", a:"영상"},
-{q:"skill", a:"기술"},
-{q:"get better", a:"더 나아지다"},
-{q:"take a walk", a:"산책하다"},
-{q:"keep a diary", a:"일기 쓰다"},
-{q:"go to sleep", a:"잠들다"},
-{q:"play", a:"재생하다"},
-{q:"Sweet dreams!", a:"좋은 꿈 꿔!"}
+  { en:"often", ko:"종종, 자주" },
+  { en:"usually", ko:"주로, 보통" },
+  { en:"fantasy novel", ko:"판타지 소설" },
+  { en:"go jogging", ko:"조깅하러 가다" },
+  { en:"these days", ko:"요즘에" },
+  { en:"take a class", ko:"수업을 듣다" },
+  { en:"twice", ko:"두 번" },
+  { en:"goal", ko:"목표" },
+  { en:"plan", ko:"계획" },
+  { en:"practice", ko:"연습하다" },
+  { en:"every day", ko:"매일" },
+  { en:"language", ko:"언어" },
+  { en:"weekend", ko:"주말" },
+  { en:"improve", ko:"향상시키다" },
+  { en:"robot", ko:"로봇" },
+  { en:"club", ko:"동아리, 클럽" },
+  { en:"join", ko:"가입하다" },
+  { en:"poster", ko:"포스터" },
+  { en:"board", ko:"게시판" },
+  { en:"scan", ko:"스캔하다, 검사하다" },
+  { en:"own", ko:"자신의" },
+
+  { en:"daily", ko:"매일 일어나는, 나날의" },
+  { en:"routine", ko:"규칙적으로 하는 일" },
+  { en:"wake up", ko:"일어나다" },
+  { en:"cheerful", ko:"발랄한, 쾌활한" },
+  { en:"curtain", ko:"커튼" },
+  { en:"sunlight", ko:"햇빛" },
+  { en:"fill", ko:"채우다" },
+  { en:"get up", ko:"일어나다" },
+  { en:"brush one's teeth", ko:"이를 닦다" },
+  { en:"check", ko:"확인하다" },
+  { en:"schedule", ko:"일정" },
+  { en:"weather", ko:"날씨" },
+  { en:"during", ko:"~ 동안" },
+  { en:"break", ko:"휴식(시간)" },
+  { en:"have fun", ko:"재미있게 보내다" },
+  { en:"healthy", ko:"건강한" },
+  { en:"breakfast", ko:"아침 식사" },
+  { en:"guide", ko:"안내하여 데려가다" },
+  { en:"virtual", ko:"가상의" },
+  { en:"trip", ko:"여행" },
+  { en:"Egypt", ko:"이집트" },
+  { en:"goggles", ko:"고글" },
+  { en:"walk along", ko:"~을 따라 걷다" },
+  { en:"Nile River", ko:"나일 강" },
+  { en:"enter", ko:"들어가다" },
+  { en:"grand", ko:"웅장한, 장려한" },
+  { en:"pyramid", ko:"피라미드" },
+  { en:"Pharaoh", ko:"파라오" },
+  { en:"ancient", ko:"고대의" },
+  { en:"life", ko:"삶, 생" },
+  { en:"wall painting", ko:"벽화" },
+  { en:"Egyptian", ko:"이집트인, 이집트의" },
+  { en:"believe in", ko:"~의 존재를 믿다" },
+  { en:"death", ko:"죽음" },
+  { en:"explore", ko:"탐험하다" },
+  { en:"wonderful", ko:"놀라운, 멋진" },
+  { en:"outside", ko:"밖으로, 밖에(서)" },
+  { en:"cheer for", ko:"응원하다" },
+  { en:"each other", ko:"서로서로" },
+  { en:"reach", ko:"이르다, 도달하다" },
+  { en:"exercise", ko:"운동" },
+  { en:"review", ko:"복습하다" },
+  { en:"solve", ko:"풀다, 해결하다" },
+  { en:"question", ko:"문제, 질문" },
+  { en:"explain", ko:"설명하다" },
+  { en:"tip", ko:"조언, 팁" },
+  { en:"be ready for", ko:"~할 준비가 되다" },
+  { en:"by the way", ko:"그런데" },
+  { en:"history", ko:"역사" },
+  { en:"recommend", ko:"추천하다" },
+  { en:"video clip", ko:"비디오 클립(짧은 영상)" },
+  { en:"skill", ko:"기술, 기량" },
+  { en:"get better", ko:"더 나아지다" },
+  { en:"take a walk", ko:"산책하다" },
+  { en:"keep a diary", ko:"일기를 쓰다" },
+  { en:"go to sleep", ko:"잠이 들다" },
+  { en:"play", ko:"재생하다, 연주하다" },
+  { en:"Sweet dreams!", ko:"좋은 꿈 꿔!" }
 ];
 
-let current = 0;
+const PASS_MESSAGE = "축하합니다. 중2 시사 김은형 1과 어휘 테스트 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
+const startYs = [-220, -320, -420, -520];
 
-function nextQuestion(){
-  if(current >= words.length){
-    alert("완료! 🎉");
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+let deck = [];
+let idx = 0;
+let choices = [];
+let raf = null;
+let running = false;
+let roundStartTs = 0;
+let locked = false;
+
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+function clearChoices(){
+  for(const el of choices){
+    el.remove();
+  }
+  choices = [];
+}
+
+function stopLoop(){
+  running = false;
+  if(raf){
+    cancelAnimationFrame(raf);
+    raf = null;
+  }
+}
+
+function resetGame(){
+  stopLoop();
+  clearChoices();
+  deck = shuffle(words);
+  idx = 0;
+  locked = false;
+  englishEl.textContent = "단어 시험";
+  progressEl.textContent = `0 / ${deck.length}`;
+}
+
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
+      false,
+      true
+    );
     return;
   }
 
-  const game = document.getElementById("game");
-  game.innerHTML = "";
+  locked = false;
 
-  const q = words[current];
-  document.getElementById("english").innerText = q.q;
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
 
-  let choices = [q.a];
+  spawnChoices(w);
+  startLoop();
+}
 
-  while(choices.length < 4){
-    const rand = words[Math.floor(Math.random()*words.length)].a;
-    if(!choices.includes(rand)) choices.push(rand);
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running || locked) return;
+  locked = true;
+
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    setTimeout(() => fail("오답을 선택했습니다."), 120);
+    return;
   }
 
-  choices.sort(()=>Math.random()-0.5);
+  el.classList.add("good");
+  stopLoop();
 
-  choices.forEach((c,i)=>{
-    const div = document.createElement("div");
-    div.className = "choice";
-    div.style.top = (i*70+50)+"px";
-    div.innerText = c;
+  setTimeout(() => {
+    clearChoices();
+    idx += 1;
+    nextWord();
+  }, 180);
+}
 
-    div.onclick = ()=>{
-      if(c === q.a){
-        current++;
-        nextQuestion();
-      }else{
-        alert("틀림 ❌");
-      }
-    };
+function spawnChoices(word){
+  clearChoices();
 
-    game.appendChild(div);
+  const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(v => v !== correct);
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+    el.dataset.correct = txt === correct ? "1" : "0";
+    el.dataset.startY = String(startYs[i]);
+    el.style.top = `${startYs[i]}px`;
+
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      pick(el);
+    });
+
+    gameEl.appendChild(el);
+    choices.push(el);
   });
 }
 
-nextQuestion();
+function startLoop(){
+  stopLoop();
+  running = true;
+  roundStartTs = performance.now();
+  raf = requestAnimationFrame(tick);
+}
 
+function tick(ts){
+  if(!running) return;
+
+  const elapsed = (ts - roundStartTs) / 1000;
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    const startY = Number(el.dataset.startY);
+    const y = startY + baseSpeed * elapsed;
+    el.style.top = `${y}px`;
+
+    if(y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+
+  raf = requestAnimationFrame(tick);
+}
+
+startBtn.addEventListener("click", startGame);
+
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "단어 시험 시작",
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
+});
+
+showOverlay(
+  "단어 시험 시작",
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
 </script>
+
 </body>
 </html>
