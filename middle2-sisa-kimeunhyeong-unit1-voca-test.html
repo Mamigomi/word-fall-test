@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>중2 시사 김은형 1과 어휘 테스트</title>
+
+<style>
+body{
+  margin:0;
+  background:#0b1220;
+  color:#fff;
+  font-family:system-ui;
+  overflow:hidden;
+}
+#wrap{
+  max-width:480px;
+  margin:0 auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+header{
+  padding:14px;
+  background:#111a2b;
+}
+#english{
+  font-size:22px;
+  font-weight:bold;
+}
+#game{
+  flex:1;
+  position:relative;
+}
+.choice{
+  position:absolute;
+  left:10px;
+  right:10px;
+  height:50px;
+  background:#1f2a44;
+  border-radius:10px;
+  text-align:center;
+  line-height:50px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+<div id="wrap">
+
+<header>
+  <div id="english">READY</div>
+</header>
+
+<div id="game"></div>
+
+</div>
+
+<script>
+
+const words = [
+{q:"often", a:"종종, 자주"},
+{q:"usually", a:"주로, 보통"},
+{q:"fantasy novel", a:"판타지 소설"},
+{q:"go jogging", a:"조깅하러 가다"},
+{q:"these days", a:"요즘에"},
+{q:"take a class", a:"수업을 듣다"},
+{q:"twice", a:"두 번"},
+{q:"goal", a:"목표"},
+{q:"plan", a:"계획"},
+{q:"practice", a:"연습하다"},
+{q:"every day", a:"매일"},
+{q:"language", a:"언어"},
+{q:"weekend", a:"주말"},
+{q:"improve", a:"향상시키다"},
+{q:"robot", a:"로봇"},
+{q:"club", a:"동아리"},
+{q:"join", a:"가입하다"},
+{q:"poster", a:"포스터"},
+{q:"board", a:"게시판"},
+{q:"scan", a:"스캔하다"},
+{q:"own", a:"자신의"},
+{q:"daily", a:"매일의"},
+{q:"routine", a:"일상"},
+{q:"wake up", a:"일어나다"},
+{q:"cheerful", a:"쾌활한"},
+{q:"curtain", a:"커튼"},
+{q:"sunlight", a:"햇빛"},
+{q:"fill", a:"채우다"},
+{q:"brush one's teeth", a:"이를 닦다"},
+{q:"schedule", a:"일정"},
+{q:"weather", a:"날씨"},
+{q:"break", a:"휴식"},
+{q:"have fun", a:"재미있게 보내다"},
+{q:"healthy", a:"건강한"},
+{q:"breakfast", a:"아침 식사"},
+{q:"guide", a:"안내하다"},
+{q:"virtual", a:"가상의"},
+{q:"trip", a:"여행"},
+{q:"Egypt", a:"이집트"},
+{q:"goggles", a:"고글"},
+{q:"walk along", a:"~을 따라 걷다"},
+{q:"Nile River", a:"나일강"},
+{q:"enter", a:"들어가다"},
+{q:"grand", a:"웅장한"},
+{q:"pyramid", a:"피라미드"},
+{q:"Pharaoh", a:"파라오"},
+{q:"ancient", a:"고대의"},
+{q:"life", a:"삶"},
+{q:"wall painting", a:"벽화"},
+{q:"Egyptian", a:"이집트의"},
+{q:"believe in", a:"믿다"},
+{q:"death", a:"죽음"},
+{q:"explore", a:"탐험하다"},
+{q:"wonderful", a:"멋진"},
+{q:"outside", a:"밖에"},
+{q:"cheer for", a:"응원하다"},
+{q:"each other", a:"서로"},
+{q:"reach", a:"도달하다"},
+{q:"exercise", a:"운동"},
+{q:"review", a:"복습하다"},
+{q:"solve", a:"풀다"},
+{q:"question", a:"문제"},
+{q:"explain", a:"설명하다"},
+{q:"tip", a:"조언"},
+{q:"be ready for", a:"준비되다"},
+{q:"by the way", a:"그런데"},
+{q:"history", a:"역사"},
+{q:"recommend", a:"추천하다"},
+{q:"video clip", a:"영상"},
+{q:"skill", a:"기술"},
+{q:"get better", a:"더 나아지다"},
+{q:"take a walk", a:"산책하다"},
+{q:"keep a diary", a:"일기 쓰다"},
+{q:"go to sleep", a:"잠들다"},
+{q:"play", a:"재생하다"},
+{q:"Sweet dreams!", a:"좋은 꿈 꿔!"}
+];
+
+let current = 0;
+
+function nextQuestion(){
+  if(current >= words.length){
+    alert("완료! 🎉");
+    return;
+  }
+
+  const game = document.getElementById("game");
+  game.innerHTML = "";
+
+  const q = words[current];
+  document.getElementById("english").innerText = q.q;
+
+  let choices = [q.a];
+
+  while(choices.length < 4){
+    const rand = words[Math.floor(Math.random()*words.length)].a;
+    if(!choices.includes(rand)) choices.push(rand);
+  }
+
+  choices.sort(()=>Math.random()-0.5);
+
+  choices.forEach((c,i)=>{
+    const div = document.createElement("div");
+    div.className = "choice";
+    div.style.top = (i*70+50)+"px";
+    div.innerText = c;
+
+    div.onclick = ()=>{
+      if(c === q.a){
+        current++;
+        nextQuestion();
+      }else{
+        alert("틀림 ❌");
+      }
+    };
+
+    game.appendChild(div);
+  });
+}
+
+nextQuestion();
+
+</script>
+</body>
+</html>
