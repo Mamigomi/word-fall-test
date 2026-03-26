@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Word Test Lesson 3</title>
+  <style>
+    :root {
+      --bg-top: #f4ecd8;
+      --bg-bottom: #d8e6f2;
+      --panel: rgba(255, 252, 245, 0.9);
+      --ink: #233142;
+      --accent: #d96c3f;
+      --accent-deep: #9f3f2d;
+      --good: #2f7d32;
+      --bad: #a52828;
+      --line: rgba(35, 49, 66, 0.15);
+      --shadow: 0 16px 40px rgba(35, 49, 66, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.55), transparent 35%),
+        linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      padding: 18px 16px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app::before,
+    .app::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      z-index: 0;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .app::before {
+      width: 220px;
+      height: 220px;
+      right: -60px;
+      top: -30px;
+      background: rgba(217, 108, 63, 0.16);
+    }
+
+    .app::after {
+      width: 180px;
+      height: 180px;
+      left: -70px;
+      bottom: 60px;
+      background: rgba(75, 122, 161, 0.16);
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 24px 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    h1, h2, p {
+      margin: 0;
+    }
+
+    .title {
+      font-size: 2rem;
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 0.98rem;
+      line-height: 1.6;
+      color: rgba(35, 49, 66, 0.8);
+      margin-bottom: 20px;
+    }
+
+    .label {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border: 2px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 18px;
+      padding: 16px 14px;
+      font-size: 1.05rem;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: rgba(217, 108, 63, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .button {
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 16px 14px;
+      margin-top: 16px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      color: #fffdf8;
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(159, 63, 45, 0.24);
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+      font-size: 0.92rem;
+      color: rgba(35, 49, 66, 0.85);
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+    }
+
+    .meaning {
+      margin-top: 8px;
+      margin-bottom: 24px;
+      text-align: center;
+      padding: 22px 14px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247, 240, 230, 0.94));
+      border: 1px solid rgba(35, 49, 66, 0.08);
+    }
+
+    .meaning-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(35, 49, 66, 0.45);
+      margin-bottom: 12px;
+    }
+
+    .meaning-text {
+      font-size: 1.8rem;
+      font-weight: 900;
+      line-height: 1.3;
+      word-break: keep-all;
+    }
+
+    .answer-box {
+      margin: 18px 0 10px;
+    }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: rgba(35, 49, 66, 0.72);
+      text-align: center;
+    }
+
+    .status {
+      min-height: 24px;
+      margin-top: 14px;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+    }
+
+    .status.good {
+      color: var(--good);
+    }
+
+    .status.bad {
+      color: var(--bad);
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 24, 31, 0.55);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      z-index: 10;
+    }
+
+    .overlay-card {
+      width: min(430px, 100%);
+      background: #fff9f3;
+      border-radius: 28px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 18px 42px rgba(20, 24, 31, 0.28);
+    }
+
+    .overlay-card h2 {
+      font-size: 1.9rem;
+      margin-bottom: 12px;
+    }
+
+    .overlay-card p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: rgba(35, 49, 66, 0.85);
+    }
+
+    .overlay-card .button {
+      margin-top: 20px;
+    }
+
+    @media (max-width: 360px) {
+      .title {
+        font-size: 1.7rem;
+      }
+
+      .meaning-text {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="start-screen" class="card">
+      <h1 class="title">Word Test Lesson 3</h1>
+      <p class="subtitle">
+        이름을 입력하고 시험을 시작하세요. 뜻을 보고 정확한 영어 단어를 입력해야 하며,
+        한 번이라도 틀리면 처음부터 다시 시작합니다.
+      </p>
+
+      <label class="label" for="player-name">이름</label>
+      <input id="player-name" type="text" maxlength="20" placeholder="이름을 입력하세요">
+      <button id="start-button" class="button">시험 시작</button>
+    </section>
+
+    <section id="game-screen" class="card hidden">
+      <div class="topbar">
+        <div class="badge" id="player-badge">학생</div>
+        <div class="badge" id="progress-badge">1 / 45</div>
+      </div>
+
+      <div class="meaning">
+        <div class="meaning-label">Korean Meaning</div>
+        <div id="meaning-text" class="meaning-text">긍정적인</div>
+      </div>
+
+      <div class="answer-box">
+        <label class="label" for="answer-input">영어 단어 입력</label>
+        <input id="answer-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="정답을 입력하세요">
+      </div>
+
+      <button id="submit-button" class="button">정답 확인</button>
+      <div class="hint">띄어쓰기와 철자를 정확히 입력해야 합니다.</div>
+      <div id="status" class="status"></div>
+    </section>
+  </main>
+
+  <div id="result-overlay" class="overlay hidden">
+    <div class="overlay-card">
+      <h2 id="result-title">Game Over</h2>
+      <p id="result-message"></p>
+      <button id="restart-button" class="button">처음으로 돌아가기</button>
+    </div>
+  </div>
+
+  <script>
+    const words = [
+      { meaning: "긍정적인", answer: "positive" },
+      { meaning: "태도", answer: "attitude" },
+      { meaning: "결과", answer: "result" },
+      { meaning: "열다, 개최하다", answer: "hold" },
+      { meaning: "대회", answer: "contest" },
+      { meaning: "참가하다, 출전하다", answer: "enter" },
+      { meaning: "농담하다", answer: "kid" },
+      { meaning: "형편없는, 끔찍한", answer: "terrible" },
+      { meaning: "춤을 추는 사람", answer: "dancer" },
+      { meaning: "관심이 있는", answer: "interested" },
+      { meaning: "추측하다", answer: "guess" },
+      { meaning: "(일이) 발생하다", answer: "happen" },
+      { meaning: "다음에", answer: "next" },
+      { meaning: "다음에 나오는", answer: "following" },
+      { meaning: "다른", answer: "different" },
+      { meaning: "상황", answer: "situation" },
+      { meaning: "팀원", answer: "teammate" },
+      { meaning: "연습하다 / 연습", answer: "practice" },
+      { meaning: "실수", answer: "mistake" },
+      { meaning: "실수를 하다", answer: "make a mistake" },
+      { meaning: "가망 없는, 절망적인", answer: "hopeless" },
+      { meaning: "그런데", answer: "by the way" },
+      { meaning: "아픈", answer: "sick" },
+      { meaning: "문자 메시지를 보내다", answer: "text" },
+      { meaning: "보다", answer: "see" },
+      { meaning: "괜찮은", answer: "all right" },
+      { meaning: "피곤한", answer: "tired" },
+      { meaning: "진전을 이루다", answer: "get anywhere" },
+      { meaning: "낭비하다", answer: "waste" },
+      { meaning: "잘못", answer: "fault" },
+      { meaning: "그만두다", answer: "quit" },
+      { meaning: "불만스러운", answer: "unhappy" },
+      { meaning: "마침내", answer: "finally" },
+      { meaning: "열심히", answer: "hard" },
+      { meaning: "미안한", answer: "sorry" },
+      { meaning: "기운을 내다", answer: "cheer up" },
+      { meaning: "걱정하다", answer: "worry" },
+      { meaning: "거의", answer: "almost" },
+      { meaning: "끝이 난", answer: "over" },
+      { meaning: "획득하다; (상·메달을) 타다", answer: "win" },
+      { meaning: "상", answer: "prize" },
+      { meaning: "성공하다, 해내다", answer: "make it" },
+      { meaning: "끝내다, 마치다", answer: "finish" },
+      { meaning: "~없이", answer: "without" },
+      { meaning: "최선을 다하다", answer: "do one's best" },
+      { meaning: "자랑스러운", answer: "proud" },
+      { meaning: "~을 자랑스러워하다", answer: "be proud of" },
+      { meaning: "응원, 지지", answer: "support" }
+    ];
+
+    const startScreen = document.getElementById("start-screen");
+    const gameScreen = document.getElementById("game-screen");
+    const resultOverlay = document.getElementById("result-overlay");
+    const playerNameInput = document.getElementById("player-name");
+    const answerInput = document.getElementById("answer-input");
+    const startButton = document.getElementById("start-button");
+    const submitButton = document.getElementById("submit-button");
+    const restartButton = document.getElementById("restart-button");
+    const playerBadge = document.getElementById("player-badge");
+    const progressBadge = document.getElementById("progress-badge");
+    const meaningText = document.getElementById("meaning-text");
+    const statusText = document.getElementById("status");
+    const resultTitle = document.getElementById("result-title");
+    const resultMessage = document.getElementById("result-message");
+
+    let playerName = "";
+    let currentIndex = 0;
+    let gameLocked = false;
+
+    function normalize(value) {
+      return value.trim().toLowerCase().replace(/\s+/g, " ");
+    }
+
+    function showQuestion() {
+      const item = words[currentIndex];
+      meaningText.textContent = item.meaning;
+      progressBadge.textContent = `${currentIndex + 1} / ${words.length}`;
+      answerInput.value = "";
+      answerInput.focus();
+      statusText.textContent = "";
+      statusText.className = "status";
+    }
+
+    function startGame() {
+      const enteredName = playerNameInput.value.trim();
+
+      if (!enteredName) {
+        statusText.textContent = "";
+        playerNameInput.focus();
+        alert("이름을 입력해 주세요.");
+        return;
+      }
+
+      playerName = enteredName;
+      currentIndex = 0;
+      gameLocked = false;
+      playerBadge.textContent = `${playerName}`;
+
+      startScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+      resultOverlay.classList.add("hidden");
+
+      showQuestion();
+    }
+
+    function goToStart() {
+      currentIndex = 0;
+      gameLocked = false;
+      answerInput.value = "";
+      playerNameInput.focus();
+      gameScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+      resultOverlay.classList.add("hidden");
+    }
+
+    function showResult(title, message) {
+      resultTitle.textContent = title;
+      resultMessage.textContent = message;
+      resultOverlay.classList.remove("hidden");
+    }
+
+    function handleWrongAnswer(correctAnswer) {
+      gameLocked = true;
+      statusText.textContent = "오답입니다. 게임 오버!";
+      statusText.className = "status bad";
+      showResult(
+        "Game Over",
+        `${playerName} 학생, 정답은 "${correctAnswer}"였습니다. 처음부터 다시 도전하세요.`
+      );
+    }
+
+    function handleCorrectAnswer() {
+      currentIndex += 1;
+
+      if (currentIndex >= words.length) {
+        gameLocked = true;
+        statusText.textContent = "전부 맞췄습니다!";
+        statusText.className = "status good";
+        showResult(
+          "Clear!",
+          `${playerName} 학생, 모든 단어를 정확히 맞혔습니다. 축하합니다!`
+        );
+        return;
+      }
+
+      statusText.textContent = "정답입니다!";
+      statusText.className = "status good";
+
+      setTimeout(() => {
+        if (!gameLocked) {
+          showQuestion();
+        }
+      }, 350);
+    }
+
+    function submitAnswer() {
+      if (gameLocked) {
+        return;
+      }
+
+      const userAnswer = normalize(answerInput.value);
+      const correctAnswer = normalize(words[currentIndex].answer);
+
+      if (!userAnswer) {
+        answerInput.focus();
+        return;
+      }
+
+      if (userAnswer === correctAnswer) {
+        handleCorrectAnswer();
+      } else {
+        handleWrongAnswer(words[currentIndex].answer);
+      }
+    }
+
+    startButton.addEventListener("click", startGame);
+    submitButton.addEventListener("click", submitAnswer);
+    restartButton.addEventListener("click", goToStart);
+
+    playerNameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        startGame();
+      }
+    });
+
+    answerInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        submitAnswer();
+      }
+    });
+  </script>
+</body>
+</html>
