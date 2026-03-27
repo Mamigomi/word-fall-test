@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>suneung-light-lesson4-vocab-test.html</title>
+
+<style>
+body{
+  margin:0;
+  background:#0b1220;
+  color:#fff;
+  font-family:"Noto Sans KR", sans-serif;
+}
+
+#wrap{
+  max-width:480px;
+  margin:0 auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+header{
+  padding:14px;
+  background:#111a2b;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+#english{
+  font-size:22px;
+  font-weight:800;
+}
+
+#progress{
+  font-size:13px;
+  opacity:.8;
+}
+
+#game{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+}
+
+.choice{
+  position:absolute;
+  left:10px;
+  right:10px;
+  height:56px;
+  background:#1e293b;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.floor{
+  position:absolute;
+  bottom:0;
+  height:60px;
+  width:100%;
+  background:red;
+  text-align:center;
+  line-height:60px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="wrap">
+<header>
+  <div id="english">수특라이트 4강 어휘 테스트</div>
+  <div id="progress"></div>
+</header>
+
+<div id="game">
+  <div class="floor">바닥 닿으면 탈락</div>
+</div>
+</div>
+
+<script>
+
+const words = [
+  {en:"powerful",ko:"강력한"},
+  {en:"rich",ko:"부유한"},
+  {en:"famous",ko:"유명한"},
+  {en:"ignore",ko:"무시하다"},
+  {en:"trappings",ko:"겉치레"},
+  {en:"success",ko:"성공"},
+  {en:"freedom",ko:"자유"},
+  {en:"demand",ko:"요구하다"},
+  {en:"attend",ko:"참석하다"},
+  {en:"realize",ko:"깨닫다"},
+  {en:"transaction",ko:"거래"},
+  {en:"slavery",ko:"노예 상태"},
+  {en:"prisoner",ko:"죄수"},
+  {en:"jail",ko:"감옥"},
+
+  {en:"obstacle",ko:"장애물"},
+  {en:"acquire",ko:"익히다"},
+  {en:"injury",ko:"손상"},
+  {en:"restore",ko:"회복시키다"},
+  {en:"revive",ko:"되살리다"},
+  {en:"symptom",ko:"증상"},
+  {en:"delay",ko:"늦추다"},
+
+  {en:"economist",ko:"경제학자"},
+  {en:"subsidy",ko:"보조금"},
+  {en:"burden",ko:"부담"},
+  {en:"benefit",ko:"혜택"},
+  {en:"supplier",ko:"공급자"},
+  {en:"demander",ko:"수요자"},
+  {en:"supply",ko:"공급"},
+
+  {en:"natural",ko:"자연스러운"},
+  {en:"necessary",ko:"필요한"},
+  {en:"distinguish",ko:"구별하다"},
+  {en:"empathy",ko:"공감"},
+  {en:"perception",ko:"인식"},
+  {en:"judgement",ko:"판단"},
+
+  {en:"significance",ko:"중요성"},
+  {en:"journalism",ko:"저널리즘"},
+  {en:"perspective",ko:"관점"},
+  {en:"significant",ko:"중요한"}
+];
+
+let current = 0;
+
+function start(){
+  next();
+}
+
+function next(){
+  if(current >= words.length){
+    alert("🎉 합격!");
+    location.reload();
+    return;
+  }
+
+  const w = words[current];
+  document.getElementById("english").innerText = w.en;
+  document.getElementById("progress").innerText = `${current+1} / ${words.length}`;
+
+  spawnChoices(w);
+}
+
+function spawnChoices(word){
+  const game = document.getElementById("game");
+  game.querySelectorAll(".choice").forEach(e=>e.remove());
+
+  let choices = [word.ko];
+
+  while(choices.length < 4){
+    const r = words[Math.floor(Math.random()*words.length)].ko;
+    if(!choices.includes(r)) choices.push(r);
+  }
+
+  choices.sort(()=>Math.random()-0.5);
+
+  choices.forEach((c,i)=>{
+    const div = document.createElement("div");
+    div.className="choice";
+    div.innerText=c;
+    div.style.top = (-100 - i*80) + "px";
+
+    div.onclick = ()=>{
+      if(c === word.ko){
+        current++;
+        next();
+      }else{
+        alert("❌ 탈락");
+        location.reload();
+      }
+    };
+
+    game.appendChild(div);
+
+    let y = parseInt(div.style.top);
+
+    const fall = setInterval(()=>{
+      y += 2;
+      div.style.top = y+"px";
+
+      if(y > window.innerHeight-120){
+        clearInterval(fall);
+        alert("💀 바닥 도달 탈락");
+        location.reload();
+      }
+    },16);
+  });
+}
+
+start();
+
+</script>
+
+</body>
+</html>
