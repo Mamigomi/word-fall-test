@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>수특라이트 5강 1번 어휘 두더지 게임</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #b8e5ff 0%, #dff4ff 45%, #a6d98a 45%, #78b55a 100%);
+      color: #1f2937;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 14px 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.92);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.55rem;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      text-align: center;
+      color: #4b5563;
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+
+    .start-screen,
+    .end-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 360px;
+    }
+
+    .start-screen input {
+      width: min(420px, 100%);
+      padding: 14px 16px;
+      font-size: 1.05rem;
+      border-radius: 14px;
+      border: 2px solid #cbd5e1;
+      outline: none;
+      background: #fff;
+    }
+
+    .start-screen input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.08s ease, opacity 0.2s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      min-width: 180px;
+    }
+
+    .btn-secondary {
+      background: #10b981;
+      color: white;
+      min-width: 180px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .pill {
+      background: #eef2ff;
+      color: #1e3a8a;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .timer-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .timer-text {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #b91c1c;
+      text-align: center;
+    }
+
+    .timer-bar-outer {
+      width: 100%;
+      height: 16px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #d1d5db;
+    }
+
+    .timer-bar-inner {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e 0%, #f59e0b 60%, #ef4444 100%);
+      transform-origin: left center;
+      transition: width 0.08s linear;
+    }
+
+    .question-box {
+      text-align: center;
+      padding: 16px;
+    }
+
+    .question-label {
+      font-size: 0.98rem;
+      color: #6b7280;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .question-word {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 900;
+      color: #111827;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+
+    .question-note {
+      color: #6b7280;
+      font-size: 0.94rem;
+    }
+
+    .field {
+      position: relative;
+      padding: 18px 12px 28px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05));
+      overflow: hidden;
+    }
+
+    .holes-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px 14px;
+      justify-items: center;
+    }
+
+    .holes-grid .hole:nth-child(5) { grid-column: 1 / span 1; }
+    .holes-grid .hole:nth-child(6) { grid-column: 2 / span 1; }
+    .holes-grid .hole:nth-child(7) { grid-column: 3 / span 1; }
+
+    .hole {
+      width: 100%;
+      max-width: 200px;
+      min-height: 132px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .hole-shadow {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 38px;
+      background: radial-gradient(ellipse at center, #2d180c 0%, #1a0d06 68%, #120803 100%);
+      border-radius: 50%;
+      box-shadow: inset 0 4px 10px rgba(255,255,255,0.05);
+    }
+
+    .mole {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      min-height: 92px;
+      border: none;
+      border-radius: 18px 18px 20px 20px;
+      background: linear-gradient(180deg, #9b6b47 0%, #7c5335 100%);
+      color: white;
+      font-weight: 900;
+      padding: 12px 10px 16px;
+      cursor: pointer;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.25;
+      font-size: clamp(0.9rem, 2vw, 1.05rem);
+      transform: translateY(0);
+      transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+      word-break: keep-all;
+    }
+
+    .mole:hover {
+      filter: brightness(1.05);
+    }
+
+    .mole:active {
+      transform: translateY(4px);
+    }
+
+    .mole.correct {
+      background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+    }
+
+    .mole.wrong {
+      background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    .mole.disabled {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: #374151;
+      font-size: 0.92rem;
+      margin-top: 4px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    .end-title {
+      font-size: clamp(1.5rem, 4.6vw, 2.3rem);
+      font-weight: 900;
+      color: #111827;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .end-sub {
+      font-size: 1.04rem;
+      color: #4b5563;
+      line-height: 1.7;
+    }
+
+    .score-box {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 14px 16px;
+      width: min(540px, 100%);
+      text-align: left;
+      line-height: 1.8;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    @media (max-width: 820px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .holes-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .holes-grid .hole:nth-child(5),
+      .holes-grid .hole:nth-child(6),
+      .holes-grid .hole:nth-child(7) {
+        grid-column: auto;
+      }
+
+      .hole {
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        padding: 12px 10px 18px;
+      }
+
+      .card {
+        padding: 14px;
+        border-radius: 18px;
+      }
+
+      .hole {
+        min-height: 116px;
+      }
+
+      .mole {
+        min-height: 84px;
+        padding: 10px 8px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <h1>수특라이트 5강 1번 어휘 두더지 게임</h1>
+      <div class="subtitle">학생 이름을 입력하고 시작하세요. 문제마다 제한 시간은 3초입니다.</div>
+    </div>
+
+    <section id="startScreen" class="card start-screen">
+      <div style="font-size:1.15rem; font-weight:800;">이름을 입력한 뒤 게임을 시작하세요</div>
+      <input id="studentName" type="text" maxlength="20" placeholder="학생 이름 입력" />
+      <button id="startBtn" class="btn btn-primary">START</button>
+      <div class="footer-note">
+        영어 단어가 나오면<br />
+        두더지 위의 한국어 뜻 중에서 맞는 뜻을 터치하세요.
+      </div>
+    </section>
+
+    <section id="gameScreen" class="hidden">
+      <div class="card topbar">
+        <div class="pill" id="nameBadge">이름: -</div>
+        <div class="pill" id="progressBadge">진행: 0 / 0</div>
+        <div class="pill" id="scoreBadge">점수: 0</div>
+      </div>
+
+      <div class="card timer-wrap">
+        <div class="timer-text" id="timerText">남은 시간: 3.0초</div>
+        <div class="timer-bar-outer">
+          <div class="timer-bar-inner" id="timerBar"></div>
+        </div>
+      </div>
+
+      <div class="card question-box">
+        <div class="question-label">다음 영어의 뜻을 고르세요</div>
+        <div class="question-word" id="questionWord">since</div>
+        <div class="question-note">올바른 뜻의 두더지를 빠르게 터치하세요.</div>
+      </div>
+
+      <div class="card field">
+        <div class="holes-grid" id="holesGrid"></div>
+        <div class="footer-note">틀리거나 시간이 끝나면 게임 종료입니다.</div>
+      </div>
+    </section>
+
+    <section id="endScreen" class="card end-screen hidden">
+      <div class="end-title" id="endTitle">게임 종료</div>
+      <div class="end-sub" id="endSub">다시 도전해 보세요.</div>
+      <div class="score-box" id="scoreBox"></div>
+      <button id="restartBtn" class="btn btn-secondary">다시 시작</button>
+    </section>
+  </div>
+
+  <script>
+    const vocabData = [
+      { english: "since", korean: "~이래로" },
+      { english: "depict", korean: "반영하다" },
+      { english: "start", korean: "시작" },
+      { english: "reflect", korean: "반영하다" },
+      { english: "social issue", korean: "사회적 갈등" },
+      { english: "society", korean: "사회" },
+      { english: "include", korean: "포함하다" },
+      { english: "contain", korean: "포함하다" },
+      { english: "civil rights", korean: "시민권" },
+      { english: "migration", korean: "이민" },
+      { english: "immigration", korean: "이민" },
+      { english: "idea", korean: "개념" },
+      { english: "conception", korean: "개념" },
+      { english: "deal with", korean: "다루다" },
+      { english: "humour", korean: "유머" },
+      { english: "comedy", korean: "유머" },
+      { english: "progressive", korean: "진보적인" },
+      { english: "advanced", korean: "진보적인" },
+      { english: "acceptable", korean: "받아들일 수 있는" },
+      { english: "tolerable", korean: "받아들일 수 있는" },
+      { english: "frequently", korean: "자주" },
+      { english: "often", korean: "자주" },
+      { english: "prejudiced", korean: "편견이 있는" },
+      { english: "bigoted", korean: "편견이 있는" },
+      { english: "oppose", korean: "저항하다" },
+      { english: "resist", korean: "저항하다" },
+      { english: "depict", korean: "묘사하다" },
+      { english: "portray", korean: "묘사하다" },
+      { english: "absurd", korean: "우스꽝스러운" },
+      { english: "ridiculous", korean: "우스꽝스러운" },
+      { english: "scold", korean: "비판하다" },
+      { english: "criticize", korean: "비판하다" },
+      { english: "stupidity", korean: "어리석음" },
+      { english: "foolishness", korean: "어리석음" },
+      { english: "therefore", korean: "따라서" },
+      { english: "thus", korean: "따라서" },
+      { english: "promote", korean: "촉진하다" },
+      { english: "encourage", korean: "촉진하다" },
+      { english: "approval", korean: "수용" },
+      { english: "acceptance", korean: "수용" },
+      { english: "open-minded", korean: "관용적인" },
+      { english: "tolerant", korean: "관용적인" }
+    ];
+
+    const HOLE_COUNT = 7;
+    const ROUND_TIME = 3.0;
+
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const endScreen = document.getElementById("endScreen");
+
+    const studentNameInput = document.getElementById("studentName");
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const nameBadge = document.getElementById("nameBadge");
+    const progressBadge = document.getElementById("progressBadge");
+    const scoreBadge = document.getElementById("scoreBadge");
+    const questionWord = document.getElementById("questionWord");
+    const timerText = document.getElementById("timerText");
+    const timerBar = document.getElementById("timerBar");
+    const holesGrid = document.getElementById("holesGrid");
+
+    const endTitle = document.getElementById("endTitle");
+    const endSub = document.getElementById("endSub");
+    const scoreBox = document.getElementById("scoreBox");
+
+    let playerName = "";
+    let gameWords = [];
+    let currentIndex = 0;
+    let score = 0;
+    let timeLeft = ROUND_TIME;
+    let timerId = null;
+    let currentCorrectAnswer = "";
+    let currentButtons = [];
+    let gameEnded = false;
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function getRandomWrongOptions(correctKorean) {
+      const uniqueKoreans = [...new Set(vocabData.map(v => v.korean))].filter(k => k !== correctKorean);
+      return shuffle(uniqueKoreans).slice(0, HOLE_COUNT - 1);
+    }
+
+    function createHoleButton(text, isCorrect) {
+      const hole = document.createElement("div");
+      hole.className = "hole";
+
+      const moleBtn = document.createElement("button");
+      moleBtn.className = "mole";
+      moleBtn.textContent = text;
+      moleBtn.dataset.correct = isCorrect ? "true" : "false";
+
+      const shadow = document.createElement("div");
+      shadow.className = "hole-shadow";
+
+      hole.appendChild(moleBtn);
+      hole.appendChild(shadow);
+
+      moleBtn.addEventListener("click", () => handleChoice(moleBtn, isCorrect));
+      return { hole, moleBtn };
+    }
+
+    function updateTopbar() {
+      nameBadge.textContent = `이름: ${playerName}`;
+      progressBadge.textContent = `진행: ${currentIndex} / ${gameWords.length}`;
+      scoreBadge.textContent = `점수: ${score}`;
+    }
+
+    function updateTimerUI() {
+      timerText.textContent = `남은 시간: ${timeLeft.toFixed(1)}초`;
+      const percent = Math.max(0, (timeLeft / ROUND_TIME) * 100);
+      timerBar.style.width = percent + "%";
+    }
+
+    function clearTimer() {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+    }
+
+    function startRoundTimer() {
+      clearTimer();
+      timeLeft = ROUND_TIME;
+      updateTimerUI();
+
+      timerId = setInterval(() => {
+        timeLeft -= 0.1;
+        if (timeLeft <= 0) {
+          timeLeft = 0;
+          updateTimerUI();
+          clearTimer();
+          endGame(false, "시간 종료");
+          return;
+        }
+        updateTimerUI();
+      }, 100);
+    }
+
+    function disableChoices() {
+      currentButtons.forEach(btn => {
+        btn.classList.add("disabled");
+        btn.disabled = true;
+      });
+    }
+
+    function handleChoice(clickedButton, isCorrect) {
+      if (gameEnded) return;
+
+      disableChoices();
+      clearTimer();
+
+      if (isCorrect) {
+        clickedButton.classList.add("correct");
+        score += 1;
+        currentIndex += 1;
+        updateTopbar();
+
+        setTimeout(() => {
+          if (currentIndex >= gameWords.length) {
+            endGame(true, "완료");
+          } else {
+            renderQuestion();
+          }
+        }, 300);
+      } else {
+        clickedButton.classList.add("wrong");
+        const correctBtn = currentButtons.find(btn => btn.dataset.correct === "true");
+        if (correctBtn) correctBtn.classList.add("correct");
+        setTimeout(() => {
+          endGame(false, "오답");
+        }, 450);
+      }
+    }
+
+    function renderQuestion() {
+      if (gameEnded) return;
+
+      holesGrid.innerHTML = "";
+      currentButtons = [];
+
+      const currentWord = gameWords[currentIndex];
+      currentCorrectAnswer = currentWord.korean;
+      questionWord.textContent = currentWord.english;
+
+      const wrongOptions = getRandomWrongOptions(currentCorrectAnswer);
+      const options = shuffle([currentCorrectAnswer, ...wrongOptions]);
+
+      options.forEach(option => {
+        const isCorrect = option === currentCorrectAnswer;
+        const { hole, moleBtn } = createHoleButton(option, isCorrect);
+        holesGrid.appendChild(hole);
+        currentButtons.push(moleBtn);
+      });
+
+      updateTopbar();
+      startRoundTimer();
+    }
+
+    function startGame() {
+      const rawName = studentNameInput.value.trim();
+      if (!rawName) {
+        alert("학생 이름을 입력해 주세요.");
+        studentNameInput.focus();
+        return;
+      }
+
+      playerName = rawName;
+      gameWords = shuffle(vocabData);
+      currentIndex = 0;
+      score = 0;
+      gameEnded = false;
+
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+
+      renderQuestion();
+    }
+
+    function endGame(isSuccess, reason) {
+      gameEnded = true;
+      clearTimer();
+      disableChoices();
+
+      gameScreen.classList.add("hidden");
+      endScreen.classList.remove("hidden");
+
+      if (isSuccess) {
+        endTitle.textContent = `축하합니다. ${playerName} 님 수특라이트 5강 1번 어휘 모두 맞추셨습니다.`;
+        endSub.textContent = "완벽합니다. 모든 어휘를 정확하게 맞혔습니다.";
+      } else {
+        endTitle.textContent = `${playerName} 님, 게임 종료`;
+        if (reason === "시간 종료") {
+          endSub.textContent = "3초 안에 고르지 못해 게임이 종료되었습니다.";
+        } else if (reason === "오답") {
+          endSub.textContent = "틀린 뜻을 선택하여 게임이 종료되었습니다.";
+        } else {
+          endSub.textContent = "다시 도전해 보세요.";
+        }
+      }
+
+      scoreBox.innerHTML = `
+        학생 이름: ${playerName}<br>
+        맞힌 개수: ${score} / ${gameWords.length}<br>
+        마지막 결과: ${isSuccess ? "전체 정답" : reason}<br>
+        학습 범위: 수특라이트 5강 1번 어휘
+      `;
+    }
+
+    function resetToStart() {
+      clearTimer();
+      gameEnded = true;
+      gameScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+      studentNameInput.focus();
+    }
+
+    startBtn.addEventListener("click", startGame);
+    restartBtn.addEventListener("click", resetToStart);
+
+    studentNameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") startGame();
+    });
+
+    window.addEventListener("beforeunload", () => clearTimer());
+  </script>
+</body>
+</html>
