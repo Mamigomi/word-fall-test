@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>수특라이트 5-1-1 어휘 게임</title>
+
+<style>
+body {
+  margin:0;
+  font-family: "Noto Sans KR", sans-serif;
+  background: linear-gradient(#bde0ff, #7bc96f);
+}
+
+.app { max-width:900px; margin:auto; padding:15px; }
+
+.card {
+  background:white;
+  border-radius:20px;
+  padding:15px;
+  margin-bottom:10px;
+  text-align:center;
+}
+
+.hidden { display:none; }
+
+input {
+  padding:12px;
+  width:70%;
+  font-size:16px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+button {
+  padding:12px 18px;
+  border:none;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.mole {
+  background:#8b5a2b;
+  color:white;
+  border-radius:15px;
+  padding:12px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.mole.correct { background:green; }
+.mole.wrong { background:red; }
+
+.grid {
+  display:grid;
+  grid-template-columns: repeat(4,1fr);
+  gap:10px;
+}
+
+.timer-bar {
+  height:10px;
+  background:red;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<div id="start" class="card">
+<h2>수특라이트 5-1-1</h2>
+<input id="name" placeholder="이름 입력">
+<br><br>
+<button onclick="startGame()">START</button>
+</div>
+
+<div id="game" class="hidden">
+
+<div class="card">
+<span id="player"></span> |
+<span id="score"></span>
+</div>
+
+<div class="card">
+<h2 id="question"></h2>
+<div id="timer"></div>
+</div>
+
+<div class="card grid" id="choices"></div>
+
+</div>
+
+<div id="end" class="hidden card"></div>
+
+</div>
+
+<script>
+
+const ROUND_TIME = 5;
+
+const words = [
+{english:"laboratory",korean:"실험실"},
+{english:"lab",korean:"실험실"},
+{english:"artificial",korean:"인공의"},
+{english:"man-made",korean:"인공의"},
+{english:"organism",korean:"생물"},
+{english:"living thing",korean:"생물"},
+{english:"act",korean:"행동하다"},
+{english:"behave",korean:"행동하다"},
+{english:"follow",korean:"따르다"},
+{english:"take",korean:"따르다"},
+{english:"path",korean:"경로"},
+{english:"route",korean:"경로"},
+{english:"season",korean:"계절"},
+{english:"period",korean:"시기"},
+{english:"reason",korean:"이유"},
+{english:"cause",korean:"이유"},
+{english:"determine",korean:"규명하다"},
+{english:"identify",korean:"규명하다"},
+{english:"modeling",korean:"모델링"},
+{english:"simulation",korean:"모델링"},
+{english:"predict",korean:"예측하다"},
+{english:"forecast",korean:"예측하다"},
+{english:"pattern",korean:"패턴"},
+{english:"trend",korean:"패턴"},
+{english:"cause",korean:"원인"},
+{english:"factor",korean:"원인"},
+{english:"essential",korean:"필수적인"},
+{english:"crucial",korean:"필수적인"},
+{english:"field",korean:"현장"},
+{english:"natural setting",korean:"현장"},
+{english:"behavior",korean:"행동"},
+{english:"activity",korean:"행동"}
+];
+
+let name="";
+let shuffled=[];
+let index=0;
+let score=0;
+let timer;
+
+function shuffle(arr){
+  return arr.sort(()=>Math.random()-0.5);
+}
+
+function startGame(){
+  name=document.getElementById("name").value;
+  if(!name){ alert("이름 입력"); return; }
+
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+
+  document.getElementById("player").innerText=name;
+  shuffled=shuffle([...words]);
+  index=0;
+  score=0;
+
+  next();
+}
+
+function next(){
+  if(index>=shuffled.length){
+    end(true);
+    return;
+  }
+
+  let word=shuffled[index];
+  document.getElementById("question").innerText=word.english;
+  document.getElementById("score").innerText="점수: "+score;
+
+  let answers=[word.korean];
+
+  while(answers.length<7){
+    let rand=words[Math.floor(Math.random()*words.length)].korean;
+    if(!answers.includes(rand)) answers.push(rand);
+  }
+
+  answers=shuffle(answers);
+
+  let html="";
+  answers.forEach(a=>{
+    html+=`<div class="mole" onclick="choose('${a}')">${a}</div>`;
+  });
+
+  document.getElementById("choices").innerHTML=html;
+
+  startTimer();
+}
+
+function choose(answer){
+  clearInterval(timer);
+
+  let correct=shuffled[index].korean;
+
+  if(answer===correct){
+    score++;
+    index++;
+    next();
+  } else {
+    end(false);
+  }
+}
+
+function startTimer(){
+  let time=ROUND_TIME;
+  let bar=document.getElementById("timer");
+
+  timer=setInterval(()=>{
+    time-=0.1;
+    bar.style.width=(time/ROUND_TIME*100)+"%";
+
+    if(time<=0){
+      clearInterval(timer);
+      end(false);
+    }
+  },100);
+}
+
+function end(success){
+  document.getElementById("game").classList.add("hidden");
+  let endDiv=document.getElementById("end");
+  endDiv.classList.remove("hidden");
+
+  if(success){
+    endDiv.innerHTML=`축하합니다. ${name} 님 수특라이트 5-1-1 어휘 모두 맞추셨습니다.`;
+  } else {
+    endDiv.innerHTML=`${name} 님 게임 종료<br>점수: ${score}`;
+  }
+}
+
+</script>
+
+</body>
+</html>
