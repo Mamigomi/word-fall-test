@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YBM 김은형 중2 2과 본문 영작 테스트</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, "Malgun Gothic", "맑은 고딕", sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .topbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+    }
+    .topbar div {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .korean-box {
+      background: #eef6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .label {
+      font-size: 14px;
+      color: #2563eb;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .korean-text {
+      font-size: 24px;
+      line-height: 1.7;
+      font-weight: 700;
+      white-space: pre-line;
+    }
+    .answer-area {
+      min-height: 84px;
+      border: 2px dashed #94a3b8;
+      border-radius: 16px;
+      padding: 14px;
+      background: #f8fafc;
+      margin-bottom: 18px;
+    }
+    .answer-placeholder {
+      color: #94a3b8;
+      font-size: 16px;
+    }
+    .word-bank {
+      min-height: 110px;
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 14px;
+      background: #ffffff;
+      margin-bottom: 18px;
+    }
+    .word {
+      display: inline-block;
+      margin: 6px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #e0ecff;
+      border: 1px solid #93c5fd;
+      cursor: pointer;
+      user-select: none;
+      font-size: 18px;
+      font-weight: 700;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+    .word:hover {
+      transform: translateY(-2px);
+      background: #dbeafe;
+    }
+    .word.used {
+      background: #e5e7eb;
+      border-color: #cbd5e1;
+      color: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .selected-word {
+      display: inline-block;
+      margin: 6px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      cursor: pointer;
+      user-select: none;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .check-btn { background: #2563eb; color: white; }
+    .reset-btn { background: #f59e0b; color: white; }
+    .undo-btn  { background: #64748b; color: white; }
+    .next-btn  { background: #10b981; color: white; display: none; }
+
+    .message {
+      min-height: 70px;
+      padding: 16px;
+      border-radius: 14px;
+      line-height: 1.7;
+      font-size: 17px;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      white-space: pre-line;
+    }
+    .success {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }
+    .error {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+    .final-screen {
+      display: none;
+      text-align: center;
+      padding: 34px 20px;
+    }
+    .final-screen h2 {
+      font-size: 36px;
+      margin-bottom: 14px;
+    }
+    .final-screen p {
+      font-size: 20px;
+      line-height: 1.8;
+      margin: 8px 0;
+    }
+    .restart-btn {
+      margin-top: 20px;
+      background: #2563eb;
+      color: white;
+    }
+    .small-note {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 24px; }
+      .korean-text { font-size: 20px; }
+      .word, .selected-word { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>YBM 김은형 중2 2과 본문 영작 테스트</h1>
+      <div class="subtitle">
+        한국어를 보고, 흩어진 영어 단어를 정확한 어순으로 배열하세요.<br>
+        오답이면 정답을 보여준 뒤 같은 문장이 3번 더 반복됩니다.
+      </div>
+
+      <div id="gameArea">
+        <div class="topbar">
+          <div id="progressText">문제 1 / 0</div>
+          <div id="wrongText">오답 수: 0</div>
+          <div id="repeatText">반복학습 대기 문장: 0</div>
+        </div>
+
+        <div class="korean-box">
+          <div class="label">한국어</div>
+          <div id="koreanText" class="korean-text"></div>
+        </div>
+
+        <div class="label">내가 만든 영어 문장</div>
+        <div id="answerArea" class="answer-area">
+          <span class="answer-placeholder">아래 단어를 눌러 문장을 완성하세요.</span>
+        </div>
+
+        <div class="label">흩어진 영어 단어</div>
+        <div id="wordBank" class="word-bank"></div>
+
+        <div class="btn-row">
+          <button class="check-btn" onclick="checkAnswer()">정답 확인</button>
+          <button class="undo-btn" onclick="undoLast()">한 단어 지우기</button>
+          <button class="reset-btn" onclick="resetCurrentAnswer()">전체 지우기</button>
+          <button id="nextBtn" class="next-btn" onclick="goNext()">다음 문제</button>
+        </div>
+
+        <div id="message" class="message">문장을 완성한 뒤 정답 확인을 누르세요.</div>
+        <div class="small-note">선택한 단어를 다시 누르면 그 단어는 답안에서 제거됩니다.</div>
+      </div>
+
+      <div id="finalScreen" class="final-screen">
+        <h2 id="finalTitle"></h2>
+        <p id="finalSummary"></p>
+        <p id="finalExtra"></p>
+        <button class="restart-btn" onclick="restartGame()">처음부터 다시 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const originalData = [
+      { en: "Join Our Food Diary Project", ko: "우리의 식사 일기 프로젝트에 참여하세요" },
+      { en: "Hello, my awesome classmates!", ko: "안녕하세요, 우리 반 멋진 친구들!" },
+      { en: "Since last week, our school has introduced a Food Diary Project.", ko: "지난주부터 우리 학교에서 식사 일기 프로젝트를 도입하여 시행해 오고 있어요." },
+      { en: "Our slogan?", ko: "우리의 슬로건은?" },
+      { en: "Low sugar, low salt, and low fat.", ko: "저당, 저염, 저지방." },
+      { en: "Do you want to join this project?", ko: "이 프로젝트에 참여하고 싶나요?" },
+      { en: "Follow these steps.", ko: "다음 단계를 따라보세요." },
+      { en: "Choose healthy foods for your meals, take photos, and share them with us.", ko: "식사로 건강한 음식을 고르고, 사진을 찍어서 우리와 공유해 주세요." },
+      { en: "Don't forget to leave friendly comments on your friends' posts.", ko: "그리고 친구들의 게시물에 따뜻한 댓글 남기는 것도 잊지 마세요." },
+      { en: "Ready to join?", ko: "참여할 준비됐나요?" },
+      { en: "Have fun sharing!", ko: "즐겁게 공유하세요!" },
+
+      { en: "Sugar Free_Maya", ko: "무가당_Maya" },
+      { en: "After a soccer game, I wanted to drink a cold soft drink.", ko: "축구 경기를 마친 후, 차가운 탄산음료를 마시고 싶었어요." },
+      { en: "But when I checked the ingredients, I realized that it has about 10 teaspoons of sugar.", ko: "하지만 재료를 확인해 보니 탄산음료에는 약 10티스푼의 설탕이 들어 있다는 것을 알게 되었어요." },
+      { en: "So, I decided to choose a cold herbal tea instead.", ko: "그래서 대신 차가운 허브차를 마시기로 했어요." },
+      { en: "It has far less sugar than a soft drink.", ko: "허브차는 탄산음료보다 설탕이 훨씬 적어요." },
+      { en: "I felt a lot healthier with the tea.", ko: "차 덕분에 훨씬 건강해진 느낌이었어요." },
+      { en: "Wow, 10 teaspoons of sugar in a soft drink?", ko: "와, 탄산음료 하나에 설탕이 10티스푼이나 들어 있다고?" },
+      { en: "Thanks for sharing this!", ko: "공유해 줘서 고마워!" },
+      { en: "I've never tried herbal tea after an exercise!", ko: "나는 운동 후에 허브차를 마셔 본 적은 없어!" },
+      { en: "I'll give it a try next time.", ko: "다음에 한번 시도해 볼게." },
+
+      { en: "Salt Checker_Eunho", ko: "염분 측정기_은호" },
+      { en: "This afternoon, my friends and I had malatang.", ko: "오늘 오후, 친구들과 저는 마라탕을 먹었어요." },
+      { en: "I thought it was a good choice because it had meat, vegetables, and noodles.", ko: "고기, 채소, 국수가 들어 있어서 좋은 선택인 줄 알았죠." },
+      { en: "But when I got home, I felt really thirsty.", ko: "하지만 집에 가서 너무 목이 말랐어요." },
+      { en: "I drank a lot of water, but it didn't help.", ko: "물을 많이 마셨는데도 도움이 되지 않았어요." },
+      { en: "I think malatang was too salty for me.", ko: "마라탕이 저한테는 너무 짰던 것 같아요." },
+      { en: "I've decided to eat less salty foods from now on.", ko: "이제부터 짠 음식을 덜 먹기로 결심했어요." },
+      { en: "You know what?", ko: "그거 알아?" },
+      { en: "Bananas can reduce the negative effects of salt in your body!", ko: "바나나가 체내 염분의 부정적인 영향을 줄여 준대!" },
+      { en: "That's a great tip!", ko: "정말 좋은 팁이네!" },
+      { en: "I'll remember that!", ko: "기억할게!" },
+
+      { en: "Healthy Fat Finder_Yura", ko: "건강한 지방 탐지기_유라" },
+      { en: "On my way home, I was really hungry and wanted a snack.", ko: "집에 가는 길에 정말 배가 고프고 간식이 먹고 싶었어요." },
+      { en: "The potato chips at the convenience store looked delicious.", ko: "편의점의 감자칩이 맛있어 보였죠." },
+      { en: "But I've learned that they have a lot of unhealthy fats.", ko: "하지만 거기에는 건강에 나쁜 지방이 많다는 걸 배웠어요." },
+      { en: "So, I chose nuts instead.", ko: "그래서 대신 견과류를 선택했어요." },
+      { en: "Nuts are full of healthy fats, vitamins, and minerals.", ko: "견과류에는 건강한 지방, 비타민, 무기질이 가득해요." },
+      { en: "They're much better than chips for the body.", ko: "감자칩보다 몸에 훨씬 더 좋아요." },
+      { en: "I've learned about healthy fats in class, too.", ko: "나도 수업에서 건강한 지방에 대해 배웠어." },
+      { en: "Great choice!", ko: "좋은 선택이네!" },
+      { en: "Nuts are good, but be careful!", ko: "견과류는 좋은 선택이지만, 조심해!" },
+      { en: "Eating too many nuts can cause stomach problems.", ko: "견과류를 너무 많이 먹으면 배탈이 날 수 있대." }
+    ];
+
+    let gameQueue = [];
+    let currentIndex = 0;
+    let selectedWords = [];
+    let currentShuffledWords = [];
+    let totalWrong = 0;
+    let solvedCount = 0;
+    let locked = false;
+
+    const progressText = document.getElementById("progressText");
+    const wrongText = document.getElementById("wrongText");
+    const repeatText = document.getElementById("repeatText");
+    const koreanText = document.getElementById("koreanText");
+    const answerArea = document.getElementById("answerArea");
+    const wordBank = document.getElementById("wordBank");
+    const message = document.getElementById("message");
+    const nextBtn = document.getElementById("nextBtn");
+    const gameArea = document.getElementById("gameArea");
+    const finalScreen = document.getElementById("finalScreen");
+    const finalTitle = document.getElementById("finalTitle");
+    const finalSummary = document.getElementById("finalSummary");
+    const finalExtra = document.getElementById("finalExtra");
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+
+      const joinedOriginal = array.join(" ");
+      const joinedShuffled = arr.join(" ");
+      if (joinedOriginal === joinedShuffled && arr.length > 1) {
+        [arr[0], arr[1]] = [arr[1], arr[0]];
+      }
+      return arr;
+    }
+
+    function tokenize(sentence) {
+      return sentence.split(" ");
+    }
+
+    function initializeGame() {
+      gameQueue = originalData.map(item => ({
+        ...item,
+        repeatLeft: 0,
+        fromWrong: false
+      }));
+      currentIndex = 0;
+      selectedWords = [];
+      totalWrong = 0;
+      solvedCount = 0;
+      locked = false;
+      gameArea.style.display = "block";
+      finalScreen.style.display = "none";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentIndex >= gameQueue.length) {
+        finishGame();
+        return;
+      }
+
+      locked = false;
+      nextBtn.style.display = "none";
+      selectedWords = [];
+
+      const current = gameQueue[currentIndex];
+      koreanText.textContent = current.ko;
+      currentShuffledWords = shuffle(tokenize(current.en));
+
+      renderAnswerArea();
+      renderWordBank();
+
+      progressText.textContent = `문제 ${currentIndex + 1} / ${gameQueue.length}`;
+      wrongText.textContent = `오답 수: ${totalWrong}`;
+
+      const remainingRepeats = gameQueue.slice(currentIndex).filter(item => item.fromWrong).length;
+      repeatText.textContent = `반복학습 대기 문장: ${remainingRepeats}`;
+
+      message.className = "message";
+      message.textContent = current.fromWrong
+        ? "반복학습 문장입니다. 이번에는 정확한 어순으로 배열해 보세요."
+        : "문장을 완성한 뒤 정답 확인을 누르세요.";
+    }
+
+    function renderAnswerArea() {
+      answerArea.innerHTML = "";
+      if (selectedWords.length === 0) {
+        const placeholder = document.createElement("span");
+        placeholder.className = "answer-placeholder";
+        placeholder.textContent = "아래 단어를 눌러 문장을 완성하세요.";
+        answerArea.appendChild(placeholder);
+        return;
+      }
+
+      selectedWords.forEach((word, index) => {
+        const span = document.createElement("span");
+        span.className = "selected-word";
+        span.textContent = word;
+        span.title = "클릭하면 제거됩니다";
+        span.onclick = () => removeSelectedWord(index);
+        answerArea.appendChild(span);
+      });
+    }
+
+    function renderWordBank() {
+      wordBank.innerHTML = "";
+      currentShuffledWords.forEach((word, index) => {
+        const span = document.createElement("span");
+        span.className = "word";
+        span.textContent = word;
+
+        const usedIndexes = getUsedOriginalIndexes();
+        if (usedIndexes.includes(index) || locked) {
+          span.classList.add("used");
+        } else {
+          span.onclick = () => addWord(index);
+        }
+        wordBank.appendChild(span);
+      });
+    }
+
+    function getUsedOriginalIndexes() {
+      const used = [];
+      const tempSelected = [...selectedWords];
+
+      currentShuffledWords.forEach((word, index) => {
+        const findIndex = tempSelected.indexOf(word);
+        if (findIndex !== -1) {
+          used.push(index);
+          tempSelected.splice(findIndex, 1);
+        }
+      });
+      return used;
+    }
+
+    function addWord(index) {
+      if (locked) return;
+
+      const usedIndexes = getUsedOriginalIndexes();
+      if (usedIndexes.includes(index)) return;
+
+      selectedWords.push(currentShuffledWords[index]);
+      renderAnswerArea();
+      renderWordBank();
+    }
+
+    function removeSelectedWord(selectedIndex) {
+      if (locked) return;
+      selectedWords.splice(selectedIndex, 1);
+      renderAnswerArea();
+      renderWordBank();
+    }
+
+    function undoLast() {
+      if (locked) return;
+      if (selectedWords.length > 0) {
+        selectedWords.pop();
+        renderAnswerArea();
+        renderWordBank();
+      }
+    }
+
+    function resetCurrentAnswer() {
+      if (locked) return;
+      selectedWords = [];
+      renderAnswerArea();
+      renderWordBank();
+    }
+
+    function normalizeQuotes(text) {
+      return text
+        .replace(/’/g, "'")
+        .replace(/‘/g, "'")
+        .replace(/“/g, '"')
+        .replace(/”/g, '"')
+        .trim();
+    }
+
+    function checkAnswer() {
+      if (locked) return;
+
+      const current = gameQueue[currentIndex];
+      const userAnswer = normalizeQuotes(selectedWords.join(" "));
+      const correctAnswer = normalizeQuotes(current.en);
+
+      if (userAnswer === correctAnswer) {
+        locked = true;
+        solvedCount++;
+        message.className = "message success";
+        message.textContent = "정답입니다.";
+        nextBtn.style.display = "inline-block";
+        renderWordBank();
+      } else {
+        locked = true;
+        totalWrong++;
+        wrongText.textContent = `오답 수: ${totalWrong}`;
+
+        const repeatItems = [];
+        for (let i = 0; i < 3; i++) {
+          repeatItems.push({
+            en: current.en,
+            ko: current.ko,
+            repeatLeft: 0,
+            fromWrong: true
+          });
+        }
+        gameQueue.push(...repeatItems);
+
+        const remainingRepeats = gameQueue.slice(currentIndex + 1).filter(item => item.fromWrong).length;
+        repeatText.textContent = `반복학습 대기 문장: ${remainingRepeats}`;
+
+        message.className = "message error";
+        message.textContent =
+          `오답입니다.\n\n정답: ${current.en}\n\n이 문장은 반복학습을 위해 뒤에 3번 더 나옵니다.`;
+
+        nextBtn.style.display = "inline-block";
+        renderWordBank();
+      }
+    }
+
+    function goNext() {
+      currentIndex++;
+      loadQuestion();
+    }
+
+    function finishGame() {
+      gameArea.style.display = "none";
+      finalScreen.style.display = "block";
+
+      if (totalWrong === 0) {
+        finalTitle.textContent = "합격입니다";
+        finalSummary.textContent = `총 ${originalData.length}문제를 모두 맞혔습니다.`;
+        finalExtra.textContent = "오답 없이 완주했습니다.";
+      } else {
+        finalTitle.textContent = "학습 완료";
+        finalSummary.textContent = `전체 학습이 끝났습니다. 오답 수는 ${totalWrong}개입니다.`;
+        finalExtra.textContent = "오답 문장은 자동으로 3번씩 반복되어 복습되었습니다.";
+      }
+    }
+
+    function restartGame() {
+      initializeGame();
+    }
+
+    initializeGame();
+  </script>
+</body>
+</html>
