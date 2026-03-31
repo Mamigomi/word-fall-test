@@ -1,0 +1,552 @@
+<!--
+파일명 예시:
+donga-yoonjeongmi-3-vocab-sentence-test.html
+
+제목 포함:
+동아윤정미 3과 어휘 속 문장 테스트
+-->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>동아윤정미 3과 어휘 속 문장 테스트</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, "Malgun Gothic", "맑은 고딕", sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .topbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+    }
+    .topbar div {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .korean-box {
+      background: #eef6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .label {
+      font-size: 14px;
+      color: #2563eb;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .korean-text {
+      font-size: 24px;
+      line-height: 1.7;
+      font-weight: 700;
+    }
+    .answer-area {
+      min-height: 84px;
+      border: 2px dashed #94a3b8;
+      border-radius: 16px;
+      padding: 14px;
+      background: #f8fafc;
+      margin-bottom: 18px;
+    }
+    .answer-placeholder {
+      color: #94a3b8;
+      font-size: 16px;
+    }
+    .word-bank {
+      min-height: 110px;
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 14px;
+      background: #ffffff;
+      margin-bottom: 18px;
+    }
+    .word {
+      display: inline-block;
+      margin: 6px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #e0ecff;
+      border: 1px solid #93c5fd;
+      cursor: pointer;
+      user-select: none;
+      font-size: 18px;
+      font-weight: 700;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+    .word:hover {
+      transform: translateY(-2px);
+      background: #dbeafe;
+    }
+    .word.used {
+      background: #e5e7eb;
+      border-color: #cbd5e1;
+      color: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .selected-word {
+      display: inline-block;
+      margin: 6px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      cursor: pointer;
+      user-select: none;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .check-btn { background: #2563eb; color: white; }
+    .reset-btn { background: #f59e0b; color: white; }
+    .undo-btn  { background: #64748b; color: white; }
+    .next-btn  { background: #10b981; color: white; display: none; }
+
+    .message {
+      min-height: 70px;
+      padding: 16px;
+      border-radius: 14px;
+      line-height: 1.7;
+      font-size: 17px;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      white-space: pre-line;
+    }
+    .success {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }
+    .error {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+    .final-screen {
+      display: none;
+      text-align: center;
+      padding: 34px 20px;
+    }
+    .final-screen h2 {
+      font-size: 36px;
+      margin-bottom: 14px;
+    }
+    .final-screen p {
+      font-size: 20px;
+      line-height: 1.8;
+      margin: 8px 0;
+    }
+    .restart-btn {
+      margin-top: 20px;
+      background: #2563eb;
+      color: white;
+    }
+    .small-note {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 24px; }
+      .korean-text { font-size: 20px; }
+      .word, .selected-word { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>동아윤정미 3과 어휘 속 문장 테스트</h1>
+      <div class="subtitle">
+        한국어를 보고, 흩어진 영어 단어를 정확한 어순으로 배열하세요.<br>
+        오답이면 정답을 보여준 뒤 같은 문장이 3번 더 반복됩니다.
+      </div>
+
+      <div id="gameArea">
+        <div class="topbar">
+          <div id="progressText">문제 1 / 0</div>
+          <div id="wrongText">오답 수: 0</div>
+          <div id="repeatText">반복학습 대기 문장: 0</div>
+        </div>
+
+        <div class="korean-box">
+          <div class="label">한국어</div>
+          <div id="koreanText" class="korean-text"></div>
+        </div>
+
+        <div class="label">내가 만든 영어 문장</div>
+        <div id="answerArea" class="answer-area">
+          <span class="answer-placeholder">아래 단어를 눌러 문장을 완성하세요.</span>
+        </div>
+
+        <div class="label">흩어진 영어 단어</div>
+        <div id="wordBank" class="word-bank"></div>
+
+        <div class="btn-row">
+          <button class="check-btn" onclick="checkAnswer()">정답 확인</button>
+          <button class="undo-btn" onclick="undoLast()">한 단어 지우기</button>
+          <button class="reset-btn" onclick="resetCurrentAnswer()">전체 지우기</button>
+          <button id="nextBtn" class="next-btn" onclick="goNext()">다음 문제</button>
+        </div>
+
+        <div id="message" class="message">문장을 완성한 뒤 정답 확인을 누르세요.</div>
+        <div class="small-note">선택한 단어를 다시 누르면 그 단어는 답안에서 제거됩니다.</div>
+      </div>
+
+      <div id="finalScreen" class="final-screen">
+        <h2 id="finalTitle"></h2>
+        <p id="finalSummary"></p>
+        <p id="finalExtra"></p>
+        <button class="restart-btn" onclick="restartGame()">처음부터 다시 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const originalData = [
+      { en: "He looks worried about something.", ko: "그는 뭔가를 걱정하는 것처럼 보여." },
+      { en: "You should make a spending plan.", ko: "너는 소비 계획을 세워야 해." },
+      { en: "We're excited about the new game.", ko: "우리는 새 게임에 신이 나." },
+      { en: "My robot is not working now.", ko: "나의 로봇이 지금 작동하지 않는다." },
+      { en: "I’m upset about my test results.", ko: "나는 시험 결과 때문에 속상하다." },
+      { en: "Our team won the first game.", ko: "우리 팀이 첫 번째 게임을 이겼다." },
+      { en: "I’m not feeling well today.", ko: "나는 오늘 몸이 안 좋아." },
+      { en: "No one is working on the problem.", ko: "아무도 그 문제에 대해 노력하지 않는다." },
+      { en: "The local fair had many fun activities.", ko: "지역 박람회는 재미있는 많은 활동들이 있었다." },
+      { en: "He did his best during difficult times.", ko: "그는 어려운 시기에 최선을 다했다." },
+      { en: "Gyesoo and I talk a lot during lunch.", ko: "계수와 나는 점심시간에 많이 얘기한다." },
+      { en: "They live a green lifestyle.", ko: "그들은 환경을 생각하는 삶을 산다." },
+      { en: "She is always positive.", ko: "그녀는 항상 긍정적이다." },
+      { en: "His attitude towards life changed.", ko: "그의 삶에 대한 태도가 바뀌었다." },
+      { en: "The result of the game is 2-0.", ko: "경기의 결과는 2대 0이다." },
+      { en: "Our school holds a concert every year.", ko: "우리 학교는 매년 음악회를 연다." },
+      { en: "Will you enter the singing contest?", ko: "너는 노래 대회에 참가할 거야?" },
+      { en: "They entered the race.", ko: "그들은 경주에 참가했다." },
+      { en: "The service at the restaurant was terrible.", ko: "그 식당의 서비스는 형편없었다." },
+      { en: "I am interested in science and math.", ko: "나는 과학과 수학에 관심이 있다." },
+      { en: "A strange thing happened this morning.", ko: "오늘 아침에 이상한 일이 일어났다." },
+      { en: "Answer the following question.", ko: "다음에 나오는 질문에 대답하시오." },
+      { en: "She has a different opinion on this topic.", ko: "그녀는 이 주제에 대해 다른 의견이 있다." },
+      { en: "The situation is getting better.", ko: "상황이 나아지고 있다." },
+      { en: "She has good teammates.", ko: "그녀는 좋은 팀원이 있다." },
+      { en: "She practices piano for two hours every day.", ko: "그녀는 매일 두 시간동안 피아노를 연습한다." },
+      { en: "We learn from mistakes.", ko: "우리는 실수로부터 배운다." },
+      { en: "She felt hopeless after the exam.", ko: "그녀는 시험 후에 가망 없음을 느꼈다." },
+      { en: "I saw John at the store today, by the way.", ko: "그런데, 오늘 가게에서 John을 봤어요." },
+      { en: "I texted my mom about dinner plans.", ko: "나는 저녁 식사 계획에 대해 엄마에게 문자 메시지를 보냈다." },
+      { en: "You won’t get anywhere in life without hard work.", ko: "너는 노력 없이 인생에서 진전을 이루지 못할 것이다." },
+      { en: "Don’t waste water.", ko: "물을 낭비하지 마세요." },
+      { en: "The accident was his fault.", ko: "그 사고는 그의 잘못이다." },
+      { en: "He quit his bad habits.", ko: "그는 나쁜 습관들을 그만두었다." },
+      { en: "They were unhappy with their room.", ko: "그들은 자신들의 방이 불만족스러웠다." },
+      { en: "She finally passed the exam.", ko: "그녀는 마침내 시험에 합격했다." },
+      { en: "He studied hard for the final exam.", ko: "그는 기말 시험을 위해 열심히 공부했다." },
+      { en: "Cheer up! Everything will be okay.", ko: "기운 내! 모든 것이 괜찮아질 거야." },
+      { en: "Parents often worry about their children.", ko: "부모는 그들의 자녀에 대해 자주 걱정한다." },
+      { en: "The concert is over, but it was amazing!", ko: "콘서트가 끝났지만, 정말 멋졌어!" },
+      { en: "She won a gold medal in the Olympics.", ko: "그녀는 올림픽에서 금메달을 땄다." },
+      { en: "She won a prize in the drawing contest.", ko: "그녀는 그리기 대회에서 상을 받았다." },
+      { en: "She worked hard and finally made it.", ko: "그녀는 열심히 일했고 마침내 해냈다." },
+      { en: "I finished my homework before bed.", ko: "나는 자기 전에 내 숙제를 끝냈다." }
+    ];
+
+    let gameQueue = [];
+    let currentIndex = 0;
+    let selectedWords = [];
+    let currentShuffledWords = [];
+    let totalWrong = 0;
+    let solvedCount = 0;
+    let locked = false;
+
+    const progressText = document.getElementById("progressText");
+    const wrongText = document.getElementById("wrongText");
+    const repeatText = document.getElementById("repeatText");
+    const koreanText = document.getElementById("koreanText");
+    const answerArea = document.getElementById("answerArea");
+    const wordBank = document.getElementById("wordBank");
+    const message = document.getElementById("message");
+    const nextBtn = document.getElementById("nextBtn");
+    const gameArea = document.getElementById("gameArea");
+    const finalScreen = document.getElementById("finalScreen");
+    const finalTitle = document.getElementById("finalTitle");
+    const finalSummary = document.getElementById("finalSummary");
+    const finalExtra = document.getElementById("finalExtra");
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+
+      const joinedOriginal = array.join(" ");
+      const joinedShuffled = arr.join(" ");
+      if (joinedOriginal === joinedShuffled && arr.length > 1) {
+        [arr[0], arr[1]] = [arr[1], arr[0]];
+      }
+      return arr;
+    }
+
+    function tokenize(sentence) {
+      return sentence.split(" ");
+    }
+
+    function initializeGame() {
+      gameQueue = originalData.map(item => ({
+        ...item,
+        repeatLeft: 0,
+        fromWrong: false
+      }));
+      currentIndex = 0;
+      selectedWords = [];
+      totalWrong = 0;
+      solvedCount = 0;
+      locked = false;
+      gameArea.style.display = "block";
+      finalScreen.style.display = "none";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentIndex >= gameQueue.length) {
+        finishGame();
+        return;
+      }
+
+      locked = false;
+      nextBtn.style.display = "none";
+      selectedWords = [];
+
+      const current = gameQueue[currentIndex];
+      koreanText.textContent = current.ko;
+      currentShuffledWords = shuffle(tokenize(current.en));
+
+      renderAnswerArea();
+      renderWordBank();
+
+      progressText.textContent = `문제 ${currentIndex + 1} / ${gameQueue.length}`;
+      wrongText.textContent = `오답 수: ${totalWrong}`;
+
+      const remainingRepeats = gameQueue.slice(currentIndex).filter(item => item.fromWrong).length;
+      repeatText.textContent = `반복학습 대기 문장: ${remainingRepeats}`;
+
+      message.className = "message";
+      message.textContent = current.fromWrong
+        ? "반복학습 문장입니다. 이번에는 정확한 어순으로 배열해 보세요."
+        : "문장을 완성한 뒤 정답 확인을 누르세요.";
+    }
+
+    function renderAnswerArea() {
+      answerArea.innerHTML = "";
+      if (selectedWords.length === 0) {
+        const placeholder = document.createElement("span");
+        placeholder.className = "answer-placeholder";
+        placeholder.textContent = "아래 단어를 눌러 문장을 완성하세요.";
+        answerArea.appendChild(placeholder);
+        return;
+      }
+
+      selectedWords.forEach((word, index) => {
+        const span = document.createElement("span");
+        span.className = "selected-word";
+        span.textContent = word;
+        span.title = "클릭하면 제거됩니다";
+        span.onclick = () => removeSelectedWord(index);
+        answerArea.appendChild(span);
+      });
+    }
+
+    function renderWordBank() {
+      wordBank.innerHTML = "";
+      currentShuffledWords.forEach((word, index) => {
+        const span = document.createElement("span");
+        span.className = "word";
+        span.textContent = word;
+
+        const usedIndexes = getUsedOriginalIndexes();
+        if (usedIndexes.includes(index) || locked) {
+          span.classList.add("used");
+        } else {
+          span.onclick = () => addWord(index);
+        }
+        wordBank.appendChild(span);
+      });
+    }
+
+    function getUsedOriginalIndexes() {
+      const used = [];
+      const tempSelected = [...selectedWords];
+
+      currentShuffledWords.forEach((word, index) => {
+        const findIndex = tempSelected.indexOf(word);
+        if (findIndex !== -1) {
+          used.push(index);
+          tempSelected.splice(findIndex, 1);
+        }
+      });
+      return used;
+    }
+
+    function addWord(index) {
+      if (locked) return;
+
+      const usedIndexes = getUsedOriginalIndexes();
+      if (usedIndexes.includes(index)) return;
+
+      selectedWords.push(currentShuffledWords[index]);
+      renderAnswerArea();
+      renderWordBank();
+    }
+
+    function removeSelectedWord(selectedIndex) {
+      if (locked) return;
+      selectedWords.splice(selectedIndex, 1);
+      renderAnswerArea();
+      renderWordBank();
+    }
+
+    function undoLast() {
+      if (locked) return;
+      if (selectedWords.length > 0) {
+        selectedWords.pop();
+        renderAnswerArea();
+        renderWordBank();
+      }
+    }
+
+    function resetCurrentAnswer() {
+      if (locked) return;
+      selectedWords = [];
+      renderAnswerArea();
+      renderWordBank();
+    }
+
+    function normalizeQuotes(text) {
+      return text
+        .replace(/’/g, "'")
+        .replace(/‘/g, "'")
+        .replace(/“/g, '"')
+        .replace(/”/g, '"')
+        .trim();
+    }
+
+    function checkAnswer() {
+      if (locked) return;
+
+      const current = gameQueue[currentIndex];
+      const userAnswer = normalizeQuotes(selectedWords.join(" "));
+      const correctAnswer = normalizeQuotes(current.en);
+
+      if (userAnswer === correctAnswer) {
+        locked = true;
+        solvedCount++;
+        message.className = "message success";
+        message.textContent = "정답입니다.";
+        nextBtn.style.display = "inline-block";
+        renderWordBank();
+      } else {
+        locked = true;
+        totalWrong++;
+        wrongText.textContent = `오답 수: ${totalWrong}`;
+
+        const repeatItems = [];
+        for (let i = 0; i < 3; i++) {
+          repeatItems.push({
+            en: current.en,
+            ko: current.ko,
+            repeatLeft: 0,
+            fromWrong: true
+          });
+        }
+        gameQueue.push(...repeatItems);
+
+        const remainingRepeats = gameQueue.slice(currentIndex + 1).filter(item => item.fromWrong).length;
+        repeatText.textContent = `반복학습 대기 문장: ${remainingRepeats}`;
+
+        message.className = "message error";
+        message.textContent =
+          `오답입니다.\n\n정답: ${current.en}\n\n이 문장은 반복학습을 위해 뒤에 3번 더 나옵니다.`;
+
+        nextBtn.style.display = "inline-block";
+        renderWordBank();
+      }
+    }
+
+    function goNext() {
+      currentIndex++;
+      loadQuestion();
+    }
+
+    function finishGame() {
+      gameArea.style.display = "none";
+      finalScreen.style.display = "block";
+
+      if (totalWrong === 0) {
+        finalTitle.textContent = "합격입니다";
+        finalSummary.textContent = `총 ${originalData.length}문제를 모두 맞혔습니다.`;
+        finalExtra.textContent = "오답 없이 완주했습니다.";
+      } else {
+        finalTitle.textContent = "학습 완료";
+        finalSummary.textContent = `전체 학습이 끝났습니다. 오답 수는 ${totalWrong}개입니다.`;
+        finalExtra.textContent = "오답 문장은 자동으로 3번씩 반복되어 복습되었습니다.";
+      }
+    }
+
+    function restartGame() {
+      initializeGame();
+    }
+
+    initializeGame();
+  </script>
+</body>
+</html>
