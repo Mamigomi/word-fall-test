@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>능률보카 수능 고난도 Day 6 어휘 테스트</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action:manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px;
+    right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    top:0;
+  }
+  .choice.good{
+    background:#065f46;
+    border-color:rgba(94,234,212,.35);
+  }
+  .choice.bad{
+    background:#7f1d1d;
+    border-color:rgba(251,113,133,.55);
+  }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <div id="english">능률보카 수능 고난도 Day 6 어휘 테스트</div>
+    <div id="progress"></div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">능률보카 수능 고난도 Day 6 어휘 테스트</h2>
+        <p id="ovText">
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const words = [
+  { en:"reference", ko:"언급, 참조, 추천서" },
+  { en:"range", ko:"범위" },
+  { en:"applaud", ko:"박수치다, 칭찬하다" },
+  { en:"exert", ko:"(힘·능력) 쓰다" },
+  { en:"mutual", ko:"상호 간의" },
+  { en:"cuisine", ko:"요리" },
+  { en:"astronomy", ko:"천문학" },
+  { en:"interact", ko:"상호작용하다" },
+  { en:"universal", ko:"보편적인" },
+  { en:"acquaintance", ko:"지인" },
+  { en:"variation", ko:"변화, 차이" },
+  { en:"toll", ko:"통행료, 사상자 수" },
+  { en:"dedicate", ko:"바치다, 헌신하다" },
+  { en:"associate", ko:"연상하다, 관련짓다" },
+  { en:"withdraw", ko:"철수하다, 인출하다" },
+  { en:"equity", ko:"공평, 공정" },
+  { en:"humiliate", ko:"굴욕감을 주다" },
+  { en:"extraordinary", ko:"비범한" },
+  { en:"document", ko:"문서, 기록하다" },
+  { en:"barrier", ko:"장벽" },
+  { en:"canal", ko:"운하" },
+  { en:"license", ko:"면허, 허가하다" },
+  { en:"craft", ko:"공예, 기술" },
+  { en:"intrude", ko:"침입하다, 방해하다" },
+  { en:"authentic", ko:"진짜의, 정통의" },
+  { en:"mutation", ko:"돌연변이" },
+  { en:"wander", ko:"돌아다니다" },
+  { en:"literary", ko:"문학의" },
+  { en:"expand", ko:"확장하다" },
+  { en:"expend", ko:"소비하다" },
+  { en:"capitalism", ko:"자본주의" },
+  { en:"call forth", ko:"불러일으키다" },
+  { en:"get by", ko:"그럭저럭 살다" },
+  { en:"bring over", ko:"가져오다" },
+  { en:"look down on", ko:"업신여기다" },
+  { en:"refer", ko:"언급하다" },
+  { en:"applause", ko:"박수" },
+  { en:"exertion", ko:"노력" },
+  { en:"mutually", ko:"서로" },
+  { en:"astronomer", ko:"천문학자" },
+  { en:"astronomical", ko:"천문학적인" },
+  { en:"interaction", ko:"상호작용" },
+  { en:"interactive", ko:"상호작용의" },
+  { en:"universally", ko:"보편적으로" },
+  { en:"universality", ko:"보편성" },
+  { en:"acquainted", ko:"알고 있는" },
+  { en:"vary", ko:"바꾸다" },
+  { en:"variance", ko:"변동" },
+  { en:"take a toll on", ko:"피해를 주다" },
+  { en:"dedicated", ko:"헌신적인" },
+  { en:"dedication", ko:"헌신" },
+  { en:"association", ko:"연관" },
+  { en:"withdrawal", ko:"철수, 인출" },
+  { en:"equitable", ko:"공정한" },
+  { en:"humiliation", ko:"굴욕" },
+  { en:"humiliating", ko:"굴욕적인" },
+  { en:"documentary", ko:"다큐멘터리" },
+  { en:"documentation", ko:"기록" },
+  { en:"licensed", ko:"허가된" },
+  { en:"crafty", ko:"교활한" },
+  { en:"intrusion", ko:"침입" },
+  { en:"intruder", ko:"침입자" },
+  { en:"intrusive", ko:"거슬리는" },
+  { en:"authenticity", ko:"진짜임" },
+  { en:"mutate", ko:"변이하다" },
+  { en:"mutant", ko:"돌연변이체" },
+  { en:"wandering", ko:"떠도는" },
+  { en:"literature", ko:"문학" },
+  { en:"expansion", ko:"확장" },
+  { en:"expansive", ko:"광범위한" },
+  { en:"expense", ko:"비용" },
+  { en:"expenditure", ko:"지출" },
+  { en:"capitalist", ko:"자본가" }
+];
+
+const PASS_MESSAGE = "축하합니다. 능률보카 수능 고난도 Day 6 어휘 테스트 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
+const startYs = [-220, -320, -420, -520];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+let deck = [];
+let idx = 0;
+let choices = [];
+let raf = null;
+let running = false;
+let roundStartTs = 0;
+let locked = false;
+
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+function clearChoices(){
+  for(const el of choices){
+    el.remove();
+  }
+  choices = [];
+}
+
+function stopLoop(){
+  running = false;
+  if(raf){
+    cancelAnimationFrame(raf);
+    raf = null;
+  }
+}
+
+function resetGame(){
+  stopLoop();
+  clearChoices();
+  deck = shuffle(words);
+  idx = 0;
+  locked = false;
+  englishEl.textContent = "능률보카 수능 고난도 Day 6 어휘 테스트";
+  progressEl.textContent = `0 / ${deck.length}`;
+}
+
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  locked = false;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running || locked) return;
+  locked = true;
+
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    setTimeout(() => fail("오답을 선택했습니다."), 120);
+    return;
+  }
+
+  el.classList.add("good");
+  stopLoop();
+
+  setTimeout(() => {
+    clearChoices();
+    idx += 1;
+    nextWord();
+  }, 180);
+}
+
+function spawnChoices(word){
+  clearChoices();
+
+  const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(v => v !== correct);
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+    el.dataset.correct = txt === correct ? "1" : "0";
+    el.dataset.startY = String(startYs[i]);
+    el.style.top = `${startYs[i]}px`;
+
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      pick(el);
+    });
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+function startLoop(){
+  stopLoop();
+  running = true;
+  roundStartTs = performance.now();
+  raf = requestAnimationFrame(tick);
+}
+
+function tick(ts){
+  if(!running) return;
+
+  const elapsed = (ts - roundStartTs) / 1000;
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    const startY = Number(el.dataset.startY);
+    const y = startY + baseSpeed * elapsed;
+    el.style.top = `${y}px`;
+
+    if(y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+
+  raf = requestAnimationFrame(tick);
+}
+
+startBtn.addEventListener("click", startGame);
+
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "능률보카 수능 고난도 Day 6 어휘 테스트",
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
+});
+
+showOverlay(
+  "능률보카 수능 고난도 Day 6 어휘 테스트",
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
+</script>
+
+</body>
+</html>
