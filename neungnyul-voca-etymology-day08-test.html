@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>능률보카 어원편 Day 8 어휘 테스트</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action:manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px;
+    right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    top:0;
+  }
+  .choice.good{
+    background:#065f46;
+    border-color:rgba(94,234,212,.35);
+  }
+  .choice.bad{
+    background:#7f1d1d;
+    border-color:rgba(251,113,133,.55);
+  }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <div id="english">능률보카 어원편 Day 8 어휘 테스트</div>
+    <div id="progress"></div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">단어 시험 시작</h2>
+        <p id="ovText">
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const words = [
+  { en:"enable", ko:"가능하게 하다" },
+  { en:"enforce", ko:"시행하다, 강제하다" },
+  { en:"enforcement", ko:"시행, 집행" },
+  { en:"enhance", ko:"향상시키다" },
+  { en:"enhancement", ko:"향상" },
+  { en:"enrich", ko:"풍부하게 하다" },
+  { en:"enlarge", ko:"확대하다" },
+  { en:"amaze", ko:"놀라게 하다" },
+  { en:"amazing", ko:"놀라운" },
+  { en:"amazement", ko:"놀람" },
+  { en:"afford", ko:"여유가 있다" },
+  { en:"affordable", ko:"감당 가능한" },
+  { en:"atom", ko:"원자" },
+  { en:"atomic", ko:"원자의" },
+  { en:"abroad", ko:"해외로" },
+  { en:"alike", ko:"비슷한" },
+  { en:"arise", ko:"발생하다" },
+  { en:"arouse", ko:"불러일으키다" },
+  { en:"ashamed", ko:"부끄러운" },
+  { en:"persevere", ko:"인내하다" },
+  { en:"perseverance", ko:"인내" },
+  { en:"persuade", ko:"설득하다" },
+  { en:"persuasion", ko:"설득" },
+  { en:"persuasive", ko:"설득력 있는" },
+  { en:"perspective", ko:"관점" },
+  { en:"aboard", ko:"탑승하여" },
+  { en:"embrace", ko:"받아들이다" },
+  { en:"perfect", ko:"완벽한" },
+  { en:"perfectly", ko:"완벽하게" },
+  { en:"perfection", ko:"완벽" },
+  { en:"permanent", ko:"영구적인" },
+  { en:"permanently", ko:"영구적으로" },
+  { en:"persist", ko:"지속하다" },
+  { en:"persistent", ko:"끈질긴" },
+  { en:"persistence", ko:"지속" },
+
+  { en:"surprising", ko:"예상 밖의 놀라운" },
+  { en:"astonishing", ko:"매우 놀라운" },
+  { en:"startling", ko:"깜짝 놀랄 정도의" },
+  { en:"improve", ko:"향상시키다" },
+  { en:"expand", ko:"확장하다" },
+  { en:"broaden", ko:"넓히다" },
+  { en:"diminish", ko:"줄이다, 감소시키다" },
+  { en:"convince", ko:"확신시키다, 설득하다" },
+  { en:"upgrade", ko:"향상시키다" },
+  { en:"boost", ko:"증가시키다" },
+  { en:"increase", ko:"증가시키다" },
+  { en:"astonish", ko:"놀라게 하다" },
+  { en:"surprise", ko:"놀라게 하다" },
+  { en:"induce", ko:"설득하다" },
+  { en:"urge", ko:"촉구하다" },
+  { en:"encourage", ko:"장려하다" },
+  { en:"continue", ko:"계속하다" },
+  { en:"endure", ko:"견디다" },
+  { en:"last", ko:"지속되다" },
+  { en:"accept", ko:"받아들이다" },
+  { en:"adopt", ko:"받아들이다" },
+  { en:"hug", ko:"껴안다" },
+  { en:"include", ko:"포함하다" },
+  { en:"allow", ko:"허용하다" },
+  { en:"permit", ko:"허락하다" },
+  { en:"disable", ko:"못하게 하다" },
+  { en:"prevent", ko:"막다" },
+  { en:"prohibit", ko:"금지하다" },
+  { en:"weaken", ko:"약화시키다" },
+  { en:"reduce", ko:"줄이다" },
+  { en:"shrink", ko:"줄어들다" },
+  { en:"ignore", ko:"무시하다" },
+  { en:"reject", ko:"거부하다" },
+  { en:"refuse", ko:"거절하다" },
+  { en:"temporary", ko:"일시적인" },
+  { en:"stop", ko:"멈추다" },
+  { en:"quit", ko:"그만두다" },
+  { en:"give up", ko:"포기하다" },
+  { en:"disconnect", ko:"연결 끊다" },
+  { en:"separate", ko:"분리하다" },
+  { en:"divide", ko:"나누다" },
+
+  { en:"enable A to V", ko:"A가 ~할 수 있게 하다" },
+  { en:"enforce the law", ko:"법을 집행하다" },
+  { en:"enhance the quality", ko:"질을 향상시키다" },
+  { en:"afford to V", ko:"~할 여유가 있다" },
+  { en:"be ashamed of", ko:"~을 부끄러워하다" },
+  { en:"persuade A to V", ko:"A를 설득해 ~하게 하다" },
+  { en:"persist in", ko:"계속 ~하다" },
+  { en:"be engaged in", ko:"~에 종사하다" },
+  { en:"aboard the train", ko:"기차에 탑승하여" },
+  { en:"be amazed at", ko:"~에 놀라다" }
+];
+
+const PASS_MESSAGE = "축하합니다. 능률보카 어원편 Day 8 어휘 테스트 통과!";
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
+const startYs = [-220, -320, -420, -520];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+let deck = [];
+let idx = 0;
+let choices = [];
+let raf = null;
+let running = false;
+let roundStartTs = 0;
+let locked = false;
+
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+function clearChoices(){
+  for(const el of choices){
+    el.remove();
+  }
+  choices = [];
+}
+
+function stopLoop(){
+  running = false;
+  if(raf){
+    cancelAnimationFrame(raf);
+    raf = null;
+  }
+}
+
+function resetGame(){
+  stopLoop();
+  clearChoices();
+  deck = shuffle(words);
+  idx = 0;
+  locked = false;
+  englishEl.textContent = "능률보카 어원편 Day 8 어휘 테스트";
+  progressEl.textContent = `0 / ${deck.length}`;
+}
+
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>단어를 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  locked = false;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running || locked) return;
+  locked = true;
+
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    setTimeout(() => fail("오답을 선택했습니다."), 120);
+    return;
+  }
+
+  el.classList.add("good");
+  stopLoop();
+
+  setTimeout(() => {
+    clearChoices();
+    idx += 1;
+    nextWord();
+  }, 180);
+}
+
+function spawnChoices(word){
+  clearChoices();
+
+  const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(v => v !== correct);
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+    el.dataset.correct = txt === correct ? "1" : "0";
+    el.dataset.startY = String(startYs[i]);
+    el.style.top = `${startYs[i]}px`;
+
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      pick(el);
+    });
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+function startLoop(){
+  stopLoop();
+  running = true;
+  roundStartTs = performance.now();
+  raf = requestAnimationFrame(tick);
+}
+
+function tick(ts){
+  if(!running) return;
+
+  const elapsed = (ts - roundStartTs) / 1000;
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    const startY = Number(el.dataset.startY);
+    const y = startY + baseSpeed * elapsed;
+    el.style.top = `${y}px`;
+
+    if(y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+
+  raf = requestAnimationFrame(tick);
+}
+
+startBtn.addEventListener("click", startGame);
+
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    "단어 시험 시작",
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
+});
+
+showOverlay(
+  "단어 시험 시작",
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
+</script>
+
+</body>
+</html>
