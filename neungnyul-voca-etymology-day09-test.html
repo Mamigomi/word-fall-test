@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>능률보카 어원편 Day 9 어휘 테스트</title>
+
+<style>
+body{
+  margin:0;
+  background:#0b1220;
+  color:#fff;
+  font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+  height:100vh;
+  overflow:hidden;
+}
+#wrap{
+  max-width:480px;
+  margin:0 auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+header{
+  padding:14px;
+  background:#111a2b;
+}
+#english{
+  font-size:22px;
+  font-weight:800;
+}
+#progress{
+  font-size:13px;
+  opacity:.8;
+}
+#game{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+}
+.choice{
+  position:absolute;
+  left:10px;
+  right:10px;
+  height:56px;
+  background:#1e293b;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  cursor:pointer;
+}
+.floor{
+  position:absolute;
+  bottom:0;
+  height:60px;
+  width:100%;
+  background:rgba(255,0,0,0.2);
+  text-align:center;
+  line-height:60px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="wrap">
+<header>
+<div id="english">능률보카 어원편 Day 9 어휘 테스트</div>
+<div id="progress"></div>
+</header>
+
+<div id="game">
+<div class="floor">바닥 도달 = 실패</div>
+</div>
+</div>
+
+<script>
+const words = [
+{en:"withstand", ko:"견디다"},
+{en:"adjust", ko:"조정하다"},
+{en:"accompany", ko:"동반하다"},
+{en:"accustomed", ko:"익숙한"},
+{en:"counterfeit", ko:"위조하다"},
+{en:"withdraw", ko:"철수하다"},
+{en:"withhold", ko:"보류하다"},
+{en:"contrary", ko:"반대의"},
+{en:"contrast", ko:"대조하다"},
+{en:"controversy", ko:"논쟁"},
+{en:"account", ko:"계좌"},
+{en:"account for", ko:"설명하다"},
+{en:"accumulate", ko:"축적하다"},
+{en:"appoint", ko:"임명하다"},
+{en:"approach", ko:"접근하다"},
+{en:"await", ko:"기다리다"},
+{en:"abandon", ko:"포기하다"},
+{en:"arrogant", ko:"거만한"},
+{en:"autobiography", ko:"자서전"},
+{en:"automatic", ko:"자동의"},
+{en:"telescope", ko:"망원경"},
+{en:"telecommute", ko:"재택근무하다"},
+{en:"autograph", ko:"사인"},
+{en:"resist", ko:"저항하다"},
+{en:"endure", ko:"견디다"},
+{en:"tolerate", ko:"참다"},
+{en:"adapt", ko:"적응하다"},
+{en:"modify", ko:"수정하다"},
+{en:"regulate", ko:"조절하다"},
+{en:"escort", ko:"호위하다"},
+{en:"fake", ko:"위조하다"},
+{en:"forge", ko:"위조하다"},
+{en:"retreat", ko:"후퇴하다"},
+{en:"oppose", ko:"반대하다"},
+{en:"compare", ko:"비교하다"},
+{en:"debate", ko:"논쟁하다"},
+{en:"explain", ko:"설명하다"},
+{en:"consider", ko:"고려하다"},
+{en:"collect", ko:"모으다"},
+{en:"assign", ko:"지정하다"},
+{en:"schedule", ko:"일정 잡다"},
+{en:"method", ko:"방법"},
+{en:"wait for", ko:"기다리다"},
+{en:"expect", ko:"기대하다"},
+{en:"desert", ko:"버리다"},
+{en:"give up", ko:"포기하다"},
+{en:"conceited", ko:"자만한"},
+{en:"vehicle", ko:"탈것"},
+{en:"remote work", ko:"재택근무"},
+{en:"sign", ko:"서명"},
+{en:"surrender", ko:"항복하다"},
+{en:"yield", ko:"굴복하다"},
+{en:"disturb", ko:"방해하다"},
+{en:"separate", ko:"분리하다"},
+{en:"genuine", ko:"진짜의"},
+{en:"advance", ko:"전진하다"},
+{en:"provide", ko:"제공하다"},
+{en:"similar", ko:"비슷한"},
+{en:"agreement", ko:"합의"},
+{en:"decrease", ko:"감소하다"},
+{en:"dismiss", ko:"해고하다"},
+{en:"avoid", ko:"피하다"},
+{en:"ignore", ko:"무시하다"},
+{en:"keep", ko:"유지하다"},
+{en:"humble", ko:"겸손한"},
+{en:"temporary", ko:"일시적인"},
+{en:"manual", ko:"수동의"}
+];
+
+let idx = 0;
+let game = document.getElementById("game");
+let eng = document.getElementById("english");
+let prog = document.getElementById("progress");
+
+function next(){
+  if(idx >= words.length){
+    alert("합격입니다!");
+    return;
+  }
+
+  game.innerHTML = '<div class="floor">바닥 도달 = 실패</div>';
+
+  let w = words[idx];
+  eng.innerText = w.en;
+  prog.innerText = (idx+1)+" / "+words.length;
+
+  let choices = shuffle(words).slice(0,4);
+  if(!choices.some(c=>c.ko===w.ko)){
+    choices[0] = w;
+  }
+
+  choices.forEach((c,i)=>{
+    let div = document.createElement("div");
+    div.className="choice";
+    div.style.top=(-100 - i*80)+"px";
+    div.innerText=c.ko;
+
+    div.onclick=()=>{
+      if(c.ko===w.ko){
+        idx++;
+        next();
+      }else{
+        alert("오답! 불합격");
+      }
+    };
+
+    game.appendChild(div);
+
+    fall(div);
+  });
+}
+
+function fall(el){
+  let y = parseInt(el.style.top);
+  let id = setInterval(()=>{
+    y+=2;
+    el.style.top=y+"px";
+
+    if(y > game.clientHeight-60){
+      clearInterval(id);
+      alert("바닥 도달! 불합격");
+    }
+  },20);
+}
+
+function shuffle(a){
+  return a.sort(()=>Math.random()-0.5);
+}
+
+next();
+</script>
+
+</body>
+</html>
