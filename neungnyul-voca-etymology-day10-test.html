@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>능률보카 어원편 Day 10 어휘 테스트</title>
+<style>
+body{
+  margin:0;
+  background:#0b1220;
+  color:#fff;
+  font-family:system-ui;
+  height:100vh;
+  overflow:hidden;
+}
+#wrap{
+  max-width:480px;
+  margin:0 auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+header{
+  padding:14px;
+  background:#111a2b;
+}
+#english{
+  font-size:22px;
+  font-weight:800;
+}
+#progress{
+  font-size:13px;
+}
+#game{
+  flex:1;
+  position:relative;
+}
+.floor{
+  position:absolute;
+  bottom:0;
+  height:60px;
+  width:100%;
+  background:rgba(255,0,0,.2);
+  text-align:center;
+  line-height:60px;
+}
+.choice{
+  position:absolute;
+  left:10px;
+  right:10px;
+  height:56px;
+  background:#1e293b;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+}
+</style>
+</head>
+<body>
+
+<div id="wrap">
+<header>
+<div id="english">능률보카 어원편 Day 10 어휘 테스트</div>
+<div id="progress"></div>
+</header>
+
+<div id="game">
+<div class="floor">바닥 닿으면 탈락</div>
+</div>
+</div>
+
+<script>
+const words = [
+{en:"geography",ko:"지리학"},
+{en:"geographical",ko:"지리의"},
+{en:"geology",ko:"지질학"},
+{en:"geometry",ko:"기하학"},
+{en:"multiple",ko:"다수의, 다양한"},
+{en:"multiply",ko:"증가하다, 곱하다"},
+{en:"multimedia",ko:"멀티미디어"},
+{en:"multitude",ko:"다수"},
+{en:"a multitude of",ko:"수많은 ~"},
+{en:"crowd",ko:"군중"},
+{en:"mob",ko:"폭도"},
+{en:"group",ko:"집단"},
+{en:"monologue",ko:"독백"},
+{en:"monoculture",ko:"단일 재배, 단일 문화"},
+{en:"universe",ko:"우주"},
+{en:"universal",ko:"보편적인"},
+{en:"university",ko:"대학교"},
+{en:"uniform",ko:"제복, 동일한"},
+{en:"union",ko:"노동조합, 연합"},
+{en:"unique",ko:"독특한, 유일한"},
+{en:"unify",ko:"통합하다"},
+{en:"unification",ko:"통합"},
+{en:"unite",ko:"결합하다"},
+{en:"unity",ko:"통합, 일체감"},
+{en:"unit",ko:"단위"},
+{en:"bilingual",ko:"2개 국어 사용자"},
+{en:"balance",ko:"균형"},
+{en:"balance between A and B",ko:"A와 B 사이의 균형"},
+{en:"off balance",ko:"균형을 잃은"},
+{en:"duplicate",ko:"복사하다"},
+{en:"duplication",ko:"복제"},
+{en:"dual",ko:"이중의"},
+{en:"twilight",ko:"황혼"},
+{en:"dawn",ko:"새벽"},
+{en:"twist",ko:"비틀다"},
+{en:"triangle",ko:"삼각형"},
+{en:"triangular",ko:"삼각형의"},
+{en:"tribe",ko:"부족"},
+{en:"trivial",ko:"사소한"},
+{en:"numerous",ko:"많은"},
+{en:"many",ko:"많은"},
+{en:"increase",ko:"증가하다"},
+{en:"divide",ko:"나누다"},
+{en:"copy",ko:"복사하다"},
+{en:"reproduce",ko:"재생산하다"},
+{en:"repeat",ko:"반복하다"},
+{en:"double",ko:"두 배"},
+{en:"dusk",ko:"황혼"},
+{en:"decline",ko:"쇠퇴"},
+{en:"distort",ko:"왜곡하다"},
+{en:"alliance",ko:"연합"},
+{en:"unusual",ko:"특이한"},
+{en:"sole",ko:"유일한"},
+{en:"only",ko:"유일한"},
+{en:"single",ko:"하나"},
+{en:"join",ko:"결합하다"},
+{en:"identical",ko:"동일한"},
+{en:"constant",ko:"일정한"},
+{en:"cosmos",ko:"우주"},
+{en:"world",ko:"세계"},
+{en:"insignificant",ko:"하찮은"},
+{en:"trifling",ko:"사소한"},
+{en:"imbalance",ko:"불균형"},
+{en:"peak",ko:"절정"},
+{en:"usual",ko:"보통의"},
+{en:"common",ko:"일반적인"}
+];
+
+console.log("총 단어 수:", words.length);
+</script>
+
+</body>
+</html>
