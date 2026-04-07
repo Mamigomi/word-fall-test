@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>동아윤정미 3과 어휘교재 4쪽 영작테스트</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Malgun Gothic", "맑은 고딕", sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .topbar div {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .korean-box {
+      background: #eef6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .label {
+      font-size: 14px;
+      color: #2563eb;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .korean-text {
+      font-size: 24px;
+      line-height: 1.7;
+      font-weight: 700;
+    }
+
+    .input-wrap {
+      margin-bottom: 18px;
+    }
+
+    .typing-input {
+      width: 100%;
+      min-height: 72px;
+      border: 2px solid #93c5fd;
+      border-radius: 16px;
+      padding: 16px 18px;
+      font-size: 24px;
+      line-height: 1.5;
+      outline: none;
+      background: #f8fbff;
+      color: #111827;
+    }
+
+    .typing-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      background: #ffffff;
+    }
+
+    .input-note {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .keyboard-wrap {
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 14px;
+      background: #ffffff;
+      margin-bottom: 18px;
+    }
+
+    .keyboard-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .keyboard-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .key {
+      min-width: 52px;
+      padding: 12px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #f8fafc;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.08s ease, background 0.12s ease;
+    }
+
+    .key:hover {
+      background: #eaf2ff;
+      transform: translateY(-1px);
+    }
+
+    .key.wide {
+      min-width: 110px;
+    }
+
+    .key.xwide {
+      min-width: 180px;
+    }
+
+    .key.active {
+      background: #dbeafe;
+      border-color: #60a5fa;
+      color: #1d4ed8;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    button.action-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .check-btn { background: #2563eb; color: white; }
+    .reset-btn { background: #f59e0b; color: white; }
+    .back-btn  { background: #64748b; color: white; }
+    .next-btn  { background: #10b981; color: white; display: none; }
+
+    .message {
+      min-height: 78px;
+      padding: 16px;
+      border-radius: 14px;
+      line-height: 1.8;
+      font-size: 17px;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      white-space: pre-line;
+    }
+
+    .success {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    .error {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+
+    .final-screen {
+      display: none;
+      text-align: center;
+      padding: 34px 20px;
+    }
+
+    .final-screen h2 {
+      font-size: 36px;
+      margin-bottom: 14px;
+    }
+
+    .final-screen p {
+      font-size: 20px;
+      line-height: 1.8;
+      margin: 8px 0;
+    }
+
+    .restart-btn {
+      margin-top: 20px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .small-note {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 24px; }
+      .korean-text { font-size: 20px; }
+      .typing-input { font-size: 20px; min-height: 64px; }
+      .key { min-width: 42px; font-size: 16px; padding: 10px 10px; }
+      .key.wide { min-width: 86px; }
+      .key.xwide { min-width: 140px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>동아윤정미 3과 어휘교재 4쪽 영작테스트</h1>
+      <div class="subtitle">
+        한국어를 보고 영어 문장을 직접 입력하세요.<br>
+        철자, 띄어쓰기, 대문자, 문장부호까지 정확하게 연습할 수 있습니다.
+      </div>
+
+      <div id="gameArea">
+        <div class="topbar">
+          <div id="progressText">문제 1 / 0</div>
+          <div id="wrongText">오답 수: 0</div>
+          <div id="repeatText">반복학습 대기 문장: 0</div>
+        </div>
+
+        <div class="korean-box">
+          <div class="label">한국어</div>
+          <div id="koreanText" class="korean-text"></div>
+        </div>
+
+        <div class="input-wrap">
+          <div class="label">영어를 직접 입력하세요</div>
+          <input
+            id="typingInput"
+            class="typing-input"
+            type="text"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="여기에 영어 문장을 입력하세요."
+          />
+          <div class="input-note">
+            컴퓨터 키보드로 입력해도 되고, 아래 화면 키보드를 눌러도 됩니다.
+          </div>
+        </div>
+
+        <div class="label">화면 키보드</div>
+        <div class="keyboard-wrap">
+          <div class="keyboard-row" id="row1"></div>
+          <div class="keyboard-row" id="row2"></div>
+          <div class="keyboard-row" id="row3"></div>
+          <div class="keyboard-row" id="row4"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="action-btn check-btn" onclick="checkAnswer()">정답 확인</button>
+          <button class="action-btn back-btn" onclick="backspaceInput()">한 글자 지우기</button>
+          <button class="action-btn reset-btn" onclick="clearInput()">전체 지우기</button>
+          <button id="nextBtn" class="action-btn next-btn" onclick="goNext()">다음 문제</button>
+        </div>
+
+        <div id="message" class="message">문장을 입력한 뒤 정답 확인을 누르세요.</div>
+        <div class="small-note">
+          오답이면 정답이 표시되고, 같은 문장이 뒤에서 3번 더 반복됩니다.
+        </div>
+      </div>
+
+      <div id="finalScreen" class="final-screen">
+        <h2 id="finalTitle"></h2>
+        <p id="finalSummary"></p>
+        <p id="finalExtra"></p>
+        <button class="restart-btn" onclick="restartGame()">처음부터 다시 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const originalData = [
+      { en: "The printer isn't working.", ko: "프린터가 작동하지 않는다." },
+      { en: "She works in a busy office.", ko: "그녀는 바쁜 사무실에서 일한다." },
+      { en: "Hyein is happy with your present.", ko: "혜인이는 네 선물에 만족해해." },
+      { en: "She is always thinking about the present, not the future.", ko: "그녀는 항상 미래가 아니라 현재에 대해 생각하고 있다." },
+      { en: "Many people are present at the meeting.", ko: "많은 사람들이 회의에 참석하고 있다." },
+      { en: "How can we win the contest?", ko: "우리가 그 대회에서 어떻게 이길 수 있을까?" },
+      { en: "What prize did you win?", ko: "넌 어떤 상을 받았어?" },
+      { en: "The children enjoyed the rides at the fair.", ko: "아이들이 박람회에서 놀이기구를 즐기고 있다." },
+      { en: "The teacher gave a fair grade to all the students.", ko: "선생님은 모든 학생들에게 공평한 점수를 주셨다." },
+      { en: "Green products are good for the planet.", ko: "환경 친화적인 제품들이 지구에 좋다." },
+      { en: "The grass in the park is so green.", ko: "공원의 잔디가 아주 초록색이다." },
+      { en: "They hold a festival in spring.", ko: "그들은 봄에 축제를 개최한다." },
+      { en: "Can you hold my baby for a moment?", ko: "잠깐 내 아기를 안아줄 수 있어?" },
+      { en: "Do you hold a passport?", ko: "당신은 여권을 갖고 있습니까?" },
+      { en: "He entered the store.", ko: "그는 가게에 들어갔다." },
+      { en: "30 schools entered the competition.", ko: "30개의 학교가 대회에 참가했다." },
+      { en: "He is kidding about the surprise party.", ko: "그는 깜짝 파티에 대해 농담하고 있다." },
+      { en: "Kids love ice cream during the summer.", ko: "아이들은 여름에 아이스크림을 매우 좋아한다." },
+      { en: "He practices soccer every day.", ko: "그는 매일 축구를 연습한다." },
+      { en: "There's a basketball practice after school.", ko: "방과 후에 농구 연습이 있다." },
+      { en: "Who are you texting?", ko: "너는 누구한테 문자메시지를 보내고 있어?" },
+      { en: "I received a text from my friend.", ko: "나는 친구로부터 문자 메시지를 받았다." },
+      { en: "We read the text on page 32.", ko: "우리는 32쪽의 글을 읽었다." },
+      { en: "She wasted her energy on the problem.", ko: "그녀는 그 문제에 그녀의 에너지를 낭비했다." },
+      { en: "The park is full of waste after the festival.", ko: "공원이 축제 후에 쓰레기로 가득하다." },
+      { en: "They played hard during the game.", ko: "그들은 경기 동안 열심히 뛰었다." },
+      { en: "He likes hard work.", ko: "그는 어려운 일을 좋아한다." },
+      { en: "The candy is too hard.", ko: "그 사탕은 너무 딱딱하다." },
+      { en: "She saw the bright sunshine, and finally cheered up.", ko: "그녀는 밝은 햇빛을 보고 마침내 기운을 냈다." },
+      { en: "He cheered up his friend after the bad news.", ko: "그는 그 안 좋은 소식 뒤에 그의 친구를 격려했다." },
+      { en: "The class will be over soon.", ko: "수업이 곧 끝날 것이다." },
+      { en: "There is a bridge over the river.", ko: "강 위에 다리가 하나 있다." },
+      { en: "The tree is over 200 years old.", ko: "그 나무는 200년 이상 되었다." }
+    ];
+
+    let gameQueue = [];
+    let currentIndex = 0;
+    let totalWrong = 0;
+    let solvedCount = 0;
+    let locked = false;
+    let isShiftOn = true;
+
+    const progressText = document.getElementById("progressText");
+    const wrongText = document.getElementById("wrongText");
+    const repeatText = document.getElementById("repeatText");
+    const koreanText = document.getElementById("koreanText");
+    const typingInput = document.getElementById("typingInput");
+    const message = document.getElementById("message");
+    const nextBtn = document.getElementById("nextBtn");
+    const gameArea = document.getElementById("gameArea");
+    const finalScreen = document.getElementById("finalScreen");
+    const finalTitle = document.getElementById("finalTitle");
+    const finalSummary = document.getElementById("finalSummary");
+    const finalExtra = document.getElementById("finalExtra");
+
+    const keyboardLayout = {
+      row1: ["1","2","3","4","5","6","7","8","9","0"],
+      row2: ["q","w","e","r","t","y","u","i","o","p"],
+      row3: ["a","s","d","f","g","h","j","k","l"],
+      row4: ["shift","z","x","c","v","b","n","m","' ",",",".","?","space","back"]
+    };
+
+    function normalizeQuotes(text) {
+      return text
+        .replace(/’/g, "'")
+        .replace(/‘/g, "'")
+        .replace(/“/g, '"')
+        .replace(/”/g, '"')
+        .trim();
+    }
+
+    function normalizeSpaces(text) {
+      return text.replace(/\s+/g, " ").trim();
+    }
+
+    function initializeGame() {
+      gameQueue = originalData.map(item => ({
+        ...item,
+        fromWrong: false
+      }));
+      currentIndex = 0;
+      totalWrong = 0;
+      solvedCount = 0;
+      locked = false;
+      isShiftOn = true;
+      gameArea.style.display = "block";
+      finalScreen.style.display = "none";
+      buildKeyboard();
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentIndex >= gameQueue.length) {
+        finishGame();
+        return;
+      }
+
+      locked = false;
+      nextBtn.style.display = "none";
+      typingInput.value = "";
+      typingInput.disabled = false;
+      typingInput.focus();
+
+      const current = gameQueue[currentIndex];
+      koreanText.textContent = current.ko;
+
+      progressText.textContent = `문제 ${currentIndex + 1} / ${gameQueue.length}`;
+      wrongText.textContent = `오답 수: ${totalWrong}`;
+
+      const remainingRepeats = gameQueue.slice(currentIndex).filter(item => item.fromWrong).length;
+      repeatText.textContent = `반복학습 대기 문장: ${remainingRepeats}`;
+
+      message.className = "message";
+      message.textContent = current.fromWrong
+        ? "반복학습 문장입니다. 이번에는 철자와 문장부호까지 정확히 입력해 보세요."
+        : "문장을 입력한 뒤 정답 확인을 누르세요.";
+
+      updateKeyboardState();
+    }
+
+    function buildKeyboard() {
+      renderKeyboardRow("row1", keyboardLayout.row1);
+      renderKeyboardRow("row2", keyboardLayout.row2);
+      renderKeyboardRow("row3", keyboardLayout.row3);
+      renderKeyboardRow("row4", keyboardLayout.row4);
+      updateKeyboardState();
+    }
+
+    function renderKeyboardRow(rowId, keys) {
+      const row = document.getElementById(rowId);
+      row.innerHTML = "";
+
+      keys.forEach(keyValue => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "key";
+
+        if (keyValue === "shift") {
+          btn.classList.add("wide");
+          btn.dataset.key = "shift";
+          btn.textContent = "Shift";
+          btn.onclick = () => toggleShift();
+        } else if (keyValue === "space") {
+          btn.classList.add("xwide");
+          btn.dataset.key = "space";
+          btn.textContent = "Space";
+          btn.onclick = () => insertFromKeyboard(" ");
+        } else if (keyValue === "back") {
+          btn.classList.add("wide");
+          btn.dataset.key = "back";
+          btn.textContent = "Back";
+          btn.onclick = () => backspaceInput();
+        } else {
+          let cleanKey = keyValue.trim();
+          btn.dataset.key = cleanKey;
+          btn.textContent = getDisplayKey(cleanKey);
+          btn.onclick = () => insertFromKeyboard(getTypedKey(cleanKey));
+        }
+
+        row.appendChild(btn);
+      });
+    }
+
+    function getDisplayKey(key) {
+      if (key.length === 1 && /[a-z]/i.test(key)) {
+        return isShiftOn ? key.toUpperCase() : key.toLowerCase();
+      }
+      return key;
+    }
+
+    function getTypedKey(key) {
+      if (key.length === 1 && /[a-z]/i.test(key)) {
+        return isShiftOn ? key.toUpperCase() : key.toLowerCase();
+      }
+      return key;
+    }
+
+    function updateKeyboardState() {
+      const keys = document.querySelectorAll(".key");
+      keys.forEach(btn => {
+        const key = btn.dataset.key;
+        if (key === "shift") {
+          btn.classList.toggle("active", isShiftOn);
+        } else if (key === "space") {
+          btn.textContent = "Space";
+        } else if (key === "back") {
+          btn.textContent = "Back";
+        } else {
+          btn.textContent = getDisplayKey(key);
+        }
+        btn.disabled = locked;
+      });
+    }
+
+    function toggleShift() {
+      if (locked) return;
+      isShiftOn = !isShiftOn;
+      updateKeyboardState();
+      typingInput.focus();
+    }
+
+    function insertFromKeyboard(char) {
+      if (locked) return;
+      typingInput.value += char;
+      typingInput.focus();
+    }
+
+    function backspaceInput() {
+      if (locked) return;
+      typingInput.value = typingInput.value.slice(0, -1);
+      typingInput.focus();
+    }
+
+    function clearInput() {
+      if (locked) return;
+      typingInput.value = "";
+      typingInput.focus();
+    }
+
+    function checkAnswer() {
+      if (locked) return;
+
+      const current = gameQueue[currentIndex];
+      const userAnswer = normalizeSpaces(normalizeQuotes(typingInput.value));
+      const correctAnswer = normalizeSpaces(normalizeQuotes(current.en));
+
+      if (userAnswer === correctAnswer) {
+        locked = true;
+        solvedCount++;
+        typingInput.disabled = true;
+        message.className = "message success";
+        message.textContent = "정답입니다.";
+        nextBtn.style.display = "inline-block";
+        updateKeyboardState();
+      } else {
+        locked = true;
+        totalWrong++;
+        typingInput.disabled = true;
+        wrongText.textContent = `오답 수: ${totalWrong}`;
+
+        const repeatItems = [];
+        for (let i = 0; i < 3; i++) {
+          repeatItems.push({
+            en: current.en,
+            ko: current.ko,
+            fromWrong: true
+          });
+        }
+        gameQueue.push(...repeatItems);
+
+        const remainingRepeats = gameQueue.slice(currentIndex + 1).filter(item => item.fromWrong).length;
+        repeatText.textContent = `반복학습 대기 문장: ${remainingRepeats}`;
+
+        message.className = "message error";
+        message.textContent =
+          `오답입니다.\n\n정답: ${current.en}\n\n입력한 답: ${typingInput.value || "(빈칸)"}\n\n이 문장은 반복학습을 위해 뒤에 3번 더 나옵니다.`;
+
+        nextBtn.style.display = "inline-block";
+        updateKeyboardState();
+      }
+    }
+
+    function goNext() {
+      currentIndex++;
+      loadQuestion();
+    }
+
+    function finishGame() {
+      gameArea.style.display = "none";
+      finalScreen.style.display = "block";
+
+      if (totalWrong === 0) {
+        finalTitle.textContent = "합격입니다";
+        finalSummary.textContent = `총 ${originalData.length}문제를 모두 맞혔습니다.`;
+        finalExtra.textContent = "철자까지 정확하게 완주했습니다.";
+      } else {
+        finalTitle.textContent = "학습 완료";
+        finalSummary.textContent = `전체 학습이 끝났습니다. 오답 수는 ${totalWrong}개입니다.`;
+        finalExtra.textContent = "오답 문장은 자동으로 3번씩 반복되어 복습되었습니다.";
+      }
+    }
+
+    function restartGame() {
+      initializeGame();
+    }
+
+    typingInput.addEventListener("keydown", function(e) {
+      if (locked) {
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        checkAnswer();
+      }
+    });
+
+    initializeGame();
+  </script>
+</body>
+</html>
