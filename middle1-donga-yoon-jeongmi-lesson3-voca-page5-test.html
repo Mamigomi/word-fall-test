@@ -1,0 +1,453 @@
+<!doctype html>
+<!-- 파일명: middle1-donga-yoon-jeongmi-lesson3-voca-page5-test.html -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>중1 동아 윤정미 3과 어휘교재 5쪽 어휘 테스트</title>
+<style>
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#fff;
+    font-family:system-ui, -apple-system, "Noto Sans KR", sans-serif;
+    height:100vh;
+    overflow:hidden;
+    user-select:none;
+    touch-action:manipulation;
+  }
+  #wrap{
+    max-width:480px;
+    margin:0 auto;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    padding:14px;
+    background:#111a2b;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #english{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  #progress{
+    margin-top:6px;
+    font-size:13px;
+    opacity:.85;
+  }
+  #game{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+  }
+  .floor{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:60px;
+    background:rgba(255,80,80,.22);
+    border-top:1px solid rgba(255,80,80,.45);
+    text-align:center;
+    line-height:60px;
+    font-size:13px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .choice{
+    position:absolute;
+    left:10px;
+    right:10px;
+    height:56px;
+    background:#1e293b;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+    z-index:1;
+    top:0;
+  }
+  .choice.good{
+    background:#065f46;
+    border-color:rgba(94,234,212,.35);
+  }
+  .choice.bad{
+    background:#7f1d1d;
+    border-color:rgba(251,113,133,.55);
+  }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:3;
+  }
+  .card{
+    background:#111a2b;
+    padding:20px;
+    border-radius:18px;
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 18px 50px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:20px;
+  }
+  .card p{
+    margin:0 0 12px;
+    font-size:13px;
+    opacity:.9;
+    line-height:1.5;
+  }
+  button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:900;
+    border-radius:12px;
+    border:none;
+    background:#38bdf8;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#1f2a44;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <div id="english">중1 동아 윤정미 3과 어휘교재 5쪽 어휘 테스트</div>
+    <div id="progress"></div>
+  </header>
+
+  <div id="game">
+    <div class="floor">바닥 도달 = 즉시 불합격</div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="ovTitle">중1 동아 윤정미 3과 어휘교재 5쪽 어휘 테스트</h2>
+        <p id="ovText">
+          화면 위 영어 단어에 맞는 한국어를 터치하세요.<br>
+          <b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.
+        </p>
+        <button id="startBtn">시험 시작</button>
+        <button id="restartBtn" class="secondary" style="display:none;">다시 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const words = [
+  { en:"waste", ko:"낭비하다, 쓰레기" },
+  { en:"be full of", ko:"~로 가득차다" },
+  { en:"festival", ko:"축제" },
+  { en:"hard", ko:"열심히, 어려운, 딱딱한" },
+  { en:"during", ko:"~동안" },
+  { en:"too", ko:"너무" },
+  { en:"cheer up", ko:"기운을 내다, 격려하다" },
+  { en:"bright", ko:"밝은" },
+  { en:"sunshine", ko:"햇빛" },
+  { en:"finally", ko:"마침내, 결국" },
+  { en:"news", ko:"소식" },
+  { en:"bad", ko:"나쁜" },
+  { en:"be over", ko:"끝나다" },
+  { en:"soon", ko:"곧" },
+  { en:"class", ko:"수업" },
+  { en:"over", ko:"끝이 난, ~위에, ~이상" },
+  { en:"There is", ko:"~이 있다" },
+  { en:"wrong", ko:"잘못된" },
+  { en:"right", ko:"옳은" },
+  { en:"worried", ko:"걱정하는" },
+  { en:"concerned", ko:"걱정하는" },
+  { en:"carefree", ko:"걱정 없는" },
+  { en:"excited", ko:"신이 난" },
+  { en:"thrilled", ko:"몹시 신이 난" },
+  { en:"bored", ko:"지루한" },
+  { en:"present", ko:"선물" },
+  { en:"gift", ko:"선물" },
+  { en:"upset", ko:"속상한" },
+  { en:"happy", ko:"행복한" },
+  { en:"glad", ko:"기쁜" },
+  { en:"win", ko:"이기다" },
+  { en:"lose", ko:"지다" },
+  { en:"green", ko:"환경 친화적인" },
+  { en:"eco-friendly", ko:"친환경적인" },
+  { en:"positive", ko:"긍정적인" },
+  { en:"negative", ko:"부정적인" },
+  { en:"result", ko:"결과" },
+  { en:"outcome", ko:"결과" },
+  { en:"enter", ko:"참가하다" },
+  { en:"participate in", ko:"참가하다" },
+  { en:"take part in", ko:"참가하다" },
+  { en:"kid", ko:"농담하다" },
+  { en:"joke", ko:"농담하다" },
+  { en:"terrible", ko:"형편없는, 끔찍한" },
+  { en:"poor", ko:"형편없는" },
+  { en:"excellent", ko:"우수한" },
+  { en:"terrific", ko:"아주 좋은" },
+  { en:"interested", ko:"관심이 있는" },
+  { en:"indifferent", ko:"무관심한" },
+  { en:"happen", ko:"발생하다, 일어나다" },
+  { en:"take place", ko:"일어나다, 발생하다" },
+  { en:"occur", ko:"발생하다" },
+  { en:"different", ko:"다른" },
+  { en:"same", ko:"같은" },
+  { en:"mistake", ko:"실수" },
+  { en:"fault", ko:"잘못" },
+  { en:"error", ko:"실수, 오류" },
+  { en:"hopeless", ko:"가망 없는" },
+  { en:"hopeful", ko:"희망에 찬" },
+  { en:"sick", ko:"아픈" },
+  { en:"ill", ko:"아픈" },
+  { en:"tired", ko:"피곤한" },
+  { en:"exhausted", ko:"기진맥진한" },
+  { en:"waste", ko:"낭비하다" },
+  { en:"save", ko:"아끼다" },
+  { en:"quit", ko:"그만두다" },
+  { en:"stop", ko:"멈추다" },
+  { en:"give up", ko:"포기하다" },
+  { en:"unhappy", ko:"불만스러운" },
+  { en:"displeased", ko:"불만스러운" },
+  { en:"dissatisfied", ko:"불만스러운" },
+  { en:"finally", ko:"마침내" },
+  { en:"in the end", ko:"마침내" },
+  { en:"almost", ko:"거의" },
+  { en:"nearly", ko:"거의" },
+  { en:"finish", ko:"끝내다, 마치다" },
+  { en:"complete", ko:"끝내다" },
+  { en:"end", ko:"끝내다" },
+  { en:"start", ko:"시작하다" },
+  { en:"begin", ko:"시작하다" },
+  { en:"proud", ko:"자랑스러운" },
+  { en:"ashamed", ko:"부끄러운" }
+];
+
+const TEST_TITLE = "중1 동아 윤정미 3과 어휘교재 5쪽 어휘 테스트";
+const PASS_MESSAGE = `축하합니다. ${TEST_TITLE} 통과!`;
+const baseSpeed = 110;
+const floorHeight = 60;
+const choiceHeight = 56;
+const startYs = [-220, -320, -420, -520];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const gameEl = document.getElementById("game");
+const englishEl = document.getElementById("english");
+const progressEl = document.getElementById("progress");
+
+const overlayEl = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+let deck = [];
+let idx = 0;
+let choices = [];
+let raf = null;
+let running = false;
+let roundStartTs = 0;
+let locked = false;
+
+function showOverlay(title, htmlText, showStart, showRestart){
+  ovTitle.textContent = title;
+  ovText.innerHTML = htmlText;
+  overlayEl.style.display = "flex";
+  startBtn.style.display = showStart ? "" : "none";
+  restartBtn.style.display = showRestart ? "" : "none";
+}
+
+function hideOverlay(){
+  overlayEl.style.display = "none";
+}
+
+function clearChoices(){
+  for(const el of choices){
+    el.remove();
+  }
+  choices = [];
+}
+
+function stopLoop(){
+  running = false;
+  if(raf){
+    cancelAnimationFrame(raf);
+    raf = null;
+  }
+}
+
+function resetGame(){
+  stopLoop();
+  clearChoices();
+  deck = shuffle(words);
+  idx = 0;
+  locked = false;
+  englishEl.textContent = TEST_TITLE;
+  progressEl.textContent = `0 / ${deck.length}`;
+}
+
+function startGame(){
+  resetGame();
+  hideOverlay();
+  nextWord();
+}
+
+function nextWord(){
+  if(idx >= deck.length){
+    stopLoop();
+    clearChoices();
+    showOverlay(
+      "합격",
+      `<b style="font-size:18px;">${PASS_MESSAGE}</b><br><br>총 <b>${deck.length}</b>문항을 모두 통과했습니다.`,
+      false,
+      true
+    );
+    return;
+  }
+
+  locked = false;
+
+  const w = deck[idx];
+  englishEl.textContent = w.en;
+  progressEl.textContent = `${idx + 1} / ${deck.length}`;
+
+  spawnChoices(w);
+  startLoop();
+}
+
+function fail(reason){
+  stopLoop();
+  clearChoices();
+  showOverlay(
+    "불합격",
+    `${reason}<br><br><b>규칙:</b> 오답 선택 또는 어떤 선택지든 바닥 도달 시 즉시 종료됩니다.`,
+    false,
+    true
+  );
+}
+
+function pick(el){
+  if(!running || locked) return;
+  locked = true;
+
+  if(el.dataset.correct !== "1"){
+    el.classList.add("bad");
+    setTimeout(() => fail("오답을 선택했습니다."), 120);
+    return;
+  }
+
+  el.classList.add("good");
+  stopLoop();
+
+  setTimeout(() => {
+    clearChoices();
+    idx += 1;
+    nextWord();
+  }, 180);
+}
+
+function spawnChoices(word){
+  clearChoices();
+
+  const correct = word.ko;
+  const pool = Array.from(new Set(words.map(x => x.ko))).filter(v => v !== correct);
+  const wrongs = shuffle(pool).slice(0, 3);
+  const options = shuffle([correct, ...wrongs]);
+
+  options.forEach((txt, i) => {
+    const el = document.createElement("div");
+    el.className = "choice";
+    el.textContent = txt;
+    el.dataset.correct = txt === correct ? "1" : "0";
+    el.dataset.startY = String(startYs[i]);
+    el.style.top = `${startYs[i]}px`;
+
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      pick(el);
+    });
+
+    gameEl.appendChild(el);
+    choices.push(el);
+  });
+}
+
+function startLoop(){
+  stopLoop();
+  running = true;
+  roundStartTs = performance.now();
+  raf = requestAnimationFrame(tick);
+}
+
+function tick(ts){
+  if(!running) return;
+
+  const elapsed = (ts - roundStartTs) / 1000;
+  const rect = gameEl.getBoundingClientRect();
+  const bottomLimit = rect.height - floorHeight - choiceHeight;
+
+  for(const el of choices){
+    const startY = Number(el.dataset.startY);
+    const y = startY + baseSpeed * elapsed;
+    el.style.top = `${y}px`;
+
+    if(y >= bottomLimit){
+      fail("선택지가 바닥에 닿았습니다.");
+      return;
+    }
+  }
+
+  raf = requestAnimationFrame(tick);
+}
+
+startBtn.addEventListener("click", startGame);
+
+restartBtn.addEventListener("click", () => {
+  showOverlay(
+    TEST_TITLE,
+    `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+    true,
+    false
+  );
+});
+
+showOverlay(
+  TEST_TITLE,
+  `화면 위 영어 단어에 맞는 한국어를 터치하세요.<br><b>4개 중 하나라도 바닥에 닿으면 즉시 불합격</b>입니다.`,
+  true,
+  false
+);
+</script>
+
+</body>
+</html>
