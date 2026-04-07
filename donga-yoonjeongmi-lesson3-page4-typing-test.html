@@ -15,7 +15,7 @@
     }
 
     .wrap {
-      max-width: 1100px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 24px 16px 60px;
     }
@@ -63,7 +63,7 @@
       border: 2px solid #bfdbfe;
       border-radius: 16px;
       padding: 18px;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
     .label {
@@ -109,58 +109,6 @@
       line-height: 1.6;
     }
 
-    .keyboard-wrap {
-      border: 2px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 14px;
-      background: #ffffff;
-      margin-bottom: 18px;
-    }
-
-    .keyboard-row {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 8px;
-    }
-
-    .keyboard-row:last-child {
-      margin-bottom: 0;
-    }
-
-    .key {
-      min-width: 52px;
-      padding: 12px 14px;
-      border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      background: #f8fafc;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.08s ease, background 0.12s ease;
-    }
-
-    .key:hover {
-      background: #eaf2ff;
-      transform: translateY(-1px);
-    }
-
-    .key.wide {
-      min-width: 110px;
-    }
-
-    .key.xwide {
-      min-width: 180px;
-    }
-
-    .key.active {
-      background: #dbeafe;
-      border-color: #60a5fa;
-      color: #1d4ed8;
-    }
-
     .btn-row {
       display: flex;
       gap: 10px;
@@ -168,7 +116,7 @@
       margin-bottom: 18px;
     }
 
-    button.action-btn {
+    button {
       border: none;
       border-radius: 12px;
       padding: 12px 18px;
@@ -183,7 +131,7 @@
     .next-btn  { background: #10b981; color: white; display: none; }
 
     .message {
-      min-height: 78px;
+      min-height: 84px;
       padding: 16px;
       border-radius: 14px;
       line-height: 1.8;
@@ -226,12 +174,6 @@
       margin-top: 20px;
       background: #2563eb;
       color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 18px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
     }
 
     .small-note {
@@ -242,13 +184,11 @@
       line-height: 1.6;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 640px) {
       h1 { font-size: 24px; }
       .korean-text { font-size: 20px; }
       .typing-input { font-size: 20px; min-height: 64px; }
-      .key { min-width: 42px; font-size: 16px; padding: 10px 10px; }
-      .key.wide { min-width: 86px; }
-      .key.xwide { min-width: 140px; }
+      button { font-size: 15px; padding: 11px 15px; }
     }
   </style>
 </head>
@@ -274,7 +214,7 @@
         </div>
 
         <div class="input-wrap">
-          <div class="label">영어를 직접 입력하세요</div>
+          <div class="label">영어를 입력하세요</div>
           <input
             id="typingInput"
             class="typing-input"
@@ -286,23 +226,15 @@
             placeholder="여기에 영어 문장을 입력하세요."
           />
           <div class="input-note">
-            컴퓨터 키보드로 입력해도 되고, 아래 화면 키보드를 눌러도 됩니다.
+            휴대폰에서는 기본 키보드로 바로 입력하면 됩니다. Enter 키를 눌러도 정답 확인이 됩니다.
           </div>
         </div>
 
-        <div class="label">화면 키보드</div>
-        <div class="keyboard-wrap">
-          <div class="keyboard-row" id="row1"></div>
-          <div class="keyboard-row" id="row2"></div>
-          <div class="keyboard-row" id="row3"></div>
-          <div class="keyboard-row" id="row4"></div>
-        </div>
-
         <div class="btn-row">
-          <button class="action-btn check-btn" onclick="checkAnswer()">정답 확인</button>
-          <button class="action-btn back-btn" onclick="backspaceInput()">한 글자 지우기</button>
-          <button class="action-btn reset-btn" onclick="clearInput()">전체 지우기</button>
-          <button id="nextBtn" class="action-btn next-btn" onclick="goNext()">다음 문제</button>
+          <button class="check-btn" onclick="checkAnswer()">정답 확인</button>
+          <button class="back-btn" onclick="backspaceInput()">한 글자 지우기</button>
+          <button class="reset-btn" onclick="clearInput()">전체 지우기</button>
+          <button id="nextBtn" class="next-btn" onclick="goNext()">다음 문제</button>
         </div>
 
         <div id="message" class="message">문장을 입력한 뒤 정답 확인을 누르세요.</div>
@@ -360,9 +292,7 @@
     let gameQueue = [];
     let currentIndex = 0;
     let totalWrong = 0;
-    let solvedCount = 0;
     let locked = false;
-    let isShiftOn = true;
 
     const progressText = document.getElementById("progressText");
     const wrongText = document.getElementById("wrongText");
@@ -376,13 +306,6 @@
     const finalTitle = document.getElementById("finalTitle");
     const finalSummary = document.getElementById("finalSummary");
     const finalExtra = document.getElementById("finalExtra");
-
-    const keyboardLayout = {
-      row1: ["1","2","3","4","5","6","7","8","9","0"],
-      row2: ["q","w","e","r","t","y","u","i","o","p"],
-      row3: ["a","s","d","f","g","h","j","k","l"],
-      row4: ["shift","z","x","c","v","b","n","m","' ",",",".","?","space","back"]
-    };
 
     function normalizeQuotes(text) {
       return text
@@ -404,12 +327,9 @@
       }));
       currentIndex = 0;
       totalWrong = 0;
-      solvedCount = 0;
       locked = false;
-      isShiftOn = true;
       gameArea.style.display = "block";
       finalScreen.style.display = "none";
-      buildKeyboard();
       loadQuestion();
     }
 
@@ -423,7 +343,6 @@
       nextBtn.style.display = "none";
       typingInput.value = "";
       typingInput.disabled = false;
-      typingInput.focus();
 
       const current = gameQueue[currentIndex];
       koreanText.textContent = current.ko;
@@ -436,97 +355,10 @@
 
       message.className = "message";
       message.textContent = current.fromWrong
-        ? "반복학습 문장입니다. 이번에는 철자와 문장부호까지 정확히 입력해 보세요."
+        ? "반복학습 문장입니다. 이번에는 정확히 입력해 보세요."
         : "문장을 입력한 뒤 정답 확인을 누르세요.";
 
-      updateKeyboardState();
-    }
-
-    function buildKeyboard() {
-      renderKeyboardRow("row1", keyboardLayout.row1);
-      renderKeyboardRow("row2", keyboardLayout.row2);
-      renderKeyboardRow("row3", keyboardLayout.row3);
-      renderKeyboardRow("row4", keyboardLayout.row4);
-      updateKeyboardState();
-    }
-
-    function renderKeyboardRow(rowId, keys) {
-      const row = document.getElementById(rowId);
-      row.innerHTML = "";
-
-      keys.forEach(keyValue => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "key";
-
-        if (keyValue === "shift") {
-          btn.classList.add("wide");
-          btn.dataset.key = "shift";
-          btn.textContent = "Shift";
-          btn.onclick = () => toggleShift();
-        } else if (keyValue === "space") {
-          btn.classList.add("xwide");
-          btn.dataset.key = "space";
-          btn.textContent = "Space";
-          btn.onclick = () => insertFromKeyboard(" ");
-        } else if (keyValue === "back") {
-          btn.classList.add("wide");
-          btn.dataset.key = "back";
-          btn.textContent = "Back";
-          btn.onclick = () => backspaceInput();
-        } else {
-          let cleanKey = keyValue.trim();
-          btn.dataset.key = cleanKey;
-          btn.textContent = getDisplayKey(cleanKey);
-          btn.onclick = () => insertFromKeyboard(getTypedKey(cleanKey));
-        }
-
-        row.appendChild(btn);
-      });
-    }
-
-    function getDisplayKey(key) {
-      if (key.length === 1 && /[a-z]/i.test(key)) {
-        return isShiftOn ? key.toUpperCase() : key.toLowerCase();
-      }
-      return key;
-    }
-
-    function getTypedKey(key) {
-      if (key.length === 1 && /[a-z]/i.test(key)) {
-        return isShiftOn ? key.toUpperCase() : key.toLowerCase();
-      }
-      return key;
-    }
-
-    function updateKeyboardState() {
-      const keys = document.querySelectorAll(".key");
-      keys.forEach(btn => {
-        const key = btn.dataset.key;
-        if (key === "shift") {
-          btn.classList.toggle("active", isShiftOn);
-        } else if (key === "space") {
-          btn.textContent = "Space";
-        } else if (key === "back") {
-          btn.textContent = "Back";
-        } else {
-          btn.textContent = getDisplayKey(key);
-        }
-        btn.disabled = locked;
-      });
-    }
-
-    function toggleShift() {
-      if (locked) return;
-      isShiftOn = !isShiftOn;
-      updateKeyboardState();
-      typingInput.focus();
-    }
-
-    function insertFromKeyboard(char) {
-      if (locked) return;
-      typingInput.value += char;
-      typingInput.focus();
+      setTimeout(() => typingInput.focus(), 50);
     }
 
     function backspaceInput() {
@@ -550,12 +382,10 @@
 
       if (userAnswer === correctAnswer) {
         locked = true;
-        solvedCount++;
         typingInput.disabled = true;
         message.className = "message success";
         message.textContent = "정답입니다.";
         nextBtn.style.display = "inline-block";
-        updateKeyboardState();
       } else {
         locked = true;
         totalWrong++;
@@ -580,7 +410,6 @@
           `오답입니다.\n\n정답: ${current.en}\n\n입력한 답: ${typingInput.value || "(빈칸)"}\n\n이 문장은 반복학습을 위해 뒤에 3번 더 나옵니다.`;
 
         nextBtn.style.display = "inline-block";
-        updateKeyboardState();
       }
     }
 
@@ -596,7 +425,7 @@
       if (totalWrong === 0) {
         finalTitle.textContent = "합격입니다";
         finalSummary.textContent = `총 ${originalData.length}문제를 모두 맞혔습니다.`;
-        finalExtra.textContent = "철자까지 정확하게 완주했습니다.";
+        finalExtra.textContent = "오답 없이 완주했습니다.";
       } else {
         finalTitle.textContent = "학습 완료";
         finalSummary.textContent = `전체 학습이 끝났습니다. 오답 수는 ${totalWrong}개입니다.`;
